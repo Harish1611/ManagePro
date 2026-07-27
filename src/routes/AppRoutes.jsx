@@ -6,11 +6,16 @@ import NotFound from "@/pages/NotFound";
 
 import AppLayout from "@/layouts/AppLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import Register from "@/pages/auth/Register";
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      <Route
+    path="/register"
+    element={<Register />}
+/>
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>

@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import {
 
-    loginSchema
+    registerSchema
 
 } from "@/validation/authValidation";
 
@@ -14,7 +14,7 @@ import AuthInput from "@/components/auth/AuthInput";
 
 import PasswordInput from "@/components/auth/PasswordInput";
 
-export default function Login() {
+export default function Register() {
 
     const {
 
@@ -26,7 +26,7 @@ export default function Login() {
 
     } = useForm({
 
-        resolver: yupResolver(loginSchema)
+        resolver: yupResolver(registerSchema)
 
     });
 
@@ -40,15 +40,15 @@ export default function Login() {
 
         <AuthLayout
 
-            title="Welcome Back"
+            title="Create Account"
 
-            subtitle="Login to continue"
+            subtitle="Register to get started"
 
-            footerText="Don't have an account?"
+            footerText="Already have an account?"
 
-            footerLink="/register"
+            footerLink="/"
 
-            footerLabel="Register"
+            footerLabel="Login"
 
         >
 
@@ -58,15 +58,33 @@ export default function Login() {
 
                 <AuthInput
 
+                    label="Name"
+
+                    error={errors.name}
+
+                    {...register("name")}
+
+                />
+
+                <AuthInput
+
                     label="Email"
 
                     type="email"
 
-                    placeholder="Enter email"
-
                     error={errors.email}
 
                     {...register("email")}
+
+                />
+
+                <AuthInput
+
+                    label="Phone"
+
+                    error={errors.phone}
+
+                    {...register("phone")}
 
                 />
 
@@ -82,13 +100,25 @@ export default function Login() {
 
                 />
 
+                <PasswordInput
+
+                    register={register}
+
+                    name="confirmPassword"
+
+                    label="Confirm Password"
+
+                    error={errors.confirmPassword}
+
+                />
+
                 <button
 
                     className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white"
 
                 >
 
-                    Login
+                    Register
 
                 </button>
 
