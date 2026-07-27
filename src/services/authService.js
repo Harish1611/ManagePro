@@ -1,10 +1,41 @@
 import api from "./api";
 
-export const register = (data) =>
-    api.post("/auth/register", data);
+const register = async (userData) => {
+    const response = await api.post(
+        "/auth/register",
+        userData
+    );
 
-export const login = (data) =>
-    api.post("/auth/login", data);
+    return response.data;
+};
 
-export const getProfile = () =>
-    api.get("/auth/me");
+const login = async (userData) => {
+    const response = await api.post(
+        "/auth/login",
+        userData
+    );
+
+    return response.data;
+};
+
+const getProfile = async () => {
+    const response = await api.get("/auth/me");
+
+    return response.data;
+};
+
+const logout = () => {
+    localStorage.removeItem("user");
+};
+
+export default {
+
+    register,
+
+    login,
+
+    logout,
+
+    getProfile
+
+};

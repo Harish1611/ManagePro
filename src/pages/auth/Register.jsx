@@ -14,7 +14,24 @@ import AuthInput from "@/components/auth/AuthInput";
 
 import PasswordInput from "@/components/auth/PasswordInput";
 
+import toast from "react-hot-toast";
+
+import { useDispatch, useSelector } from "react-redux";
+
+import { register as registerUser } from "@/redux/slices/authSlice";
+
+import { useNavigate } from "react-router-dom";
+
 export default function Register() {
+
+    const dispatch = useDispatch();
+
+const navigate = useNavigate();
+
+const { loading } = useSelector(
+    state => state.auth
+);
+
 
     const {
 
@@ -30,11 +47,18 @@ export default function Register() {
 
     });
 
-    const onSubmit = (data) => {
+const onSubmit = async (data) => {
+    delete data.confirmPassword;
 
-        console.log(data);
+    const result = await dispatch(registerUser(data));
 
-    };
+    if (registerUser.fulfilled.match(result)) {
+        toast.success("Registration Successful");
+        navigate("/"); // Login page
+    } else {
+        toast.error(result.payload);
+    }
+};
 
     return (
 
@@ -112,15 +136,15 @@ export default function Register() {
 
                 />
 
-                <button
+               
 
-                    className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white"
-
-                >
-
-                    Register
-
-                </button>
+<button
+    type="submit"
+    disabled={loading}
+    className="w-full rounded-lg bg-blue-600 py-3 text-white disabled:cursor-not-allowed disabled:opacity-60"
+>
+    {loading ? "Registering..." : "Register"}
+</button>
 
             </form>
 
