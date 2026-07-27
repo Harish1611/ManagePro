@@ -4,6 +4,11 @@ import {
 } from "@reduxjs/toolkit";
 
 import authService from "@/services/authService";
+import {
+
+    resetProjects,
+
+} from "./projectSlice";
 
 const user = JSON.parse(
     localStorage.getItem("user")
@@ -115,6 +120,20 @@ export const fetchProfile = createAsyncThunk(
     }
 
 );
+
+export const logoutUser =
+    createAsyncThunk(
+        "auth/logout",
+        async (_, thunkAPI) => {
+
+            authService.logout();
+
+            thunkAPI.dispatch(
+                resetProjects()
+            );
+
+        }
+    );
 
 const authSlice = createSlice({
 

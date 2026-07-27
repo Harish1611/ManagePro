@@ -1,27 +1,45 @@
+import PageHeader from "@/components/ui/PageHeader";
+
+import StatsGrid from "@/components/dashboard/StatsGrid";
+
+import RecentProjects from "@/components/dashboard/RecentProjects";
+
+import RecentTasks from "@/components/dashboard/RecentTasks";
+
+import QuickActions from "@/components/dashboard/QuickActions";
+
 export default function Dashboard() {
-  return (
-    <div>
-      <h2 className="mb-4 text-3xl font-bold">
-        Dashboard
-      </h2>
 
-      <div className="grid gap-5 md:grid-cols-4">
-        <div className="rounded-xl bg-white p-6 shadow">
-          Total Projects
-        </div>
+    return (
 
-        <div className="rounded-xl bg-white p-6 shadow">
-          Total Tasks
-        </div>
+        <>
 
-        <div className="rounded-xl bg-white p-6 shadow">
-          Pending
-        </div>
+            <PageHeader
 
-        <div className="rounded-xl bg-white p-6 shadow">
-          Completed
-        </div>
-      </div>
-    </div>
-  );
+                title="Dashboard"
+
+                subtitle="Welcome back! Here's an overview of your workspace."
+
+            />
+
+            <StatsGrid />
+
+            <div className="grid gap-6 mt-8 lg:grid-cols-2">
+
+                <RecentProjects />
+
+                <RecentTasks />
+
+            </div>
+
+            <div className="mt-8">
+
+                <QuickActions />
+
+            </div>
+
+        </>
+
+    );
+
 }

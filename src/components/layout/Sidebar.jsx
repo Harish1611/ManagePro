@@ -1,67 +1,105 @@
-import { NavLink } from "react-router-dom";
-
 import {
-  FaHome,
-  FaProjectDiagram,
-  FaTasks,
-  FaUsers,
-  FaUser,
+
+    FaBars,
+
+    FaChevronLeft
+
 } from "react-icons/fa";
 
-const menus = [
-  {
-    name: "Dashboard",
-    icon: <FaHome />,
-    path: "/dashboard",
-  },
-  {
-    name: "Projects",
-    icon: <FaProjectDiagram />,
-    path: "/projects",
-  },
-  {
-    name: "Tasks",
-    icon: <FaTasks />,
-    path: "/tasks",
-  },
-  {
-    name: "Teams",
-    icon: <FaUsers />,
-    path: "/teams",
-  },
-  {
-    name: "Profile",
-    icon: <FaUser />,
-    path: "/profile",
-  },
-];
+import { navigation } from "@/constants/navigation";
 
-export default function Sidebar() {
-  return (
-    <aside className="hidden w-64 bg-slate-900 text-white md:block">
-      <div className="p-6 text-2xl font-bold">
-        TeamTask
-      </div>
+import NavItem from "./NavItem";
 
-      <nav className="space-y-2 px-4">
-        {menus.map((menu) => (
-          <NavLink
-            key={menu.path}
-            to={menu.path}
-            className={({ isActive }) =>
-              `flex items-center gap-3 rounded-lg p-3 ${
-                isActive
-                  ? "bg-blue-600"
-                  : "hover:bg-slate-700"
-              }`
-            }
-          >
-            {menu.icon}
+export default function Sidebar({
 
-            {menu.name}
-          </NavLink>
-        ))}
-      </nav>
-    </aside>
-  );
+    collapsed,
+
+    setCollapsed
+
+}) {
+
+    return (
+
+        <aside
+
+            className={`
+
+            hidden
+
+            md:flex
+
+            flex-col
+
+            border-r
+
+            dark:border-slate-700
+
+            bg-white
+
+            dark:bg-slate-900
+
+            transition-all
+
+            duration-300
+
+            ${collapsed ? "w-20" : "w-64"}
+
+            `}
+
+        >
+
+            <div
+
+                className="flex h-16 items-center justify-between px-4"
+
+            >
+
+                {!collapsed && (
+
+                    <h2 className="font-bold text-xl">
+
+                        TeamTask
+
+                    </h2>
+
+                )}
+
+                <button
+
+                    onClick={() =>
+                        setCollapsed(!collapsed)
+                    }
+
+                >
+
+                    {collapsed
+                        ? <FaBars />
+                        : <FaChevronLeft />}
+
+                </button>
+
+            </div>
+
+            <nav className="space-y-2 p-3">
+
+                {navigation.map(item => (
+
+                    <NavItem
+
+                        key={item.path}
+
+                        item={item}
+
+                        collapsed={collapsed}
+
+                    />
+
+                ))}
+
+            </nav>
+
+        </aside>
+
+    );
+
 }
