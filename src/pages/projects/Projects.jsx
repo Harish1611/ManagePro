@@ -15,7 +15,7 @@ import ProjectTable from "@/components/projects/ProjectTable";
 
 import ProjectModal from "@/components/projects/ProjectModal";
 import DeleteProjectModal from "@/components/projects/DeleteProjectModal";
-
+import ProjectMembersModal from "@/components/projects/ProjectMembersModal";
 
 export default function Projects() {
 
@@ -55,7 +55,10 @@ fetchProjects,
         deleteModal,
         setDeleteModal
     ] = useState(false);
-
+const [
+    showMembersModal,
+    setShowMembersModal,
+] = useState(false);
 
 
     const {
@@ -116,7 +119,17 @@ fetchProjects,
 
     };
 
+/*
+    MANAGE MEMBERS
+*/
 
+const handleManageMembers = (project) => {
+
+    setSelectedProject(project);
+
+    setShowMembersModal(true);
+
+};
 
     return (
 
@@ -200,33 +213,37 @@ fetchProjects,
 
                     <ProjectGrid
 
-                        projects={projects}
+    projects={projects}
 
-                        onEdit={handleEdit}
+    onEdit={handleEdit}
 
-                        onDelete={handleDelete}
+    onDelete={handleDelete}
 
-                    />
+    onManageMembers={handleManageMembers}
+
+/>
 
 
                     :
 
 
-                    <ProjectTable
+                   <ProjectTable
 
-                        projects={projects}
+    projects={projects}
 
-                        pagination={pagination}
+    pagination={pagination}
 
-                        filters={filters}
+    filters={filters}
 
-                        setFilters={setFilters}
+    setFilters={setFilters}
 
-                        onEdit={handleEdit}
+    onEdit={handleEdit}
 
-                        onDelete={handleDelete}
+    onDelete={handleDelete}
 
-                    />
+    onManageMembers={handleManageMembers}
+
+/>
 
                 )
 
@@ -275,6 +292,24 @@ fetchProjects,
                 }}
 
             />
+
+            {/* PROJECT MEMBERS */}
+
+<ProjectMembersModal
+
+    open={showMembersModal}
+
+    project={selectedProject}
+
+    onClose={() => {
+
+        setShowMembersModal(false);
+
+        setSelectedProject(null);
+
+    }}
+
+/>
 
 
         </div>

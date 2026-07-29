@@ -8,12 +8,13 @@ export default function ProjectGrid({
 
     onDelete,
 
+    onManageMembers,
+
 }) {
 
     if (!projects.length) {
         return null;
     }
-
 
     return (
 
@@ -47,6 +48,8 @@ export default function ProjectGrid({
                             onEdit={onEdit}
 
                             onDelete={onDelete}
+
+                            onManageMembers={onManageMembers}
 
                         />
 

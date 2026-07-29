@@ -1,4 +1,4 @@
-import { FiCalendar } from "react-icons/fi";
+import { FiCalendar, FiUsers } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 import ProjectStatusBadge from "./ProjectStatusBadge";
@@ -13,6 +13,8 @@ export default function ProjectCard({
 
     onDelete,
 
+    onManageMembers,
+
 }) {
 
     const navigate = useNavigate();
@@ -23,21 +25,23 @@ export default function ProjectCard({
 
             onClick={() => navigate(`/projects/${project._id}`)}
 
-           className="
-group
-cursor-pointer
-rounded-xl
-border
-bg-white
-p-5
-transition-all
-duration-300
-hover:-translate-y-1
-hover:shadow-xl
-dark:bg-gray-900
-"
+            className="
+                group
+                cursor-pointer
+                rounded-xl
+                border
+                bg-white
+                p-5
+                transition-all
+                duration-300
+                hover:-translate-y-1
+                hover:shadow-xl
+                dark:bg-gray-900
+            "
 
         >
+
+            {/* Header */}
 
             <div className="mb-5 flex items-start justify-between">
 
@@ -48,40 +52,47 @@ dark:bg-gray-900
                         className="h-4 w-4 rounded-full"
 
                         style={{
-                            backgroundColor: project.color || "#3B82F6",
+                            backgroundColor:
+                                project.color || "#3B82F6",
                         }}
 
                     />
 
                     <div>
 
-                        <h3 className="font-semibold text-lg">
+                        <h3 className="text-lg font-semibold">
 
                             {project.name}
 
                         </h3>
 
                         <ProjectStatusBadge
-
                             status={project.status}
-
                         />
 
                     </div>
 
                 </div>
 
-                <ProjectMenu
+                <div
+                    onClick={(e) => e.stopPropagation()}
+                >
 
-                    project={project}
+                    <ProjectMenu
 
-                    onEdit={onEdit}
+                        project={project}
 
-                    onDelete={onDelete}
+                        onEdit={onEdit}
 
-                />
+                        onDelete={onDelete}
+
+                    />
+
+                </div>
 
             </div>
+
+            {/* Description */}
 
             <p className="line-clamp-3 text-sm text-gray-500 dark:text-gray-400">
 
@@ -91,29 +102,77 @@ dark:bg-gray-900
 
             </p>
 
+            {/* Members */}
+
             <div className="mt-6">
 
                 <ProjectMembers
-
                     members={project.members}
-
                 />
 
             </div>
 
-            <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4 text-xs text-gray-500 dark:border-gray-800">
+            {/* Footer */}
 
-                <span className="flex items-center gap-2">
+            <div className="mt-6 border-t border-gray-100 pt-4 dark:border-gray-800">
 
-                    <FiCalendar />
+                <div className="mb-3 flex items-center justify-between text-xs text-gray-500">
 
-                    {new Date(
+                    <span className="flex items-center gap-2">
 
-                        project.createdAt
+                        <FiCalendar />
 
-                    ).toLocaleDateString()}
+                        {new Date(
+                            project.createdAt
+                        ).toLocaleDateString()}
 
-                </span>
+                    </span>
+
+                    <span>
+
+                        {project.members?.length || 0} Members
+
+                    </span>
+
+                </div>
+
+                <button
+
+                    type="button"
+
+                    onClick={(e) => {
+
+                        e.stopPropagation();
+
+                        onManageMembers?.(project);
+
+                    }}
+
+                    className="
+                        flex
+                        w-full
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-lg
+                        border
+                        px-4
+                        py-2
+                        text-sm
+                        font-medium
+                        transition
+                        hover:bg-gray-100
+                        dark:border-gray-700
+                        dark:hover:bg-gray-800
+                    "
+
+                >
+
+                    <FiUsers />
+
+                    Manage Members
+
+                </button>
 
             </div>
 

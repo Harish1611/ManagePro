@@ -1,14 +1,29 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import {
+
     fetchProjects,
+
     fetchProject,
+
+    fetchProjectMembers,
+
+    addProjectMembers,
+
+    removeProjectMember,
+
     createProject,
+
     updateProject,
+
     deleteProject,
+
     clearProject,
+
     clearProjectError,
+
     resetProjects,
+
 } from "@/redux/slices/projectSlice";
 
 const useProjects = () => {
@@ -20,6 +35,8 @@ const useProjects = () => {
         projects,
 
         project,
+
+        projectMembers,
 
         pagination,
 
@@ -33,9 +50,17 @@ const useProjects = () => {
 
     return {
 
+        /*
+        |--------------------------------------------------------------------------
+        | State
+        |--------------------------------------------------------------------------
+        */
+
         projects,
 
         project,
+
+        projectMembers,
 
         pagination,
 
@@ -43,16 +68,25 @@ const useProjects = () => {
 
         error,
 
-        fetchProjects: (params) =>
+        /*
+        |--------------------------------------------------------------------------
+        | Projects
+        |--------------------------------------------------------------------------
+        */
+
+        fetchProjects: (params = {}) =>
             dispatch(fetchProjects(params)),
 
-        fetchProject: (id) =>
-            dispatch(fetchProject(id)),
+        fetchProject: (projectId) =>
+            dispatch(fetchProject(projectId)),
 
-        createProject: (data) =>
-            dispatch(createProject(data)),
+        createProject: (projectData) =>
+            dispatch(createProject(projectData)),
 
-        updateProject: (projectId, projectData) =>
+        updateProject: (
+            projectId,
+            projectData
+        ) =>
             dispatch(
                 updateProject({
                     projectId,
@@ -60,8 +94,47 @@ const useProjects = () => {
                 })
             ),
 
-        deleteProject: (id) =>
-            dispatch(deleteProject(id)),
+        deleteProject: (projectId) =>
+            dispatch(deleteProject(projectId)),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Project Members
+        |--------------------------------------------------------------------------
+        */
+
+        fetchProjectMembers: (projectId) =>
+            dispatch(
+                fetchProjectMembers(projectId)
+            ),
+
+        addProjectMembers: (
+            projectId,
+            members
+        ) =>
+            dispatch(
+                addProjectMembers({
+                    projectId,
+                    members,
+                })
+            ),
+
+        removeProjectMember: (
+            projectId,
+            userId
+        ) =>
+            dispatch(
+                removeProjectMember({
+                    projectId,
+                    userId,
+                })
+            ),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Helpers
+        |--------------------------------------------------------------------------
+        */
 
         clearProject: () =>
             dispatch(clearProject()),

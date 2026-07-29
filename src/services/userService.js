@@ -1,9 +1,8 @@
 import api from "./api";
 
-
 /*
 |--------------------------------------------------------------------------
-| Get All Team Members
+| Get All Users
 |--------------------------------------------------------------------------
 */
 
@@ -23,10 +22,9 @@ const getUsers = async (params = {}) => {
 
     );
 
-
     const response = await api.get(
 
-        "/team",
+        "/users",
 
         {
 
@@ -36,41 +34,35 @@ const getUsers = async (params = {}) => {
 
     );
 
-
     return response.data;
 
 };
 
-
 /*
 |--------------------------------------------------------------------------
-| Get Single Member
+| Get Single User
 |--------------------------------------------------------------------------
 */
 
 const getUser = async (userId) => {
 
-
     const response = await api.get(
 
-        `/team/${userId}`
+        `/users/${userId}`
 
     );
-
 
     return response.data;
 
 };
 
-
 /*
 |--------------------------------------------------------------------------
-| Get Member Projects
+| Get Member Projects (Team Module)
 |--------------------------------------------------------------------------
 */
 
 const getMemberProjects = async (userId) => {
-
 
     const response = await api.get(
 
@@ -78,15 +70,13 @@ const getMemberProjects = async (userId) => {
 
     );
 
-
     return response.data;
 
 };
 
-
 /*
 |--------------------------------------------------------------------------
-| Get Member Tasks
+| Get Member Tasks (Team Module)
 |--------------------------------------------------------------------------
 */
 
@@ -97,7 +87,6 @@ const getMemberTasks = async (
     params = {}
 
 ) => {
-
 
     const filteredParams = Object.fromEntries(
 
@@ -113,7 +102,6 @@ const getMemberTasks = async (
 
     );
 
-
     const response = await api.get(
 
         `/team/${userId}/tasks`,
@@ -126,20 +114,17 @@ const getMemberTasks = async (
 
     );
 
-
     return response.data;
 
 };
 
-
 /*
 |--------------------------------------------------------------------------
-| Get Member Workload
+| Get Member Workload (Team Module)
 |--------------------------------------------------------------------------
 */
 
 const getMemberWorkload = async (userId) => {
-
 
     const response = await api.get(
 
@@ -147,15 +132,11 @@ const getMemberWorkload = async (userId) => {
 
     );
 
-
     return response.data;
 
 };
 
-
-
 export default {
-
 
     getUsers,
 
@@ -166,6 +147,5 @@ export default {
     getMemberTasks,
 
     getMemberWorkload,
-
 
 };

@@ -12,18 +12,29 @@ import projectService from "@/services/projectService";
 */
 
 const initialState = {
+
     projects: [],
+
     project: null,
 
+    projectMembers: [],
+
     pagination: {
+
         page: 1,
+
         limit: 10,
+
         total: 0,
+
         totalPages: 0,
+
     },
 
     loading: false,
+
     error: null,
+
 };
 
 /*
@@ -80,6 +91,155 @@ export const fetchProject = createAsyncThunk(
         }
 
     }
+);
+
+/*
+|--------------------------------------------------------------------------
+| Fetch Project Members
+|--------------------------------------------------------------------------
+*/
+
+export const fetchProjectMembers = createAsyncThunk(
+
+    "projects/fetchProjectMembers",
+
+    async (projectId, thunkAPI) => {
+
+        try {
+
+            const response =
+                await projectService.getProjectMembers(
+                    projectId
+                );
+
+            return response.data;
+
+        }
+
+        catch (error) {
+
+            return thunkAPI.rejectWithValue(
+
+                error.response?.data?.message ||
+
+                "Failed to fetch members"
+
+            );
+
+        }
+
+    }
+
+);
+
+/*
+|--------------------------------------------------------------------------
+| Add Project Members
+|--------------------------------------------------------------------------
+*/
+
+export const addProjectMembers = createAsyncThunk(
+
+    "projects/addProjectMembers",
+
+    async (
+
+        {
+
+            projectId,
+
+            members,
+
+        },
+
+        thunkAPI
+
+    ) => {
+
+        try {
+
+            const response =
+                await projectService.addProjectMembers(
+
+                    projectId,
+
+                    members
+
+                );
+
+            return response.data;
+
+        }
+
+        catch (error) {
+
+            return thunkAPI.rejectWithValue(
+
+                error.response?.data?.message ||
+
+                "Failed to add members"
+
+            );
+
+        }
+
+    }
+
+);
+
+/*
+|--------------------------------------------------------------------------
+| Remove Project Member
+|--------------------------------------------------------------------------
+*/
+
+export const removeProjectMember = createAsyncThunk(
+
+    "projects/removeProjectMember",
+
+    async (
+
+        {
+
+            projectId,
+
+            userId,
+
+        },
+
+        thunkAPI
+
+    ) => {
+
+        try {
+
+            const response =
+                await projectService.removeProjectMember(
+
+                    projectId,
+
+                    userId
+
+                );
+
+            return response.data;
+
+        }
+
+        catch (error) {
+
+            return thunkAPI.rejectWithValue(
+
+                error.response?.data?.message ||
+
+                "Failed to remove member"
+
+            );
+
+        }
+
+    }
+
 );
 
 
@@ -231,9 +391,13 @@ const projectSlice = createSlice({
         |--------------------------------------------------------------------------
         */
 
-        clearProject(state) {
-            state.project = null;
-        },
+       clearProject(state) {
+
+    state.project = null;
+
+    state.projectMembers = [];
+
+},
 
         /*
         |--------------------------------------------------------------------------
@@ -293,6 +457,100 @@ const projectSlice = createSlice({
 
         }
     );
+
+    /*
+|--------------------------------------------------------------------------
+| Fetch Project Members
+|--------------------------------------------------------------------------
+*/
+
+builder.addCase(
+
+    fetchProjectMembers.fulfilled,
+
+    (state, action) => {
+
+        state.projectMembers = action.payload;
+
+    }
+
+);
+
+/*
+|--------------------------------------------------------------------------
+| Add Project Members
+|--------------------------------------------------------------------------
+*/
+
+builder.addCase(
+
+    addProjectMembers.fulfilled,
+
+    (state, action) => {
+
+        // Updated members returned from API
+        state.projectMembers = action.payload;
+
+        const { projectId } = action.meta.arg;
+
+        // Update selected project
+        if (
+            state.project &&
+            state.project._id === projectId
+        ) {
+            state.project.members = action.payload;
+        }
+
+        // Update project inside project list
+        const project = state.projects.find(
+            (p) => p._id === projectId
+        );
+
+        if (project) {
+            project.members = action.payload;
+        }
+
+    }
+
+);
+
+/*
+|--------------------------------------------------------------------------
+| Remove Project Member
+|--------------------------------------------------------------------------
+*/
+
+builder.addCase(
+
+    removeProjectMember.fulfilled,
+
+    (state, action) => {
+
+        // Updated members returned from API
+        state.projectMembers = action.payload;
+
+        const { projectId } = action.meta.arg;
+
+        // Update selected project
+        if (
+            state.project &&
+            state.project._id === projectId
+        ) {
+            state.project.members = action.payload;
+        }
+
+        // Update project inside project list
+        const project = state.projects.find(
+            (p) => p._id === projectId
+        );
+
+        if (project) {
+            project.members = action.payload;
+        }
+
+    }
+
+);
 
     /*
     |--------------------------------------------------------------------------
@@ -437,6 +695,9 @@ export const selectProjects = (state) =>
 
 export const selectProject = (state) =>
     state.projects.project;
+
+export const selectProjectMembers = (state) =>
+    state.projects.projectMembers;
 
 export const selectProjectLoading = (state) =>
     state.projects.loading;

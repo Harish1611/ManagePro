@@ -1,22 +1,34 @@
+import { FiUsers } from "react-icons/fi";
+
 import ProjectStatusBadge from "./ProjectStatusBadge";
 import ProjectMenu from "./ProjectMenu";
 import ProjectPagination from "./ProjectPagination";
 
 export default function ProjectTable({
+
     projects,
+
     pagination,
+
     filters,
+
     setFilters,
+
     onEdit,
+
     onDelete,
+
+    onManageMembers,
+
 }) {
 
     return (
-       <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow dark:border-gray-800 dark:bg-gray-900">
 
-    <div className="w-full overflow-x-auto">
+        <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow dark:border-gray-800 dark:bg-gray-900">
 
-        <table className="min-w-[800px] w-full">
+            <div className="w-full overflow-x-auto">
+
+                <table className="min-w-[900px] w-full">
 
                     <thead className="bg-gray-100 dark:bg-gray-800">
 
@@ -48,85 +60,136 @@ export default function ProjectTable({
 
                     <tbody>
 
-                        {projects.map((project) => (
+                        {
 
-                            <tr
-                                key={project._id}
-                                className="border-t border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800"
-                            >
+                            projects.map((project) => (
 
-                                <td className="px-6 py-4">
+                                <tr
 
-                                    <div className="flex items-center gap-3">
+                                    key={project._id}
 
-                                        <div
-                                            className="h-4 w-4 rounded-full"
-                                            style={{
-                                                backgroundColor:
-                                                    project.color ||
-                                                    "#3B82F6",
-                                            }}
-                                        />
+                                    className="border-t border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800"
 
-                                        <div>
+                                >
 
-                                            <p className="font-medium">
+                                    <td className="px-6 py-4">
 
-                                                {project.name}
+                                        <div className="flex items-center gap-3">
 
-                                            </p>
+                                            <div
 
-                                            <p className="text-sm text-gray-500">
+                                                className="h-4 w-4 rounded-full"
 
-                                                {project.description?.slice(0, 40)}
+                                                style={{
+                                                    backgroundColor:
+                                                        project.color ||
+                                                        "#3B82F6",
+                                                }}
 
-                                            </p>
+                                            />
+
+                                            <div>
+
+                                                <p className="font-medium">
+
+                                                    {project.name}
+
+                                                </p>
+
+                                                <p className="text-sm text-gray-500">
+
+                                                    {project.description?.slice(0, 40)}
+
+                                                </p>
+
+                                            </div>
 
                                         </div>
 
-                                    </div>
+                                    </td>
 
-                                </td>
+                                    <td className="px-6 py-4">
 
-                                <td className="px-6 py-4">
+                                        <ProjectStatusBadge
+                                            status={project.status}
+                                        />
 
-                                    <ProjectStatusBadge
-                                        status={project.status}
-                                    />
+                                    </td>
 
-                                </td>
+                                    <td className="px-6 py-4">
 
-                                <td className="px-6 py-4">
+                                        {project.members?.length || 0}
 
-                                    {project.members.length}
+                                    </td>
 
-                                </td>
+                                    <td className="px-6 py-4">
 
-                                <td className="px-6 py-4">
+                                        {
 
-                                    {new Date(
-                                        project.createdAt
-                                    ).toLocaleDateString()}
+                                            new Date(
 
-                                </td>
+                                                project.createdAt
 
-                                <td className="px-6 py-4 text-right">
+                                            ).toLocaleDateString()
 
-                                   <ProjectMenu
+                                        }
 
-project={project}
+                                    </td>
 
-onEdit={onEdit}
+                                    <td className="px-6 py-4">
 
-onDelete={onDelete}
+                                        <div className="flex justify-end items-center gap-2">
 
-/>
+                                            <button
 
-                                </td>
+                                                type="button"
 
-                            </tr>
+                                                onClick={() =>
+                                                    onManageMembers?.(project)
+                                                }
 
-                        ))}
+                                                className="
+                                                    inline-flex
+                                                    items-center
+                                                    gap-2
+                                                    rounded-lg
+                                                    border
+                                                    px-3
+                                                    py-2
+                                                    text-sm
+                                                    transition
+                                                    hover:bg-gray-100
+                                                    dark:border-gray-700
+                                                    dark:hover:bg-gray-800
+                                                "
+
+                                            >
+
+                                                <FiUsers />
+
+                                                Members
+
+                                            </button>
+
+                                            <ProjectMenu
+
+                                                project={project}
+
+                                                onEdit={onEdit}
+
+                                                onDelete={onDelete}
+
+                                            />
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            ))
+
+                        }
 
                     </tbody>
 
@@ -135,12 +198,17 @@ onDelete={onDelete}
             </div>
 
             <ProjectPagination
+
                 pagination={pagination}
+
                 filters={filters}
+
                 setFilters={setFilters}
+
             />
 
         </div>
+
     );
 
 }

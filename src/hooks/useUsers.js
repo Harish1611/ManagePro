@@ -139,7 +139,7 @@ export default function useUsers() {
     | Return
     |--------------------------------------------------------------------------
     */
-
+console.log("x Redux users:", users);
 
     return {
 
@@ -198,3 +198,4 @@ export default function useUsers() {
 
 
 }
+

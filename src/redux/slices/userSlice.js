@@ -70,45 +70,20 @@ const initialState = {
 */
 
 export const fetchUsers = createAsyncThunk(
-
     "users/fetchUsers",
-
     async (params = {}, thunkAPI) => {
-
-
         try {
+            const response = await userService.getUsers(params);
 
-
-            const response =
-
-                await userService.getUsers(params);
-
-
-
-            return response.data;
-
-
-        }
-
-        catch(error){
-
-
+            return response;   // <-- NOT response.data
+        } catch (error) {
             return thunkAPI.rejectWithValue(
-
                 error.response?.data?.message ||
-
-                "Failed to fetch members"
-
+                "Failed to fetch users"
             );
-
-
         }
-
-
     }
-
 );
-
 
 
 /*
@@ -392,39 +367,25 @@ const userSlice = createSlice({
         |--------------------------------------------------------------------------
         */
 
-        builder.addCase(
+  builder.addCase(
+    fetchUsers.fulfilled,
+    (state, action) => {
 
-            fetchUsers.fulfilled,
+        console.log("fetchUsers reducer fired");
+        console.log(action.payload.data);
 
-            (state, action) => {
+        state.users = action.payload.data;
 
+        console.log("After assignment:", state.users);
 
-                state.users =
-
-                    action.payload.users || [];
-
-
-
-                state.pagination =
-
-                    action.payload.pagination || {
-
-                        page: 1,
-
-                        limit: 10,
-
-                        total: 0,
-
-                        totalPages: 0,
-
-                    };
-
-
-            }
-
-        );
-
-
+        state.pagination = {
+            page: 1,
+            limit: state.users.length,
+            total: state.users.length,
+            totalPages: 1,
+        };
+    }
+);
 
         /*
         |--------------------------------------------------------------------------
