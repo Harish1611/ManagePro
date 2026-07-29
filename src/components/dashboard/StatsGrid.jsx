@@ -1,70 +1,152 @@
-import {
+import { useEffect } from "react";
 
-    FaTasks,
+import {
 
     FaProjectDiagram,
 
-    FaUsers,
+    FaTasks,
 
-    FaCheckCircle
+    FaCheckCircle,
+
+    FaExclamationTriangle,
+
+    FaClipboardList,
+
+    FaFolderOpen,
 
 } from "react-icons/fa";
 
 import DashboardCard from "./DashboardCard";
 
+import useDashboard from "@/hooks/useDashboard";
+
 export default function StatsGrid() {
+
+    const {
+
+        summary,
+
+        loading,
+
+        fetchDashboard,
+
+    } = useDashboard();
+
+    useEffect(() => {
+
+        fetchDashboard();
+
+    }, []);
+
+    const stats = [
+
+        {
+
+            title: "Total Projects",
+
+            value: summary.totalProjects,
+
+            color: "bg-blue-600",
+
+            icon: <FaFolderOpen />,
+
+        },
+
+        {
+
+            title: "Active Projects",
+
+            value: summary.activeProjects,
+
+            color: "bg-cyan-600",
+
+            icon: <FaProjectDiagram />,
+
+        },
+
+        {
+
+            title: "Total Tasks",
+
+            value: summary.totalTasks,
+
+            color: "bg-green-600",
+
+            icon: <FaTasks />,
+
+        },
+
+        {
+
+            title: "Completed Tasks",
+
+            value: summary.completedTasks,
+
+            color: "bg-emerald-600",
+
+            icon: <FaCheckCircle />,
+
+        },
+
+        {
+
+            title: "Overdue Tasks",
+
+            value: summary.overdueTasks,
+
+            color: "bg-red-600",
+
+            icon: <FaExclamationTriangle />,
+
+        },
+
+        {
+
+            title: "My Tasks",
+
+            value: summary.myTasks,
+
+            color: "bg-purple-600",
+
+            icon: <FaClipboardList />,
+
+        },
+
+    ];
 
     return (
 
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
 
-            <DashboardCard
+            {
 
-                title="Projects"
+                stats.map((item) => (
 
-                value="12"
+                    <DashboardCard
 
-                color="bg-blue-600"
+                        key={item.title}
 
-                icon={<FaProjectDiagram />}
+                        title={item.title}
 
-            />
+                        value={
 
-            <DashboardCard
+                            loading
 
-                title="Tasks"
+                                ? "..."
 
-                value="245"
+                                : item.value
 
-                color="bg-green-600"
+                        }
 
-                icon={<FaTasks />}
+                        color={item.color}
 
-            />
+                        icon={item.icon}
 
-            <DashboardCard
+                    />
 
-                title="Members"
+                ))
 
-                value="18"
-
-                color="bg-purple-600"
-
-                icon={<FaUsers />}
-
-            />
-
-            <DashboardCard
-
-                title="Completed"
-
-                value="162"
-
-                color="bg-orange-500"
-
-                icon={<FaCheckCircle />}
-
-            />
+            }
 
         </div>
 

@@ -8,6 +8,7 @@ export default function Modal({
     open,
 
     onClose,
+    loading,
 
     title,
 
@@ -17,6 +18,12 @@ export default function Modal({
 
 
     if (!open) return null;
+
+    if(loading){
+
+    return;
+
+}
 
 
     return (
@@ -64,6 +71,8 @@ export default function Modal({
 
                     <button
                         onClick={onClose}
+                        disabled={loading}
+
                         className="
                         rounded-lg
                         p-2

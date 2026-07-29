@@ -10,6 +10,10 @@ import {
 
 } from "./projectSlice";
 
+import {
+    resetDashboard,
+} from "./dashboardSlice";
+
 const user = JSON.parse(
     localStorage.getItem("user")
 );
@@ -121,19 +125,25 @@ export const fetchProfile = createAsyncThunk(
 
 );
 
-export const logoutUser =
-    createAsyncThunk(
-        "auth/logout",
-        async (_, thunkAPI) => {
+export const logoutUser = createAsyncThunk(
 
-            authService.logout();
+    "auth/logout",
 
-            thunkAPI.dispatch(
-                resetProjects()
-            );
+    async (_, thunkAPI) => {
 
-        }
-    );
+        authService.logout();
+
+        thunkAPI.dispatch(
+            resetProjects()
+        );
+
+        thunkAPI.dispatch(
+            resetDashboard()
+        );
+
+    }
+
+);
 
 const authSlice = createSlice({
 

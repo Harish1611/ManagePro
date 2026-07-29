@@ -242,6 +242,8 @@ fetchProjects,
 
                 project={selectedProject}
 
+                loading={loading}
+
                 onClose={() => {
 
                     setShowModal(false);
@@ -261,6 +263,8 @@ fetchProjects,
                 open={deleteModal}
 
                 project={selectedProject}
+
+                loading={loading}
 
                 onClose={() => {
 

@@ -9,6 +9,8 @@ export default function ProjectModal({
 
     onClose,
 
+    loading,
+
     project,
 
 }) {
@@ -21,6 +23,8 @@ export default function ProjectModal({
             open={open}
 
             onClose={onClose}
+
+            loading={loading}
 
             title={
                 project

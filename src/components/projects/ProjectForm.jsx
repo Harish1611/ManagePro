@@ -16,6 +16,7 @@ import {
 import {
     useDispatch
 } from "react-redux";
+import getErrorMessage from "@/utils/getErrorMessage";
 
 
 import {
@@ -127,10 +128,9 @@ else{
         }
         catch(error){
 
-            toast.error(
-                error
-            );
-
+           toast.error(
+    getErrorMessage(error)
+);
         }
 
 
@@ -249,36 +249,46 @@ else{
 
 
 
-            <button
+           <button
 
-                disabled={isSubmitting}
+disabled={isSubmitting}
 
-                className="
-                w-full
-                rounded-lg
-                bg-blue-600
-                py-3
-                text-white
-                hover:bg-blue-700
-                disabled:opacity-50
-                "
+className="
+w-full
+rounded-lg
+bg-blue-600
+py-3
+font-medium
+text-white
+disabled:cursor-not-allowed
+disabled:opacity-50
+"
 
-            >
+>
 
-                {
-                    isSubmitting
-                    ?
-                    "Saving..."
-                    :
-                    project
-                    ?
-                    "Update Project"
-                    :
-                    "Create Project"
-                }
+{
 
+isSubmitting
 
-            </button>
+?
+
+"Saving..."
+
+:
+
+project
+
+?
+
+"Update Project"
+
+:
+
+"Create Project"
+
+}
+
+</button>
 
 
         </form>

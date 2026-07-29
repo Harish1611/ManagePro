@@ -8,37 +8,38 @@ import RecentTasks from "@/components/dashboard/RecentTasks";
 
 import QuickActions from "@/components/dashboard/QuickActions";
 
+import TaskStatusChart from "@/components/dashboard/TaskStatusChart";
+
+import TaskPriorityChart from "@/components/dashboard/TaskPriorityChart";
+import ProjectProgressChart from "@/components/dashboard/ProjectProgressChart";
+
 export default function Dashboard() {
 
     return (
 
-        <>
+      <>
+      <PageHeader />
 
-            <PageHeader
+<StatsGrid />
 
-                title="Dashboard"
+<div className="mt-8">
+    <QuickActions />
+</div>
 
-                subtitle="Welcome back! Here's an overview of your workspace."
+<div className="grid gap-6 mt-8 lg:grid-cols-2">
+    <TaskStatusChart />
+    <TaskPriorityChart />
+</div>
 
-            />
+<div className="mt-8">
+    <ProjectProgressChart />
+</div>
 
-            <StatsGrid />
-
-            <div className="grid gap-6 mt-8 lg:grid-cols-2">
-
-                <RecentProjects />
-
-                <RecentTasks />
-
-            </div>
-
-            <div className="mt-8">
-
-                <QuickActions />
-
-            </div>
-
-        </>
+<div className="grid gap-6 mt-8 lg:grid-cols-2">
+    <RecentProjects />
+    <RecentTasks />
+</div>
+</>
 
     );
 

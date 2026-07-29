@@ -12,11 +12,11 @@ export default function ProjectTable({
 }) {
 
     return (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow dark:border-gray-800 dark:bg-gray-900">
+       <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow dark:border-gray-800 dark:bg-gray-900">
 
-            <div className="overflow-x-auto">
+    <div className="w-full overflow-x-auto">
 
-                <table className="min-w-full">
+        <table className="min-w-[800px] w-full">
 
                     <thead className="bg-gray-100 dark:bg-gray-800">
 

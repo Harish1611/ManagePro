@@ -1,5 +1,5 @@
 import Modal from "@/components/common/Modal";
-
+import getErrorMessage from "@/utils/getErrorMessage";
 import {
     useDispatch
 } from "react-redux";
@@ -16,6 +16,7 @@ export default function DeleteProjectModal({
     open,
 
     onClose,
+    loading,
 
     project
 
@@ -53,7 +54,9 @@ export default function DeleteProjectModal({
         }
         catch(error){
 
-            toast.error(error);
+            toast.error(
+    getErrorMessage(error)
+);
 
         }
 
@@ -68,6 +71,8 @@ export default function DeleteProjectModal({
             open={open}
 
             onClose={onClose}
+
+            loading={loading}
 
             title="Delete Project"
 
