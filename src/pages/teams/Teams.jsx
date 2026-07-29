@@ -3,10 +3,10 @@ import {
     useState,
 } from "react";
 
+import { useNavigate } from "react-router-dom";
 
-import useUsers from "@/hooks/useUsers";
 
-
+import useTeam from "@/hooks/useTeam";
 import MemberHeader from "@/components/team/MemberHeader";
 import MemberFilters from "@/components/team/MemberFilters";
 import MemberTable from "@/components/team/MemberTable";
@@ -14,7 +14,7 @@ import MemberGrid from "@/components/team/MemberGrid";
 
 import TeamSkeleton from "@/components/team/TeamSkeleton";
 import EmptyMembers from "@/components/team/EmptyMembers";
-
+import TeamStats from "@/components/team/TeamStats";
 
 
 export default function Team() {
@@ -27,19 +27,15 @@ export default function Team() {
     */
 
 
-    const {
+    const navigate = useNavigate();
 
-        users,
-
-        pagination,
-
-        loading,
-
-        error,
-
-        fetchUsers,
-
-    } = useUsers();
+const {
+    members,
+    pagination,
+    loading,
+    error,
+    fetchMembers,
+} = useTeam();
 
 
 
@@ -86,39 +82,24 @@ export default function Team() {
     |--------------------------------------------------------------------------
     */
 
-
-    useEffect(() => {
-
-
-        fetchUsers(filters);
-
-
-    }, [filters]);
+useEffect(() => {
+    fetchMembers(filters);
+}, [filters]);
 
 
 
     /*
     |--------------------------------------------------------------------------
-    | Invite Member
+    | Manage Member
     |--------------------------------------------------------------------------
     */
 
 
-    const handleInvite = () => {
+    const handleManageMembers = () => {
 
+    navigate("/projects");
 
-        console.log(
-
-            "Invite member"
-
-        );
-
-
-        // Future:
-        // Open Invite Member Modal
-
-
-    };
+};
 
 
 
@@ -164,13 +145,19 @@ export default function Team() {
 
             <MemberHeader
 
-                onInvite={handleInvite}
+    onManageMembers={handleManageMembers}
 
-                view={view}
+    view={view}
 
-                setView={setView}
+    setView={setView}
 
-            />
+/>
+
+            <TeamStats
+    members={members}
+/>
+
+
 
 
 
@@ -242,7 +229,7 @@ export default function Team() {
 
                 !error &&
 
-                users.length === 0 &&
+                members.length === 0 &&
 
                 (
 
@@ -262,7 +249,7 @@ export default function Team() {
 
                 !error &&
 
-                users.length > 0 &&
+                members.length > 0 &&
 
                 (
 
@@ -272,7 +259,7 @@ export default function Team() {
 
                     <MemberTable
 
-                        members={users}
+                        members={members}
 
                         pagination={pagination}
 
@@ -284,7 +271,7 @@ export default function Team() {
 
                     <MemberGrid
 
-                        members={users}
+                        members={members}
 
                     />
 

@@ -12,6 +12,10 @@ import dashboardReducer from "./slices/dashboardSlice";
 
 import userReducer from "./slices/userSlice";
 
+import teamReducer from "@/redux/slices/teamSlice";
+
+import profileReducer from "@/redux/slices/profileSlice";
+
 
 export const store = configureStore({
 
@@ -28,6 +32,10 @@ export const store = configureStore({
         dashboard: dashboardReducer,
 
         users: userReducer,
+
+        team: teamReducer,
+
+        profile: profileReducer,
 
     },
 

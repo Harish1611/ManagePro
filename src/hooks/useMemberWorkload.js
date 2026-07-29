@@ -88,7 +88,7 @@ export default function useMemberWorkload() {
     | Return
     |--------------------------------------------------------------------------
     */
-
+console.log("Redux workload:", workload);
 
     return {
 

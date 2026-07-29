@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 
 
-import useUsers from "@/hooks/useUsers";
+import useTeam from "@/hooks/useTeam";
 import useMemberProjects from "@/hooks/useMemberProjects";
 import useMemberTasks from "@/hooks/useMemberTasks";
 import useMemberWorkload from "@/hooks/useMemberWorkload";
@@ -45,15 +45,15 @@ export default function MemberProfile() {
     */
 
 
-    const {
+const {
 
-        user,
+    member,
 
-        loading:userLoading,
+    loading: userLoading,
 
-        fetchUser,
+    fetchMember,
 
-    } = useUsers();
+} = useTeam();
 
 
 
@@ -127,7 +127,7 @@ export default function MemberProfile() {
         if(!id) return;
 
 
-        fetchUser(id);
+        fetchMember(id);
 
 
         fetchMemberProjects(id);
@@ -194,7 +194,7 @@ export default function MemberProfile() {
     */
 
 
-    if(!user){
+    if(!member){
 
 
         return (
@@ -259,7 +259,7 @@ export default function MemberProfile() {
 
             <MemberProfileCard
 
-                user={user}
+                user={member}
 
             />
 
@@ -315,7 +315,7 @@ export default function MemberProfile() {
 
             <MemberActivity
 
-                user={user}
+                user={member}
 
             />
 

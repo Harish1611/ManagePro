@@ -4,51 +4,39 @@ export default function WorkloadChart({
 
 }) {
 
-
     const data = [
 
         {
-
             label: "Todo",
-
-            value: workload.todo || 0,
-
+            value: workload.todoTasks || 0,
+            color: "bg-gray-500",
         },
 
         {
-
             label: "In Progress",
-
-            value: workload.inProgress || 0,
-
+            value: workload.inProgressTasks || 0,
+            color: "bg-blue-600",
         },
 
         {
-
             label: "Review",
-
-            value: workload.review || 0,
-
+            value: workload.reviewTasks || 0,
+            color: "bg-purple-600",
         },
 
         {
-
             label: "Completed",
-
-            value: workload.completed || 0,
-
+            value: workload.completedTasks || 0,
+            color: "bg-green-600",
         },
 
     ];
 
-
     const total = workload.totalTasks || 1;
-
 
     return (
 
         <div
-
             className="
                 rounded-xl
                 border
@@ -58,15 +46,23 @@ export default function WorkloadChart({
                 dark:border-gray-700
                 dark:bg-gray-900
             "
-
         >
 
-            <h3 className="mb-5 text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="mb-6">
 
-                Task Status Distribution
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
 
-            </h3>
+                    Task Distribution
 
+                </h3>
+
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+
+                    Status-wise workload
+
+                </p>
+
+            </div>
 
             <div className="space-y-5">
 
@@ -76,62 +72,32 @@ export default function WorkloadChart({
 
                         <div key={item.label}>
 
+                            <div className="mb-2 flex justify-between">
 
-                            <div className="mb-2 flex justify-between text-sm">
-
-                                <span className="text-gray-600 dark:text-gray-300">
+                                <span className="text-sm text-gray-600 dark:text-gray-300">
 
                                     {item.label}
 
                                 </span>
 
-
-                                <span className="font-medium text-gray-900 dark:text-white">
+                                <span className="text-sm font-semibold text-gray-900 dark:text-white">
 
                                     {item.value}
 
                                 </span>
 
-
                             </div>
 
-
-                            <div
-
-                                className="
-                                    h-3
-                                    overflow-hidden
-                                    rounded-full
-                                    bg-gray-200
-                                    dark:bg-gray-700
-                                "
-
-                            >
+                            <div className="h-3 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
 
                                 <div
-
-                                    className="
-                                        h-full
-                                        rounded-full
-                                        bg-blue-600
-                                    "
-
+                                    className={`h-full rounded-full ${item.color}`}
                                     style={{
-
-                                        width:
-
-                                            `${
-
-                                                (item.value / total) * 100
-
-                                            }%`
-
+                                        width: `${(item.value / total) * 100}%`,
                                     }}
-
                                 />
 
                             </div>
-
 
                         </div>
 
@@ -141,6 +107,25 @@ export default function WorkloadChart({
 
             </div>
 
+            <div className="mt-8 rounded-xl bg-blue-50 p-5 dark:bg-blue-900/20">
+
+                <div className="flex items-center justify-between">
+
+                    <span className="font-medium text-blue-700 dark:text-blue-300">
+
+                        Overall Completion
+
+                    </span>
+
+                    <span className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+
+                        {workload.completionRate || 0}%
+
+                    </span>
+
+                </div>
+
+            </div>
 
         </div>
 

@@ -13,33 +13,23 @@ export default function MemberWorkload({
 
             <div>
 
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
 
                     Workload Overview
 
                 </h2>
 
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
 
-                    Member task distribution and productivity.
+                    Task distribution and productivity summary.
 
                 </p>
 
             </div>
 
+            <WorkloadStats workload={workload} />
 
-            <WorkloadStats
-
-                workload={workload}
-
-            />
-
-
-            <WorkloadChart
-
-                workload={workload}
-
-            />
+            <WorkloadChart workload={workload} />
 
         </div>
 

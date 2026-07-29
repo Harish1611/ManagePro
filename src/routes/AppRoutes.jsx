@@ -15,6 +15,7 @@ import Notifications from "@/pages/notifications/Notifications";
 import Settings from "@/pages/settings/Settings";
 import Profile from "@/pages/profile/Profile";
 import Kanban from "@/pages/Kanban";
+import MemberProfile from "@/pages/teams/MemberProfile";
 
 export default function AppRoutes() {
   return (
@@ -48,6 +49,11 @@ export default function AppRoutes() {
             path="/teams"
             element={<Teams />}
         />
+
+        <Route
+    path="/team/:id"
+    element={<MemberProfile />}
+/>
 
         <Route
             path="/notifications"

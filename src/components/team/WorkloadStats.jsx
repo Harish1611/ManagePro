@@ -1,104 +1,134 @@
+import {
+    FolderKanban,
+    CheckCircle2,
+    Clock3,
+    Eye,
+    AlertTriangle,
+    ListTodo,
+    TrendingUp,
+} from "lucide-react";
+
 export default function WorkloadStats({
 
     workload = {},
 
 }) {
 
-
     const stats = [
 
         {
+            label: "Projects",
+            value: workload.totalProjects || 0,
+            icon: FolderKanban,
+            color: "text-indigo-600",
+        },
 
-            label: "Total Tasks",
-
+        {
+            label: "Tasks",
             value: workload.totalTasks || 0,
-
+            icon: ListTodo,
+            color: "text-blue-600",
         },
 
         {
-
             label: "Completed",
-
-            value: workload.completed || 0,
-
+            value: workload.completedTasks || 0,
+            icon: CheckCircle2,
+            color: "text-green-600",
         },
 
         {
-
             label: "In Progress",
-
-            value: workload.inProgress || 0,
-
+            value: workload.inProgressTasks || 0,
+            icon: Clock3,
+            color: "text-yellow-600",
         },
 
         {
-
             label: "Review",
-
-            value: workload.review || 0,
-
+            value: workload.reviewTasks || 0,
+            icon: Eye,
+            color: "text-purple-600",
         },
 
         {
-
-            label: "Todo",
-
-            value: workload.todo || 0,
-
-        },
-
-        {
-
             label: "Overdue",
+            value: workload.overdueTasks || 0,
+            icon: AlertTriangle,
+            color: "text-red-600",
+        },
 
-            value: workload.overdue || 0,
+        {
+            label: "High Priority",
+            value: workload.highPriorityTasks || 0,
+            icon: TrendingUp,
+            color: "text-orange-600",
+        },
 
+        {
+            label: "Completion",
+            value: `${workload.completionRate || 0}%`,
+            icon: CheckCircle2,
+            color: "text-emerald-600",
         },
 
     ];
 
-
     return (
 
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
             {
 
-                stats.map((item) => (
+                stats.map((item) => {
 
-                    <div
+                    const Icon = item.icon;
 
-                        key={item.label}
+                    return (
 
-                        className="
-                            rounded-xl
-                            border
-                            bg-white
-                            p-4
-                            shadow-sm
-                            dark:border-gray-700
-                            dark:bg-gray-900
-                        "
+                        <div
+                            key={item.label}
+                            className="
+                                rounded-xl
+                                border
+                                bg-white
+                                p-5
+                                shadow-sm
+                                dark:border-gray-700
+                                dark:bg-gray-900
+                            "
+                        >
 
-                    >
+                            <div className="flex items-center justify-between">
 
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                <div>
 
-                            {item.label}
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
 
-                        </p>
+                                        {item.label}
 
+                                    </p>
 
-                        <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+                                    <h3 className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
 
-                            {item.value}
+                                        {item.value}
 
-                        </p>
+                                    </h3>
 
+                                </div>
 
-                    </div>
+                                <Icon
+                                    size={28}
+                                    className={item.color}
+                                />
 
-                ))
+                            </div>
+
+                        </div>
+
+                    );
+
+                })
 
             }
 

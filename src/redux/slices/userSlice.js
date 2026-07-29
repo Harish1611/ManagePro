@@ -488,21 +488,14 @@ const userSlice = createSlice({
         |--------------------------------------------------------------------------
         */
 
-        builder.addCase(
+      builder.addCase(
+    fetchMemberWorkload.fulfilled,
+    (state, action) => {
 
-            fetchMemberWorkload.fulfilled,
+        state.workload = action.payload.workload;
 
-            (state, action) => {
-
-
-                state.workload =
-
-                    action.payload;
-
-
-            }
-
-        );
+    }
+);
 
 
 

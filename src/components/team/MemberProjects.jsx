@@ -3,7 +3,49 @@ import {
     Users,
     CheckCircle,
     Clock,
+    UserCircle2,
 } from "lucide-react";
+
+function StatusBadge({ status }) {
+
+    const styles = {
+
+        Planning:
+            "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+
+        Active:
+            "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+
+        Completed:
+            "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+
+        Archived:
+            "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+
+    };
+
+    return (
+
+        <span
+            className={`
+                inline-flex
+                items-center
+                rounded-full
+                px-3
+                py-1
+                text-xs
+                font-semibold
+                ${styles[status] || styles.Active}
+            `}
+        >
+
+            {status || "Active"}
+
+        </span>
+
+    );
+
+}
 
 export default function MemberProjects({
 
@@ -11,14 +53,55 @@ export default function MemberProjects({
 
 }) {
 
-
     if (!projects.length) {
 
         return (
 
-            <div className="rounded-xl border p-6 text-center text-gray-500 dark:border-gray-700 dark:text-gray-400">
+            <div
+                className="
+                    rounded-2xl
+                    border
+                    border-dashed
+                    border-gray-300
+                    bg-white
+                    py-16
+                    text-center
+                    dark:border-gray-700
+                    dark:bg-gray-900
+                "
+            >
 
-                No projects assigned.
+                <FolderKanban
+                    className="
+                        mx-auto
+                        mb-4
+                        h-12
+                        w-12
+                        text-gray-400
+                    "
+                />
+
+                <h3
+                    className="
+                        text-lg
+                        font-semibold
+                        text-gray-900
+                        dark:text-white
+                    "
+                >
+                    No Projects Assigned
+                </h3>
+
+                <p
+                    className="
+                        mt-2
+                        text-sm
+                        text-gray-500
+                        dark:text-gray-400
+                    "
+                >
+                    This member is not assigned to any projects yet.
+                </p>
 
             </div>
 
@@ -26,137 +109,278 @@ export default function MemberProjects({
 
     }
 
-
     return (
 
-        <div className="space-y-4">
+        <section className="space-y-5">
 
+            <div className="flex items-center justify-between">
 
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2
+                    className="
+                        text-2xl
+                        font-bold
+                        text-gray-900
+                        dark:text-white
+                    "
+                >
+                    Assigned Projects
+                </h2>
 
-                Assigned Projects
+                <span
+                    className="
+                        rounded-full
+                        bg-blue-100
+                        px-3
+                        py-1
+                        text-sm
+                        font-semibold
+                        text-blue-700
+                        dark:bg-blue-900/30
+                        dark:text-blue-300
+                    "
+                >
+                    {projects.length} Projects
+                </span>
 
-            </h2>
+            </div>
 
+            <div
+                className="
+                    grid
+                    gap-5
+                    lg:grid-cols-2
+                "
+            >
 
-            <div className="grid gap-4 md:grid-cols-2">
+                {projects.map((project) => {
 
+                    const progress = project.progress || 0;
 
-                {
-
-                    projects.map((project) => (
+                    return (
 
                         <div
 
                             key={project._id}
 
-                            className="rounded-xl border bg-white p-5 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-900"
+                            className="
+                                rounded-2xl
+                                border
+                                border-gray-200
+                                bg-white
+                                p-6
+                                shadow-sm
+                                transition-all
+                                duration-300
+                                hover:-translate-y-1
+                                hover:shadow-xl
+                                dark:border-gray-700
+                                dark:bg-gray-900
+                            "
 
                         >
 
-
                             {/* Header */}
 
-                            <div className="flex items-start justify-between">
+                            <div className="flex justify-between">
 
-
-                                <div className="flex items-center gap-3">
-
+                                <div className="flex gap-4">
 
                                     <div
 
-                                        className="h-10 w-10 rounded-lg"
+                                        className="
+                                            h-14
+                                            w-14
+                                            rounded-xl
+                                            shadow-sm
+                                        "
 
                                         style={{
 
                                             backgroundColor:
-
                                                 project.color || "#2563EB",
 
                                         }}
 
                                     />
 
-
                                     <div>
 
-                                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                                        <h3
+                                            className="
+                                                text-lg
+                                                font-semibold
+                                                text-gray-900
+                                                dark:text-white
+                                            "
+                                        >
 
                                             {project.name}
 
                                         </h3>
 
+                                        <p
+                                            className="
+                                                mt-1
+                                                text-sm
+                                                text-gray-500
+                                                dark:text-gray-400
+                                            "
+                                        >
 
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
-
-                                            {project.role || "Member"}
+                                            {project.description ||
+                                                "No description available"}
 
                                         </p>
 
                                     </div>
 
-
                                 </div>
 
+                                <StatusBadge
+
+                                    status={project.status}
+
+                                />
 
                             </div>
 
+                            {/* Owner */}
 
+                            <div
+                                className="
+                                    mt-5
+                                    flex
+                                    items-center
+                                    gap-2
+                                    text-sm
+                                    text-gray-600
+                                    dark:text-gray-400
+                                "
+                            >
 
-                            {/* Description */}
+                                <UserCircle2 size={17} />
 
-                            {
+                                <span>
 
-                                project.description &&
+                                    Owner:
 
-                                <p className="mt-3 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                    <span
+                                        className="
+                                            ml-1
+                                            font-semibold
+                                            text-gray-900
+                                            dark:text-white
+                                        "
+                                    >
 
-                                    {project.description}
+                                        {project.owner?.name || "-"}
 
-                                </p>
+                                    </span>
 
-                            }
+                                </span>
 
+                            </div>
 
+                            {/* Progress */}
 
-                            {/* Stats */}
+                            <div className="mt-6">
 
-                            <div className="mt-5 grid grid-cols-3 gap-3">
+                                <div
+                                    className="
+                                        mb-2
+                                        flex
+                                        items-center
+                                        justify-between
+                                    "
+                                >
 
+                                    <span
+                                        className="
+                                            text-sm
+                                            font-medium
+                                            text-gray-600
+                                            dark:text-gray-400
+                                        "
+                                    >
+                                        Completion
+                                    </span>
 
-                                <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
-
-
-                                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-
-                                        <CheckCircle size={16}/>
-
-                                        <span className="text-xs">
-
-                                            Progress
-
-                                        </span>
-
-                                    </div>
-
-
-                                    <p className="mt-1 font-semibold text-gray-900 dark:text-white">
-
-                                        {project.progress || 0}%
-
-                                    </p>
-
+                                    <span
+                                        className="
+                                            text-sm
+                                            font-bold
+                                            text-blue-600
+                                        "
+                                    >
+                                        {progress}%
+                                    </span>
 
                                 </div>
 
+                                <div
+                                    className="
+                                        h-2.5
+                                        overflow-hidden
+                                        rounded-full
+                                        bg-gray-200
+                                        dark:bg-gray-700
+                                    "
+                                >
 
+                                    <div
 
-                                <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                                        className="
+                                            h-full
+                                            rounded-full
+                                            bg-gradient-to-r
+                                            from-blue-500
+                                            to-indigo-600
+                                            transition-all
+                                        "
 
+                                        style={{
 
-                                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                                            width: `${progress}%`,
 
-                                        <Users size={16}/>
+                                        }}
+
+                                    />
+
+                                </div>
+
+                            </div>
+
+                            {/* Statistics */}
+
+                            <div
+                                className="
+                                    mt-6
+                                    grid
+                                    grid-cols-3
+                                    gap-4
+                                "
+                            >
+
+                                <div
+                                    className="
+                                        rounded-xl
+                                        bg-gray-50
+                                        p-4
+                                        dark:bg-gray-800
+                                    "
+                                >
+
+                                    <div
+                                        className="
+                                            flex
+                                            items-center
+                                            gap-2
+                                            text-gray-500
+                                            dark:text-gray-400
+                                        "
+                                    >
+
+                                        <Users size={16} />
 
                                         <span className="text-xs">
 
@@ -166,28 +390,42 @@ export default function MemberProjects({
 
                                     </div>
 
+                                    <p
+                                        className="
+                                            mt-2
+                                            text-xl
+                                            font-bold
+                                            text-gray-900
+                                            dark:text-white
+                                        "
+                                    >
 
-                                    <p className="mt-1 font-semibold text-gray-900 dark:text-white">
-
-                                        {
-
-                                            project.members?.length || 0
-
-                                        }
+                                        {project.members?.length || 0}
 
                                     </p>
 
-
                                 </div>
 
+                                <div
+                                    className="
+                                        rounded-xl
+                                        bg-gray-50
+                                        p-4
+                                        dark:bg-gray-800
+                                    "
+                                >
 
+                                    <div
+                                        className="
+                                            flex
+                                            items-center
+                                            gap-2
+                                            text-gray-500
+                                            dark:text-gray-400
+                                        "
+                                    >
 
-                                <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
-
-
-                                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-
-                                        <Clock size={16}/>
+                                        <FolderKanban size={16} />
 
                                         <span className="text-xs">
 
@@ -197,66 +435,77 @@ export default function MemberProjects({
 
                                     </div>
 
+                                    <p
+                                        className="
+                                            mt-2
+                                            text-xl
+                                            font-bold
+                                            text-gray-900
+                                            dark:text-white
+                                        "
+                                    >
 
-                                    <p className="mt-1 font-semibold text-gray-900 dark:text-white">
-
-                                        {
-
-                                            project.taskCount || 0
-
-                                        }
+                                        {project.totalTasks || 0}
 
                                     </p>
 
-
                                 </div>
 
-
-                            </div>
-
-
-
-                            {/* Progress Bar */}
-
-                            <div className="mt-4">
-
-
-                                <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-
+                                <div
+                                    className="
+                                        rounded-xl
+                                        bg-gray-50
+                                        p-4
+                                        dark:bg-gray-800
+                                    "
+                                >
 
                                     <div
+                                        className="
+                                            flex
+                                            items-center
+                                            gap-2
+                                            text-gray-500
+                                            dark:text-gray-400
+                                        "
+                                    >
 
-                                        className="h-full rounded-full bg-blue-600"
+                                        <CheckCircle size={16} />
 
-                                        style={{
+                                        <span className="text-xs">
 
-                                            width:
+                                            Done
 
-                                                `${project.progress || 0}%`,
+                                        </span>
 
-                                        }}
+                                    </div>
 
-                                    />
+                                    <p
+                                        className="
+                                            mt-2
+                                            text-xl
+                                            font-bold
+                                            text-green-600
+                                        "
+                                    >
 
+                                        {project.completedTasks || 0}
+
+                                    </p>
 
                                 </div>
 
-
                             </div>
-
 
                         </div>
 
+                    );
 
-                    ))
-
-                }
-
+                })}
 
             </div>
 
-
-        </div>
+        </section>
 
     );
 
