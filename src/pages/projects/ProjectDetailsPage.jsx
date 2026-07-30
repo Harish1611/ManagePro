@@ -48,13 +48,15 @@ import useProjects from "@/hooks/useProjects";
 
 import useNotifications from "@/hooks/useNotifications";
 
-
 import ProjectStatusBadge from "@/components/projects/ProjectStatusBadge";
 
 import ProjectModal from "@/components/projects/ProjectModal";
 
 import ProjectMembersModal from "@/components/projects/ProjectMembersModal";
 
+import useActivities from "@/hooks/useActivities";
+
+import ActivityTimeline from "@/components/activity/ActivityTimeline";
 
 const API_BASE_URL =
 
@@ -234,6 +236,30 @@ export default function ProjectDetailsPage() {
     } = useNotifications();
 
 
+        /*
+    |--------------------------------------------------------------------------
+    | Activities
+    |--------------------------------------------------------------------------
+    */
+
+    const {
+
+        activities,
+
+        pagination: activityPagination,
+
+        loading: activitiesLoading,
+
+        error: activitiesError,
+
+        fetchProjectActivities,
+
+        resetActivities,
+
+    } = useActivities();
+
+
+
     const [
 
         editModalOpen,
@@ -296,6 +322,67 @@ export default function ProjectDetailsPage() {
         [project?.members]
 
     );
+
+
+        useEffect(() => {
+
+        if (!projectId) {
+
+            return;
+
+        }
+
+        fetchProject(projectId);
+
+    }, [
+
+        projectId,
+
+        fetchProject,
+
+    ]);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Load Project Activities
+    |--------------------------------------------------------------------------
+    */
+
+    useEffect(() => {
+
+        if (!projectId) {
+
+            return;
+
+        }
+
+
+        fetchProjectActivities(
+
+            projectId,
+
+            {
+
+                page: 1,
+
+                limit: 10,
+
+            }
+
+        );
+
+
+        return () => {
+
+            resetActivities();
+
+        };
+
+    }, [
+
+        projectId,
+
+    ]);
 
 
 
@@ -371,6 +458,80 @@ export default function ProjectDetailsPage() {
             setDeleting(false);
 
         }
+
+    };
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Retry Project Activities
+    |--------------------------------------------------------------------------
+    */
+
+    const handleActivityRetry = () => {
+
+        if (!projectId) {
+
+            return;
+
+        }
+
+
+        fetchProjectActivities(
+
+            projectId,
+
+            {
+
+                page:
+
+                    activityPagination?.page || 1,
+
+                limit:
+
+                    activityPagination?.limit || 10,
+
+            }
+
+        );
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Project Activity Pagination
+    |--------------------------------------------------------------------------
+    */
+
+    const handleActivityPageChange = (
+
+        page
+
+    ) => {
+
+        if (!projectId) {
+
+            return;
+
+        }
+
+
+        fetchProjectActivities(
+
+            projectId,
+
+            {
+
+                page,
+
+                limit:
+
+                    activityPagination?.limit || 10,
+
+            }
+
+        );
 
     };
 
@@ -1264,73 +1425,27 @@ if (
                     |--------------------------------------------------------------------------
                     */}
 
-                    <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+                    <ActivityTimeline
 
-                        <div className="flex items-center gap-3">
+                        activities={activities}
 
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400">
+                        loading={activitiesLoading}
 
-                                <Clock3
+                        error={activitiesError}
 
-                                    size={20}
+                        pagination={activityPagination}
 
-                                    aria-hidden="true"
+                        onRetry={handleActivityRetry}
 
-                                />
+                        onPageChange={handleActivityPageChange}
 
-                            </div>
+                        title="Project Activity"
 
+                        description="Recent actions and updates"
 
-                            <div>
+                        className="rounded-2xl dark:bg-gray-900"
 
-                                <h2 className="font-semibold text-gray-900 dark:text-white">
-
-                                    Project Activity
-
-                                </h2>
-
-
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-
-                                    Important timestamps
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div className="mt-6 space-y-5">
-
-                            <ActivityItem
-
-                                title="Project created"
-
-                                date={formatDateTime(
-
-                                    project.createdAt
-
-                                )}
-
-                            />
-
-
-                            <ActivityItem
-
-                                title="Project last updated"
-
-                                date={formatDateTime(
-
-                                    project.updatedAt
-
-                                )}
-
-                            />
-
-                        </div>
-
-                    </section>
+                    />
 
                 </div>
 

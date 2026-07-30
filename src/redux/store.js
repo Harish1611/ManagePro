@@ -18,6 +18,8 @@ import profileReducer from "@/redux/slices/profileSlice";
 
 import notificationReducer from "./slices/notificationSlice";
 
+import activityReducer from "@/redux/slices/activitySlice";
+
 export const store = configureStore({
 
     reducer: {
@@ -39,6 +41,8 @@ export const store = configureStore({
         profile: profileReducer,
 
         notifications: notificationReducer,
+
+        activities: activityReducer,
 
     },
 

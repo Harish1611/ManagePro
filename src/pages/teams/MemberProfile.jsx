@@ -27,13 +27,14 @@ import useTeam from "@/hooks/useTeam";
 import useMemberProjects from "@/hooks/useMemberProjects";
 import useMemberTasks from "@/hooks/useMemberTasks";
 import useMemberWorkload from "@/hooks/useMemberWorkload";
+import useActivities from "@/hooks/useActivities";
 
 
 import MemberProfileCard from "@/components/team/MemberProfileCard";
 import MemberProjects from "@/components/team/MemberProjects";
 import MemberTasks from "@/components/team/MemberTasks";
 import MemberWorkload from "@/components/team/MemberWorkload";
-import MemberActivity from "@/components/team/MemberActivity";
+import ActivityTimeline from "@/components/activity/ActivityTimeline";
 
 
 export default function MemberProfile() {
@@ -120,6 +121,29 @@ export default function MemberProfile() {
 
     /*
     |--------------------------------------------------------------------------
+    | Activities
+    |--------------------------------------------------------------------------
+    */
+
+    const {
+
+        activities,
+
+        pagination: activityPagination,
+
+        loading: activitiesLoading,
+
+        error: activitiesError,
+
+        fetchMemberActivities,
+
+        resetActivities,
+
+    } = useActivities();
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Initial Load
     |--------------------------------------------------------------------------
     */
@@ -153,7 +177,102 @@ export default function MemberProfile() {
 
         fetchMemberWorkload(id);
 
+        fetchMemberActivities(
+
+            id,
+
+            {
+
+                page: 1,
+
+                limit: 10,
+
+            }
+
+        );
+
+
+        return () => {
+
+            resetActivities();
+
+        };
+
     }, [id]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Activity Retry
+    |--------------------------------------------------------------------------
+    */
+
+    const handleActivityRetry = () => {
+
+        if (!id) {
+
+            return;
+
+        }
+
+
+        fetchMemberActivities(
+
+            id,
+
+            {
+
+                page:
+
+                    activityPagination?.page || 1,
+
+                limit:
+
+                    activityPagination?.limit || 10,
+
+            }
+
+        );
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Activity Pagination
+    |--------------------------------------------------------------------------
+    */
+
+    const handleActivityPageChange = (
+
+        page
+
+    ) => {
+
+        if (!id) {
+
+            return;
+
+        }
+
+
+        fetchMemberActivities(
+
+            id,
+
+            {
+
+                page,
+
+                limit:
+
+                    activityPagination?.limit || 10,
+
+            }
+
+        );
+
+    };
 
 
     /*
@@ -532,9 +651,23 @@ export default function MemberProfile() {
             |--------------------------------------------------------------------------
             */}
 
-            <MemberActivity
+            <ActivityTimeline
 
-                user={member}
+                activities={activities}
+
+                loading={activitiesLoading}
+
+                error={activitiesError}
+
+                pagination={activityPagination}
+
+                onRetry={handleActivityRetry}
+
+                onPageChange={handleActivityPageChange}
+
+                title="Member Activity"
+
+                description={`Recent actions involving ${member.name}`}
 
             />
 

@@ -32,6 +32,7 @@ import useTasks from "@/hooks/useTasks";
 
 import useNotifications from "@/hooks/useNotifications";
 
+import ConfirmDialog from "@/components/common/ConfirmDialog"
 
 /*
 |--------------------------------------------------------------------------
@@ -218,7 +219,11 @@ export default function TaskAttachments({
 
     task,
 
+    onActivityChange,
+
 }) {
+
+
 
     const fileInputRef =
 
@@ -252,6 +257,11 @@ export default function TaskAttachments({
         attachmentLoading,
 
     } = useTasks();
+
+    const [deleteDialog, setDeleteDialog] = useState({
+        open: false,
+        attachment: null,
+    });
 
 
     const {
@@ -415,6 +425,7 @@ export default function TaskAttachments({
 
             );
 
+            await onActivityChange?.();
 
             notify({
 
@@ -460,102 +471,159 @@ export default function TaskAttachments({
     |--------------------------------------------------------------------------
     */
 
-    const handleDelete = async (
+  /*
+|--------------------------------------------------------------------------
+| Open Delete Confirmation
+|--------------------------------------------------------------------------
+*/
 
-        attachment
+const handleDelete = (attachment) => {
 
-    ) => {
+    if (
 
-        if (
+        !task?._id ||
 
-            !task?._id ||
+        !attachment?._id
 
-            !attachment?._id
+    ) {
 
-        ) {
+        return;
 
-            return;
-
-        }
-
-
-        const confirmed =
-
-            window.confirm(
-
-                `Are you sure you want to delete "${attachment.fileName}"?`
-
-            );
+    }
 
 
-        if (
+    setDeleteDialog({
 
-            !confirmed
+        open: true,
 
-        ) {
+        attachment,
 
-            return;
+    });
 
-        }
-
-
-        try {
-
-            setDeletingAttachmentId(
-
-                attachment._id
-
-            );
+};
 
 
-            await deleteAttachment(
+/*
+|--------------------------------------------------------------------------
+| Close Delete Confirmation
+|--------------------------------------------------------------------------
+*/
 
-                task._id,
+const closeDeleteDialog = () => {
 
-                attachment._id
+    if (deletingAttachmentId) {
 
-            );
+        return;
+
+    }
 
 
-            notify({
+    setDeleteDialog({
 
-                title: "Attachment Deleted",
+        open: false,
 
-                message: `${attachment.fileName || "The attachment"} was removed from ${task.title || "the task"}.`,
+        attachment: null,
 
-                type: "success",
+    });
 
-                entityType: "task",
+};
 
-                entityId: task._id,
 
-            });
+/*
+|--------------------------------------------------------------------------
+| Confirm Delete
+|--------------------------------------------------------------------------
+*/
 
-        }
+const confirmDelete = async () => {
 
-        catch (error) {
+    const attachment =
 
-            toast.error(
+        deleteDialog.attachment;
 
-                getErrorMessage(
 
-                    error,
+    if (
 
-                    "Failed to delete attachment."
+        !task?._id ||
 
-                )
+        !attachment?._id
 
-            );
+    ) {
 
-        }
+        return;
 
-        finally {
+    }
 
-            setDeletingAttachmentId(null);
 
-        }
+    try {
 
-    };
+        setDeletingAttachmentId(
+
+            attachment._id
+
+        );
+
+
+        await deleteAttachment(
+
+            task._id,
+
+            attachment._id
+
+        );
+
+
+        await onActivityChange?.();
+
+
+        notify({
+
+            title: "Attachment Deleted",
+
+            message: `${attachment.fileName || "The attachment"} was removed from ${task.title || "the task"}.`,
+
+            type: "success",
+
+            entityType: "task",
+
+            entityId: task._id,
+
+        });
+
+
+        setDeleteDialog({
+
+            open: false,
+
+            attachment: null,
+
+        });
+
+    }
+
+    catch (error) {
+
+        toast.error(
+
+            getErrorMessage(
+
+                error,
+
+                "Failed to delete attachment."
+
+            )
+
+        );
+
+    }
+
+    finally {
+
+        setDeletingAttachmentId(null);
+
+    }
+
+};
 
 
     /*
@@ -1168,6 +1236,32 @@ export default function TaskAttachments({
                 )}
 
             </div>
+
+            <ConfirmDialog
+
+    open={deleteDialog.open}
+
+    title="Delete Attachment"
+
+    description={`Are you sure you want to delete "${deleteDialog.attachment?.fileName || "this attachment"}"? This action cannot be undone.`}
+
+    confirmText="Delete"
+
+    cancelText="Cancel"
+
+    confirmVariant="danger"
+
+    loading={Boolean(
+
+        deletingAttachmentId
+
+    )}
+
+    onCancel={closeDeleteDialog}
+
+    onConfirm={confirmDelete}
+
+/>
 
         </section>
 

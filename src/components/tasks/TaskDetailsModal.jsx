@@ -27,6 +27,10 @@ import TaskPriorityBadge from "@/components/tasks/TaskPriorityBadge";
 
 import TaskStatusBadge from "@/components/tasks/TaskStatusBadge";
 
+import useActivities from "@/hooks/useActivities";
+
+import ActivityTimeline from "@/components/activity/ActivityTimeline";
+
 
 /*
 |--------------------------------------------------------------------------
@@ -102,17 +106,36 @@ export default function TaskDetailsModal({
 
     /*
     |--------------------------------------------------------------------------
+    | Activities
+    |--------------------------------------------------------------------------
+    */
+
+    const {
+
+        activities,
+
+        pagination: activityPagination,
+
+        loading: activitiesLoading,
+
+        error: activitiesError,
+
+        fetchTaskActivities,
+
+        resetActivities,
+
+    } = useActivities();
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Close On Escape
     |--------------------------------------------------------------------------
     */
 
     useEffect(() => {
 
-        if (
-
-            !open
-
-        ) {
+        if (!open) {
 
             return undefined;
 
@@ -164,6 +187,63 @@ export default function TaskDetailsModal({
     ]);
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Load Task Activities
+    |--------------------------------------------------------------------------
+    */
+
+    useEffect(() => {
+
+        if (
+
+            !open ||
+
+            !task?._id
+
+        ) {
+
+            return undefined;
+
+        }
+
+
+        fetchTaskActivities(
+
+            task._id,
+
+            {
+
+                page: 1,
+
+                limit: 10,
+
+            }
+
+        );
+
+
+        return () => {
+
+            resetActivities();
+
+        };
+
+    }, [
+
+        open,
+
+        task?._id,
+
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Hidden Modal
+    |--------------------------------------------------------------------------
+    */
+
     if (
 
         !open ||
@@ -193,6 +273,80 @@ export default function TaskDetailsModal({
 
     /*
     |--------------------------------------------------------------------------
+    | Retry Task Activities
+    |--------------------------------------------------------------------------
+    */
+
+    const handleActivityRetry = () => {
+
+        if (!task?._id) {
+
+            return;
+
+        }
+
+
+        fetchTaskActivities(
+
+            task._id,
+
+            {
+
+                page:
+
+                    activityPagination?.page || 1,
+
+                limit:
+
+                    activityPagination?.limit || 10,
+
+            }
+
+        );
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Task Activity Pagination
+    |--------------------------------------------------------------------------
+    */
+
+    const handleActivityPageChange = (
+
+        page
+
+    ) => {
+
+        if (!task?._id) {
+
+            return;
+
+        }
+
+
+        fetchTaskActivities(
+
+            task._id,
+
+            {
+
+                page,
+
+                limit:
+
+                    activityPagination?.limit || 10,
+
+            }
+
+        );
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Edit Task
     |--------------------------------------------------------------------------
     */
@@ -202,6 +356,40 @@ export default function TaskDetailsModal({
         onClose();
 
         onEdit?.(task);
+
+    };
+
+
+       /*
+    |--------------------------------------------------------------------------
+    | Refresh Task Activities
+    |--------------------------------------------------------------------------
+    */
+
+    const handleAttachmentActivityChange = () => {
+
+        if (!task?._id) {
+
+            return;
+
+        }
+
+
+        fetchTaskActivities(
+
+            task._id,
+
+            {
+
+                page: 1,
+
+                limit:
+
+                    activityPagination?.limit || 10,
+
+            }
+
+        );
 
     };
 
@@ -582,7 +770,7 @@ export default function TaskDetailsModal({
                         </section>
 
 
-                        {/*
+                                               {/*
                         |--------------------------------------------------------------------------
                         | Attachments
                         |--------------------------------------------------------------------------
@@ -593,6 +781,41 @@ export default function TaskDetailsModal({
                             <TaskAttachments
 
                                 task={task}
+
+                                onActivityChange={handleAttachmentActivityChange}
+
+                            />
+
+                        </section>
+
+
+                        {/*
+                        |--------------------------------------------------------------------------
+                        | Activity
+                        |--------------------------------------------------------------------------
+                        */}
+
+                        <section className="border-t border-gray-200 pt-7 dark:border-gray-800">
+
+                            <ActivityTimeline
+
+                                activities={activities}
+
+                                loading={activitiesLoading}
+
+                                error={activitiesError}
+
+                                pagination={activityPagination}
+
+                                onRetry={handleActivityRetry}
+
+                                onPageChange={handleActivityPageChange}
+
+                                title="Task Activity"
+
+                                description="Recent changes and actions for this task"
+
+                                className="rounded-2xl shadow-none dark:bg-gray-900"
 
                             />
 
