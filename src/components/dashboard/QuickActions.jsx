@@ -14,9 +14,11 @@ import {
 
 } from "react-icons/fa";
 
+
 export default function QuickActions() {
 
     const navigate = useNavigate();
+
 
     const actions = [
 
@@ -58,7 +60,7 @@ export default function QuickActions() {
 
             color: "bg-purple-600",
 
-            path: "/members",
+            path: "/teams",
 
         },
 
@@ -78,57 +80,88 @@ export default function QuickActions() {
 
     ];
 
+
     return (
 
         <Card title="Quick Actions">
 
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
 
-                {
+                {actions.map((action) => (
 
-                    actions.map((action) => (
+                    <button
 
-                        <button
+                        key={action.title}
 
-                            key={action.title}
+                        type="button"
 
-                            onClick={() =>
+                        onClick={() => navigate(action.path)}
 
-                                navigate(action.path)
+                        className="
+                            group
+                            rounded-2xl
+                            border
+                            border-gray-200
+                            bg-white
+                            p-5
+                            text-left
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:border-blue-200
+                            hover:shadow-lg
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-blue-500/20
+                            dark:border-gray-700
+                            dark:bg-gray-900
+                            dark:hover:border-blue-800
+                        "
 
-                            }
+                    >
 
-                            className="group rounded-xl border border-gray-200 bg-white p-5 text-left transition-all hover:-translate-y-1 hover:shadow-lg dark:border-gray-700 dark:bg-gray-900"
+                        <div
+
+                            className={`
+                                ${action.color}
+                                mb-4
+                                flex
+                                h-14
+                                w-14
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                text-white
+                                shadow-sm
+                                transition-transform
+                                duration-300
+                                group-hover:scale-110
+                            `}
 
                         >
 
-                            <div
+                            {action.icon}
 
-                                className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg text-white ${action.color}`}
+                        </div>
 
-                            >
 
-                                {action.icon}
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-white">
 
-                            </div>
+                            {action.title}
 
-                            <h3 className="font-semibold">
+                        </h3>
 
-                                {action.title}
 
-                            </h3>
+                        <p className="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
 
-                            <p className="mt-1 text-sm text-gray-500">
+                            {action.description}
 
-                                {action.description}
+                        </p>
 
-                            </p>
+                    </button>
 
-                        </button>
-
-                    ))
-
-                }
+                ))}
 
             </div>
 

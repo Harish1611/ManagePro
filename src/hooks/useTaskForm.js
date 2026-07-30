@@ -22,39 +22,44 @@ import {
 
 } from "@/validation/taskValidation";
 
-export default function useTaskForm(task = null) {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Default Values
-    |--------------------------------------------------------------------------
-    */
+const defaultValues = {
 
-    const defaultValues = {
+    title: "",
 
-        title: "",
+    description: "",
 
-        description: "",
+    project: "",
 
-        project: "",
+    assignedTo: "",
 
-        assignedTo: "",
+    priority: "Medium",
 
-        priority: "Medium",
+    status: "Todo",
 
-        status: "Todo",
+    dueDate: "",
 
-        dueDate: "",
+};
 
-    };
+
+export default function useTaskForm(
+
+    task = null
+
+) {
 
     const form = useForm({
 
-        resolver: yupResolver(taskSchema),
+        resolver: yupResolver(
+
+            taskSchema
+
+        ),
 
         defaultValues,
 
     });
+
 
     const {
 
@@ -62,9 +67,10 @@ export default function useTaskForm(task = null) {
 
     } = form;
 
+
     /*
     |--------------------------------------------------------------------------
-    | Edit Mode
+    | Create / Edit Values
     |--------------------------------------------------------------------------
     */
 
@@ -72,41 +78,66 @@ export default function useTaskForm(task = null) {
 
         if (!task) {
 
-            reset(defaultValues);
+            reset(
+
+                defaultValues
+
+            );
 
             return;
 
         }
 
+
         reset({
 
-            title: task.title || "",
+            title:
+
+                task.title || "",
 
             description:
+
                 task.description || "",
 
             project:
+
                 task.project?._id ||
+
                 task.project ||
+
                 "",
 
             assignedTo:
+
                 task.assignedTo?._id ||
+
                 task.assignedTo ||
+
                 "",
 
             priority:
+
                 task.priority ||
+
                 "Medium",
 
             status:
+
                 task.status ||
+
                 "Todo",
 
             dueDate:
+
                 task.dueDate
 
-                    ? task.dueDate.slice(0, 10)
+                    ? task.dueDate.slice(
+
+                        0,
+
+                        10
+
+                    )
 
                     : "",
 
@@ -119,6 +150,7 @@ export default function useTaskForm(task = null) {
         reset,
 
     ]);
+
 
     return form;
 

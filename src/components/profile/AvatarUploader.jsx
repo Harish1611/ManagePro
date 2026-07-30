@@ -28,6 +28,8 @@ import toast from "react-hot-toast";
 
 import useProfile from "@/hooks/useProfile";
 
+import useNotifications from "@/hooks/useNotifications";
+
 import getErrorMessage from "@/utils/getErrorMessage";
 
 
@@ -62,12 +64,6 @@ export default function AvatarUploader({
     const fileInputRef = useRef(null);
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Profile
-    |--------------------------------------------------------------------------
-    */
-
     const {
 
         uploadProfileAvatar,
@@ -81,11 +77,12 @@ export default function AvatarUploader({
     } = useProfile();
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Local State
-    |--------------------------------------------------------------------------
-    */
+    const {
+
+        notify,
+
+    } = useNotifications();
+
 
     const [
 
@@ -113,12 +110,6 @@ export default function AvatarUploader({
 
     ] = useState(0);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Avatar URL
-    |--------------------------------------------------------------------------
-    */
 
     const apiUrl =
 
@@ -149,12 +140,6 @@ export default function AvatarUploader({
         currentAvatar;
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Preview Cleanup
-    |--------------------------------------------------------------------------
-    */
-
     useEffect(() => {
 
         return () => {
@@ -174,11 +159,48 @@ export default function AvatarUploader({
     }, [previewUrl]);
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Select Image
-    |--------------------------------------------------------------------------
-    */
+    const clearSelection = () => {
+
+        if (previewUrl) {
+
+            URL.revokeObjectURL(
+
+                previewUrl
+
+            );
+
+        }
+
+
+        setSelectedFile(
+
+            null
+
+        );
+
+
+        setPreviewUrl(
+
+            ""
+
+        );
+
+
+        setUploadProgress(
+
+            0
+
+        );
+
+
+        if (fileInputRef.current) {
+
+            fileInputRef.current.value = "";
+
+        }
+
+    };
+
 
     const handleFileChange = (event) => {
 
@@ -200,6 +222,7 @@ export default function AvatarUploader({
 
             );
 
+
             event.target.value = "";
 
             return;
@@ -214,6 +237,7 @@ export default function AvatarUploader({
                 "Avatar image must not exceed 5 MB."
 
             );
+
 
             event.target.value = "";
 
@@ -260,61 +284,6 @@ export default function AvatarUploader({
     };
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Clear Selection
-    |--------------------------------------------------------------------------
-    */
-
-    const clearSelection = () => {
-
-        if (previewUrl) {
-
-            URL.revokeObjectURL(
-
-                previewUrl
-
-            );
-
-        }
-
-
-        setSelectedFile(
-
-            null
-
-        );
-
-
-        setPreviewUrl(
-
-            ""
-
-        );
-
-
-        setUploadProgress(
-
-            0
-
-        );
-
-
-        if (fileInputRef.current) {
-
-            fileInputRef.current.value = "";
-
-        }
-
-    };
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Upload Avatar
-    |--------------------------------------------------------------------------
-    */
-
     const handleUpload = async () => {
 
         if (!selectedFile) {
@@ -332,7 +301,7 @@ export default function AvatarUploader({
 
         try {
 
-            await uploadProfileAvatar(
+            const updatedProfile = await uploadProfileAvatar(
 
                 selectedFile,
 
@@ -341,11 +310,23 @@ export default function AvatarUploader({
             ).unwrap();
 
 
-            toast.success(
+            notify({
 
-                "Avatar updated successfully."
+                title: "Profile Picture Updated",
 
-            );
+                message: "Your profile picture was updated successfully.",
+
+                type: "success",
+
+                entityType: "profile",
+
+                entityId:
+
+                    updatedProfile?._id ||
+
+                    profile?._id,
+
+            });
 
 
             clearSelection();
@@ -367,12 +348,6 @@ export default function AvatarUploader({
     };
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Remove Avatar
-    |--------------------------------------------------------------------------
-    */
-
     const handleRemove = async () => {
 
         if (!profile?.avatar) {
@@ -384,14 +359,26 @@ export default function AvatarUploader({
 
         try {
 
-            await removeProfileAvatar().unwrap();
+            const updatedProfile = await removeProfileAvatar().unwrap();
 
 
-            toast.success(
+            notify({
 
-                "Avatar removed successfully."
+                title: "Profile Picture Removed",
 
-            );
+                message: "Your profile picture was removed successfully.",
+
+                type: "success",
+
+                entityType: "profile",
+
+                entityId:
+
+                    updatedProfile?._id ||
+
+                    profile?._id,
+
+            });
 
 
             clearSelection();
@@ -422,42 +409,40 @@ export default function AvatarUploader({
 
     return (
 
-        <section
-            className="
-                rounded-2xl
-                border
-                border-gray-200
-                bg-white
-                p-5
-                shadow-sm
-                dark:border-gray-700
-                dark:bg-gray-900
-            "
-        >
+      <section
+    className="
+        flex
+        h-full
+        flex-col
+        overflow-hidden
+        rounded-2xl
+        border
+        border-gray-200
+        bg-white
+        shadow-sm
+        dark:border-gray-800
+        dark:bg-gray-900
+    "
+>
 
-            <div className="mb-5">
+            <div
+                className="
+                    border-b
+                    border-gray-200
+                    px-6
+                    py-5
+                    dark:border-gray-800
+                "
+            >
 
-                <h2
-                    className="
-                        text-lg
-                        font-semibold
-                        text-gray-900
-                        dark:text-white
-                    "
-                >
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
 
                     Profile Picture
 
                 </h2>
 
-                <p
-                    className="
-                        mt-1
-                        text-sm
-                        text-gray-500
-                        dark:text-gray-400
-                    "
-                >
+
+                <p className="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
 
                     Upload a JPG, PNG, or WEBP image up to 5 MB.
 
@@ -466,204 +451,177 @@ export default function AvatarUploader({
             </div>
 
 
-            <div
-                className="
-                    flex
-                    flex-col
-                    gap-5
-                    sm:flex-row
-                    sm:items-center
-                "
-            >
+            <div className="p-6">
 
-                <div className="relative shrink-0">
+                <div
+                    className="
+                        flex
+                        flex-col
+                        gap-6
+                        sm:flex-row
+                        sm:items-center
+                    "
+                >
 
-                    {
+                    <div className="relative mx-auto shrink-0 sm:mx-0">
 
-                        displayedAvatar
+                        {displayedAvatar ? (
 
-                            ? (
+                            <img
 
-                                <img
+                                src={displayedAvatar}
 
-                                    src={displayedAvatar}
+                                alt={profile?.name || "Profile"}
 
-                                    alt={profile?.name || "Profile"}
+                                className="
+                                    h-32
+                                    w-32
+                                    rounded-2xl
+                                    border
+                                    border-gray-200
+                                    object-cover
+                                    shadow-sm
+                                    dark:border-gray-700
+                                "
 
-                                    className="
-                                        h-28
-                                        w-28
-                                        rounded-full
-                                        border-4
-                                        border-gray-100
-                                        object-cover
-                                        dark:border-gray-800
-                                    "
+                            />
 
-                                />
-
-                            )
-
-                            : (
-
-                                <div
-                                    className="
-                                        flex
-                                        h-28
-                                        w-28
-                                        items-center
-                                        justify-center
-                                        rounded-full
-                                        border-4
-                                        border-gray-100
-                                        bg-gray-100
-                                        dark:border-gray-800
-                                        dark:bg-gray-800
-                                    "
-                                >
-
-                                    <Camera
-                                        size={32}
-                                        className="
-                                            text-gray-400
-                                        "
-                                    />
-
-                                </div>
-
-                            )
-
-                    }
-
-
-                    <button
-
-                        type="button"
-
-                        disabled={busy}
-
-                        onClick={() => {
-
-                            fileInputRef.current?.click();
-
-                        }}
-
-                        className="
-                            absolute
-                            bottom-0
-                            right-0
-                            flex
-                            h-9
-                            w-9
-                            items-center
-                            justify-center
-                            rounded-full
-                            bg-blue-600
-                            text-white
-                            shadow-md
-                            transition
-                            hover:bg-blue-700
-                            disabled:cursor-not-allowed
-                            disabled:opacity-60
-                        "
-
-                        aria-label="Select profile picture"
-
-                    >
-
-                        <ImagePlus size={18} />
-
-                    </button>
-
-                </div>
-
-
-                <div className="min-w-0 flex-1">
-
-                    <input
-
-                        ref={fileInputRef}
-
-                        type="file"
-
-                        accept="
-                            image/jpeg,
-                            image/jpg,
-                            image/png,
-                            image/webp
-                        "
-
-                        onChange={handleFileChange}
-
-                        className="hidden"
-
-                    />
-
-
-                    {
-
-                        selectedFile && (
+                        ) : (
 
                             <div
                                 className="
-                                    mb-4
-                                    rounded-xl
+                                    flex
+                                    h-32
+                                    w-32
+                                    items-center
+                                    justify-center
+                                    rounded-2xl
                                     border
-                                    border-gray-200
+                                    border-dashed
+                                    border-gray-300
                                     bg-gray-50
-                                    p-3
                                     dark:border-gray-700
-                                    dark:bg-gray-800
+                                    dark:bg-gray-800/60
                                 "
                             >
 
-                                <div
-                                    className="
-                                        flex
-                                        items-start
-                                        justify-between
-                                        gap-3
-                                    "
-                                >
+                                <Camera
+
+                                    size={34}
+
+                                    className="text-gray-400 dark:text-gray-500"
+
+                                />
+
+                            </div>
+
+                        )}
+
+
+                        <button
+
+                            type="button"
+
+                            disabled={busy}
+
+                            onClick={() =>
+
+                                fileInputRef.current?.click()
+
+                            }
+
+                            className="
+                                absolute
+                                -bottom-2
+                                -right-2
+                                inline-flex
+                                h-10
+                                w-10
+                                items-center
+                                justify-center
+                                rounded-xl
+                                border-4
+                                border-white
+                                bg-indigo-600
+                                text-white
+                                shadow-lg
+                                transition-all
+                                duration-200
+                                hover:bg-indigo-700
+                                hover:shadow-xl
+                                focus:outline-none
+                                focus:ring-2
+                                focus:ring-indigo-500/40
+                                disabled:cursor-not-allowed
+                                disabled:opacity-60
+                                dark:border-gray-900
+                            "
+
+                            aria-label="Select profile picture"
+
+                        >
+
+                            <ImagePlus size={18} />
+
+                        </button>
+
+                    </div>
+
+
+                    <div className="min-w-0 flex-1">
+
+                        <input
+
+                            ref={fileInputRef}
+
+                            type="file"
+
+                            accept="image/jpeg,image/jpg,image/png,image/webp"
+
+                            onChange={handleFileChange}
+
+                            className="hidden"
+
+                        />
+
+
+                        {selectedFile && (
+
+                            <div
+                                className="
+                                    mb-5
+                                    rounded-2xl
+                                    border
+                                    border-gray-200
+                                    bg-gray-50
+                                    p-4
+                                    dark:border-gray-700
+                                    dark:bg-gray-800/70
+                                "
+                            >
+
+                                <div className="flex items-start justify-between gap-4">
 
                                     <div className="min-w-0">
 
-                                        <p
-                                            className="
-                                                truncate
-                                                text-sm
-                                                font-medium
-                                                text-gray-800
-                                                dark:text-gray-200
-                                            "
-                                        >
+                                        <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
 
                                             {selectedFile.name}
 
                                         </p>
 
-                                        <p
-                                            className="
-                                                mt-1
-                                                text-xs
-                                                text-gray-500
-                                                dark:text-gray-400
-                                            "
-                                        >
 
-                                            {
+                                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
 
-                                                (
+                                            {(
 
-                                                    selectedFile.size /
+                                                selectedFile.size /
 
-                                                    1024 /
+                                                1024 /
 
-                                                    1024
+                                                1024
 
-                                                ).toFixed(2)
-
-                                            } MB
+                                            ).toFixed(2)} MB
 
                                         </p>
 
@@ -679,15 +637,21 @@ export default function AvatarUploader({
                                         onClick={clearSelection}
 
                                         className="
+                                            inline-flex
+                                            h-9
+                                            w-9
+                                            shrink-0
+                                            items-center
+                                            justify-center
                                             rounded-lg
-                                            p-1.5
                                             text-gray-400
-                                            transition
+                                            transition-colors
                                             hover:bg-gray-200
                                             hover:text-gray-700
+                                            disabled:cursor-not-allowed
                                             disabled:opacity-50
                                             dark:hover:bg-gray-700
-                                            dark:hover:text-gray-200
+                                            dark:hover:text-white
                                         "
 
                                         aria-label="Clear selected image"
@@ -701,143 +665,127 @@ export default function AvatarUploader({
                                 </div>
 
 
-                                {
+                                {avatarUploading && (
 
-                                    avatarUploading && (
+                                    <div className="mt-4">
 
-                                        <div className="mt-3">
+                                        <div className="mb-2 flex items-center justify-between text-xs font-medium text-gray-500 dark:text-gray-400">
 
-                                            <div
-                                                className="
-                                                    mb-1
-                                                    flex
-                                                    justify-between
-                                                    text-xs
-                                                    text-gray-500
-                                                    dark:text-gray-400
-                                                "
-                                            >
+                                            <span>
 
-                                                <span>
+                                                Uploading
 
-                                                    Uploading
+                                            </span>
 
-                                                </span>
+                                            <span>
 
-                                                <span>
+                                                {uploadProgress}%
 
-                                                    {uploadProgress}%
-
-                                                </span>
-
-                                            </div>
-
-
-                                            <div
-                                                className="
-                                                    h-2
-                                                    overflow-hidden
-                                                    rounded-full
-                                                    bg-gray-200
-                                                    dark:bg-gray-700
-                                                "
-                                            >
-
-                                                <div
-
-                                                    className="
-                                                        h-full
-                                                        rounded-full
-                                                        bg-blue-600
-                                                        transition-all
-                                                    "
-
-                                                    style={{
-
-                                                        width:
-
-                                                            `${uploadProgress}%`,
-
-                                                    }}
-
-                                                />
-
-                                            </div>
+                                            </span>
 
                                         </div>
 
-                                    )
 
-                                }
+                                        <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+
+                                            <div
+
+                                                className="
+                                                    h-full
+                                                    rounded-full
+                                                    bg-indigo-600
+                                                    transition-all
+                                                    duration-300
+                                                "
+
+                                                style={{
+
+                                                    width: `${uploadProgress}%`,
+
+                                                }}
+
+                                            />
+
+                                        </div>
+
+                                    </div>
+
+                                )}
 
                             </div>
 
-                        )
-
-                    }
+                        )}
 
 
-                    <div
-                        className="
-                            flex
-                            flex-wrap
-                            gap-3
-                        "
-                    >
+                        <div className="flex flex-wrap gap-3">
 
-                        <button
+                            <button
 
-                            type="button"
+                                type="button"
 
-                            disabled={busy}
+                                disabled={busy}
 
-                            onClick={() => {
+                                onClick={() =>
 
-                                fileInputRef.current?.click();
+                                    fileInputRef.current?.click()
 
-                            }}
+                                }
 
-                            className="
-                                inline-flex
-                                items-center
-                                gap-2
-                                rounded-xl
-                                border
-                                border-gray-300
-                                px-4
-                                py-2.5
-                                text-sm
-                                font-medium
-                                text-gray-700
-                                transition
-                                hover:bg-gray-50
-                                disabled:cursor-not-allowed
-                                disabled:opacity-60
-                                dark:border-gray-600
-                                dark:text-gray-200
-                                dark:hover:bg-gray-800
-                            "
+                                className="
+                                    inline-flex
+                                    h-11
+                                    items-center
+                                    justify-center
+                                    gap-2
+                                    rounded-xl
+                                    border
+                                    border-gray-300
+                                    bg-white
+                                    px-4
+                                    text-sm
+                                    font-medium
+                                    leading-none
+                                    text-gray-700
+                                    shadow-sm
+                                    transition-all
+                                    duration-200
+                                    hover:-translate-y-0.5
+                                    hover:bg-gray-50
+                                    hover:shadow-md
+                                    focus:outline-none
+                                    focus:ring-2
+                                    focus:ring-indigo-500/30
+                                    disabled:translate-y-0
+                                    disabled:cursor-not-allowed
+                                    disabled:opacity-60
+                                    dark:border-gray-700
+                                    dark:bg-gray-900
+                                    dark:text-gray-200
+                                    dark:hover:bg-gray-800
+                                "
 
-                        >
+                            >
 
-                            <ImagePlus size={18} />
+                                <ImagePlus
 
-                            {
+                                    size={17}
 
-                                profile?.avatar
+                                    className="shrink-0"
+
+                                />
+
+                                {profile?.avatar
 
                                     ? "Replace Image"
 
                                     : "Select Image"
 
-                            }
+                                }
 
-                        </button>
+                            </button>
 
 
-                        {
-
-                            selectedFile && (
+                            {selectedFile && (
 
                                 <button
 
@@ -849,66 +797,69 @@ export default function AvatarUploader({
 
                                     className="
                                         inline-flex
+                                        h-11
                                         items-center
+                                        justify-center
                                         gap-2
                                         rounded-xl
-                                        bg-blue-600
+                                        bg-indigo-600
                                         px-4
-                                        py-2.5
                                         text-sm
                                         font-medium
+                                        leading-none
                                         text-white
-                                        transition
-                                        hover:bg-blue-700
+                                        shadow-sm
+                                        transition-all
+                                        duration-200
+                                        hover:-translate-y-0.5
+                                        hover:bg-indigo-700
+                                        hover:shadow-md
+                                        focus:outline-none
+                                        focus:ring-2
+                                        focus:ring-indigo-500/40
+                                        disabled:translate-y-0
                                         disabled:cursor-not-allowed
                                         disabled:opacity-60
                                     "
 
                                 >
 
-                                    {
+                                    {avatarUploading ? (
 
-                                        avatarUploading
+                                        <LoaderCircle
 
-                                            ? (
+                                            size={17}
 
-                                                <LoaderCircle
-                                                    size={18}
-                                                    className="animate-spin"
-                                                />
+                                            className="shrink-0 animate-spin"
 
-                                            )
+                                        />
 
-                                            : (
+                                    ) : (
 
-                                                <Upload size={18} />
+                                        <Upload
 
-                                            )
+                                            size={17}
 
-                                    }
+                                            className="shrink-0"
 
-                                    {
+                                        />
 
-                                        avatarUploading
+                                    )}
 
-                                            ? "Uploading..."
+                                    {avatarUploading
 
-                                            : "Upload Avatar"
+                                        ? "Uploading..."
+
+                                        : "Upload Avatar"
 
                                     }
 
                                 </button>
 
-                            )
-
-                        }
+                            )}
 
 
-                        {
-
-                            profile?.avatar &&
-
-                            !selectedFile && (
+                            {profile?.avatar && !selectedFile && (
 
                                 <button
 
@@ -920,63 +871,74 @@ export default function AvatarUploader({
 
                                     className="
                                         inline-flex
+                                        h-11
                                         items-center
+                                        justify-center
                                         gap-2
                                         rounded-xl
                                         border
                                         border-red-200
+                                        bg-white
                                         px-4
-                                        py-2.5
                                         text-sm
                                         font-medium
+                                        leading-none
                                         text-red-600
-                                        transition
+                                        shadow-sm
+                                        transition-all
+                                        duration-200
+                                        hover:-translate-y-0.5
                                         hover:bg-red-50
+                                        hover:shadow-md
+                                        focus:outline-none
+                                        focus:ring-2
+                                        focus:ring-red-500/30
+                                        disabled:translate-y-0
                                         disabled:cursor-not-allowed
                                         disabled:opacity-60
-                                        dark:border-red-900
+                                        dark:border-red-900/70
+                                        dark:bg-gray-900
                                         dark:text-red-400
                                         dark:hover:bg-red-950/30
                                     "
 
                                 >
 
-                                    {
+                                    {avatarRemoving ? (
 
-                                        avatarRemoving
+                                        <LoaderCircle
 
-                                            ? (
+                                            size={17}
 
-                                                <LoaderCircle
-                                                    size={18}
-                                                    className="animate-spin"
-                                                />
+                                            className="shrink-0 animate-spin"
 
-                                            )
+                                        />
 
-                                            : (
+                                    ) : (
 
-                                                <Trash2 size={18} />
+                                        <Trash2
 
-                                            )
+                                            size={17}
 
-                                    }
+                                            className="shrink-0"
 
-                                    {
+                                        />
 
-                                        avatarRemoving
+                                    )}
 
-                                            ? "Removing..."
+                                    {avatarRemoving
 
-                                            : "Remove"
+                                        ? "Removing..."
+
+                                        : "Remove"
 
                                     }
 
                                 </button>
 
-                            )
+                            )}
 
-                        }
+                        </div>
 
                     </div>
 

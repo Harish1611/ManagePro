@@ -1,6 +1,11 @@
+
 import {
-    FiFolderPlus
-} from "react-icons/fi";
+
+    FolderPlus,
+
+    Plus,
+
+} from "lucide-react";
 
 
 export default function EmptyProjects({
@@ -11,86 +16,97 @@ export default function EmptyProjects({
 
     return (
 
-        <div
+        <div className="flex min-h-[420px] flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center shadow-sm dark:border-gray-700 dark:bg-gray-900">
 
-            className="
-            flex
-            flex-col
-            items-center
-            justify-center
-            rounded-xl
-            border
-            border-dashed
-            border-gray-300
-            bg-white
-            px-6
-            py-16
-            text-center
-            dark:border-gray-700
-            dark:bg-gray-900
-            "
+            {/*
+            |--------------------------------------------------------------------------
+            | Icon
+            |--------------------------------------------------------------------------
+            */}
 
-        >
+            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
 
+                <FolderPlus
 
-            <div
+                    size={38}
 
-                className="
-                flex
-                h-20
-                w-20
-                items-center
-                justify-center
-                rounded-full
-                bg-blue-100
-                text-blue-600
-                dark:bg-blue-500/20
-                dark:text-blue-400
-                "
+                    aria-hidden="true"
 
-            >
-
-                <FiFolderPlus size={40}/>
+                />
 
             </div>
 
 
-            <h2 className="mt-6 text-xl font-semibold">
+            {/*
+            |--------------------------------------------------------------------------
+            | Content
+            |--------------------------------------------------------------------------
+            */}
+
+            <h2 className="mt-6 text-xl font-bold text-gray-900 dark:text-white">
 
                 No Projects Found
 
             </h2>
 
 
-            <p className="mt-2 max-w-md text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-2 max-w-md text-sm leading-6 text-gray-500 dark:text-gray-400">
 
-                Start creating projects to organize your team's work.
+                Create your first project to organize tasks, assign team members, and track progress.
 
             </p>
 
 
-           <button
+            {/*
+            |--------------------------------------------------------------------------
+            | Create Action
+            |--------------------------------------------------------------------------
+            */}
 
-onClick={onCreate}
+            <button
 
-className="
-mt-6
-rounded-lg
-bg-blue-600
-px-6
-py-3
-text-white
-"
+                type="button"
 
->
+                onClick={onCreate}
 
-Create Project
+                className="
+                    mt-6
+                    inline-flex
+                    items-center
+                    justify-center
+                    gap-2
+                    rounded-xl
+                    bg-blue-600
+                    px-5
+                    py-2.5
+                    text-sm
+                    font-semibold
+                    text-white
+                    shadow-sm
+                    transition
+                    hover:bg-blue-700
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-blue-500/30
+                "
 
-</button>
+            >
 
+                <Plus
+
+                    size={18}
+
+                    aria-hidden="true"
+
+                />
+
+                Create Project
+
+            </button>
 
         </div>
 
     );
 
 }
+

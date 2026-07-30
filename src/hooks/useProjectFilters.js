@@ -1,10 +1,28 @@
-import { useEffect, useState } from "react";
+import {
+
+    useEffect,
+
+    useState,
+
+} from "react";
+
 
 import useDebounce from "./useDebounce";
 
-export default function useProjectFilters(fetchProjects) {
 
-    const [filters, setFilters] = useState({
+export default function useProjectFilters(
+
+    fetchProjects
+
+) {
+
+    const [
+
+        filters,
+
+        setFilters,
+
+    ] = useState({
 
         search: "",
 
@@ -18,6 +36,7 @@ export default function useProjectFilters(fetchProjects) {
 
     });
 
+
     const debouncedSearch = useDebounce(
 
         filters.search,
@@ -25,6 +44,7 @@ export default function useProjectFilters(fetchProjects) {
         500
 
     );
+
 
     useEffect(() => {
 
@@ -38,6 +58,8 @@ export default function useProjectFilters(fetchProjects) {
 
     }, [
 
+        fetchProjects,
+
         debouncedSearch,
 
         filters.status,
@@ -49,6 +71,7 @@ export default function useProjectFilters(fetchProjects) {
         filters.limit,
 
     ]);
+
 
     return {
 

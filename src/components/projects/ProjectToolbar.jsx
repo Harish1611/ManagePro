@@ -1,6 +1,9 @@
-import ProjectSearch from "./ProjectSearch";
 import ProjectFilters from "./ProjectFilters";
+
+import ProjectSearch from "./ProjectSearch";
+
 import ViewToggle from "./ViewToggle";
+
 
 export default function ProjectToolbar({
 
@@ -16,17 +19,22 @@ export default function ProjectToolbar({
 
     return (
 
-        <div className="flex flex-col gap-4 rounded-xl bg-white p-4 shadow dark:bg-gray-900 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between dark:border-gray-700 dark:bg-gray-900">
 
-            <ProjectSearch
+            <div className="w-full lg:max-w-sm">
 
-                filters={filters}
+                <ProjectSearch
 
-                setFilters={setFilters}
+                    filters={filters}
 
-            />
+                    setFilters={setFilters}
 
-            <div className="flex flex-wrap items-center gap-3">
+                />
+
+            </div>
+
+
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:w-auto lg:justify-end">
 
                 <ProjectFilters
 
@@ -35,6 +43,7 @@ export default function ProjectToolbar({
                     setFilters={setFilters}
 
                 />
+
 
                 <ViewToggle
 

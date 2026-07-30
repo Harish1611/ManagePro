@@ -1,3 +1,4 @@
+
 import {
 
     ChevronLeft,
@@ -6,9 +7,10 @@ import {
 
 } from "lucide-react";
 
+
 export default function TaskPagination({
 
-    pagination,
+    pagination = {},
 
     filters,
 
@@ -16,13 +18,15 @@ export default function TaskPagination({
 
 }) {
 
-    const {
+    const page =
 
-        page,
+        pagination.page || 1;
 
-        totalPages,
 
-    } = pagination;
+    const totalPages =
+
+        pagination.totalPages || 1;
+
 
     const changePage = (newPage) => {
 
@@ -30,7 +34,9 @@ export default function TaskPagination({
 
             newPage < 1 ||
 
-            newPage > totalPages
+            newPage > totalPages ||
+
+            newPage === page
 
         ) {
 
@@ -38,73 +44,135 @@ export default function TaskPagination({
 
         }
 
-        setFilters({
 
-            ...filters,
+        setFilters((currentFilters) => ({
+
+            ...currentFilters,
 
             page: newPage,
 
-        });
+        }));
 
     };
 
+
+    const isPreviousDisabled =
+
+        page <= 1;
+
+
+    const isNextDisabled =
+
+        page >= totalPages;
+
+
     return (
 
-        <div className="flex flex-col gap-4 border-t border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
+        <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:flex-row sm:items-center sm:justify-between">
 
-            <p className="text-sm text-gray-500">
+            {/*
+            |--------------------------------------------------------------------------
+            | Page Information
+            |--------------------------------------------------------------------------
+            */}
 
-                Page <strong>{page}</strong> of{" "}
+            <p
 
-                <strong>{totalPages || 1}</strong>
+                className="text-sm text-gray-500 dark:text-gray-400"
+
+                aria-live="polite"
+
+            >
+
+                Page{" "}
+
+                <span className="font-semibold text-gray-900 dark:text-white">
+
+                    {page}
+
+                </span>{" "}
+
+                of{" "}
+
+                <span className="font-semibold text-gray-900 dark:text-white">
+
+                    {totalPages}
+
+                </span>
 
             </p>
+
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Pagination Controls
+            |--------------------------------------------------------------------------
+            */}
 
             <div className="flex items-center gap-2">
 
                 <button
 
+                    type="button"
+
                     onClick={() =>
 
-                        changePage(page - 1)
+                        changePage(
+
+                            page - 1
+
+                        )
 
                     }
 
-                    disabled={page === 1}
+                    disabled={isPreviousDisabled}
 
-                    className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:hover:bg-gray-800"
+                    aria-label="Go to previous page"
+
+                    className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
 
                 >
 
-                    <ChevronLeft size={16} />
+                    <ChevronLeft
+
+                        size={16}
+
+                    />
 
                     Previous
 
                 </button>
 
+
                 <button
+
+                    type="button"
 
                     onClick={() =>
 
-                        changePage(page + 1)
+                        changePage(
+
+                            page + 1
+
+                        )
 
                     }
 
-                    disabled={
+                    disabled={isNextDisabled}
 
-                        page === totalPages ||
+                    aria-label="Go to next page"
 
-                        totalPages === 0
-
-                    }
-
-                    className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:hover:bg-gray-800"
+                    className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
 
                 >
 
                     Next
 
-                    <ChevronRight size={16} />
+                    <ChevronRight
+
+                        size={16}
+
+                    />
 
                 </button>
 
@@ -115,3 +183,4 @@ export default function TaskPagination({
     );
 
 }
+

@@ -1,4 +1,11 @@
+import {
+
+    FaPlus,
+
+} from "react-icons/fa";
+
 import KanbanFilters from "./KanbanFilters";
+
 
 export default function KanbanHeader({
 
@@ -16,11 +23,33 @@ export default function KanbanHeader({
 
     return (
 
-        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start">
+        <section
+            className="
+                flex
+                flex-col
+                gap-4
+                rounded-2xl
+                border
+                border-gray-200
+                bg-white
+                p-4
+                shadow-sm
+                dark:border-gray-800
+                dark:bg-slate-900
+                sm:p-5
+                xl:flex-row
+                xl:items-end
+                xl:justify-between
+            "
+        >
 
-            {/* Filters */}
+            {/*
+            |--------------------------------------------------------------------------
+            | Filters
+            |--------------------------------------------------------------------------
+            */}
 
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
 
                 <KanbanFilters
 
@@ -36,9 +65,20 @@ export default function KanbanHeader({
 
             </div>
 
-            {/* Create Button */}
 
-            <div className="flex shrink-0 lg:justify-end">
+            {/*
+            |--------------------------------------------------------------------------
+            | Create Task
+            |--------------------------------------------------------------------------
+            */}
+
+            <div
+                className="
+                    flex
+                    shrink-0
+                    sm:justify-end
+                "
+            >
 
                 <button
 
@@ -46,17 +86,60 @@ export default function KanbanHeader({
 
                     onClick={onCreateTask}
 
-                    className="h-11 whitespace-nowrap rounded-lg bg-blue-600 px-6 font-medium text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-400 dark:focus:ring-offset-gray-900"
+                    className="
+                        inline-flex
+                        h-11
+                        w-full
+                        items-center
+                        justify-center
+                        gap-2
+                        whitespace-nowrap
+                        rounded-xl
+                        bg-indigo-600
+                        px-5
+                        text-sm
+                        font-semibold
+                        text-white
+                        shadow-sm
+                        shadow-indigo-600/20
+                        transition-all
+                        duration-200
+                        hover:-translate-y-0.5
+                        hover:bg-indigo-700
+                        hover:shadow-md
+                        hover:shadow-indigo-600/25
+                        focus:outline-none
+                        focus:ring-4
+                        focus:ring-indigo-500/20
+                        active:translate-y-0
+                        disabled:cursor-not-allowed
+                        disabled:opacity-60
+                        dark:bg-indigo-500
+                        dark:hover:bg-indigo-600
+                        sm:w-auto
+                    "
 
                 >
 
-                    + New Task
+                    <FaPlus
+
+                        size={13}
+
+                        aria-hidden="true"
+
+                    />
+
+                    <span>
+
+                        New Task
+
+                    </span>
 
                 </button>
 
             </div>
 
-        </div>
+        </section>
 
     );
 

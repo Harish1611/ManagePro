@@ -1,12 +1,28 @@
-import { FiUsers } from "react-icons/fi";
+import {
+
+    CalendarDays,
+
+    Users,
+
+} from "lucide-react";
+
+import {
+
+    useNavigate,
+
+} from "react-router-dom";
+
+
+import ProjectMenu from "./ProjectMenu";
+
+import ProjectPagination from "./ProjectPagination";
 
 import ProjectStatusBadge from "./ProjectStatusBadge";
-import ProjectMenu from "./ProjectMenu";
-import ProjectPagination from "./ProjectPagination";
+
 
 export default function ProjectTable({
 
-    projects,
+    projects = [],
 
     pagination,
 
@@ -22,180 +38,367 @@ export default function ProjectTable({
 
 }) {
 
+    const navigate = useNavigate();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Format Date
+    |--------------------------------------------------------------------------
+    */
+
+    const formatDate = (date) => {
+
+        if (!date) {
+
+            return "Unavailable";
+
+        }
+
+
+        const parsedDate = new Date(date);
+
+
+        if (
+
+            Number.isNaN(
+
+                parsedDate.getTime()
+
+            )
+
+        ) {
+
+            return "Unavailable";
+
+        }
+
+
+        return parsedDate.toLocaleDateString(
+
+            "en-US",
+
+            {
+
+                year: "numeric",
+
+                month: "short",
+
+                day: "numeric",
+
+            }
+
+        );
+
+    };
+
+
     return (
 
-        <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow dark:border-gray-800 dark:bg-gray-900">
+        <div className="w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
 
             <div className="w-full overflow-x-auto">
 
-                <table className="min-w-[900px] w-full">
+                <table className="w-full min-w-[900px]">
 
-                    <thead className="bg-gray-100 dark:bg-gray-800">
+                    <thead className="bg-gray-50 dark:bg-gray-800/70">
 
                         <tr>
 
-                            <th className="px-6 py-4 text-left">
+                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+
                                 Project
+
                             </th>
 
-                            <th className="px-6 py-4 text-left">
+                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+
                                 Status
+
                             </th>
 
-                            <th className="px-6 py-4 text-left">
+                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+
                                 Members
+
                             </th>
 
-                            <th className="px-6 py-4 text-left">
+                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+
                                 Created
+
                             </th>
 
-                            <th className="px-6 py-4 text-right">
+                            <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+
                                 Actions
+
                             </th>
 
                         </tr>
 
                     </thead>
 
-                    <tbody>
 
-                        {
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
 
-                            projects.map((project) => (
+                        {projects.map((project) => (
 
-                                <tr
+                            <tr
 
-                                    key={project._id}
+                                key={project._id}
 
-                                    className="border-t border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800"
+                                onClick={() =>
 
-                                >
+                                    navigate(
 
-                                    <td className="px-6 py-4">
+                                        `/projects/${project._id}`
 
-                                        <div className="flex items-center gap-3">
+                                    )
 
-                                            <div
+                                }
 
-                                                className="h-4 w-4 rounded-full"
+                                className="
+                                    cursor-pointer
+                                    transition
+                                    hover:bg-gray-50
+                                    dark:hover:bg-gray-800/60
+                                "
 
-                                                style={{
-                                                    backgroundColor:
-                                                        project.color ||
-                                                        "#3B82F6",
-                                                }}
+                            >
 
-                                            />
+                                {/*
+                                |--------------------------------------------------------------------------
+                                | Project
+                                |--------------------------------------------------------------------------
+                                */}
 
-                                            <div>
+                                <td className="px-6 py-4">
 
-                                                <p className="font-medium">
+                                    <div className="flex min-w-0 items-center gap-3">
 
-                                                    {project.name}
+                                        <span
 
-                                                </p>
+                                            className="h-3.5 w-3.5 shrink-0 rounded-full ring-4 ring-gray-100 dark:ring-gray-800"
 
-                                                <p className="text-sm text-gray-500">
+                                            style={{
 
-                                                    {project.description?.slice(0, 40)}
+                                                backgroundColor:
 
-                                                </p>
+                                                    project.color ||
 
-                                            </div>
+                                                    "#3B82F6",
+
+                                            }}
+
+                                            aria-hidden="true"
+
+                                        />
+
+
+                                        <div className="min-w-0">
+
+                                            <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
+
+                                                {project.name ||
+
+                                                    "Untitled Project"}
+
+                                            </p>
+
+
+                                            <p className="mt-1 max-w-xs truncate text-sm text-gray-500 dark:text-gray-400">
+
+                                                {project.description ||
+
+                                                    "No description available."}
+
+                                            </p>
 
                                         </div>
 
-                                    </td>
+                                    </div>
 
-                                    <td className="px-6 py-4">
+                                </td>
 
-                                        <ProjectStatusBadge
-                                            status={project.status}
+
+                                {/*
+                                |--------------------------------------------------------------------------
+                                | Status
+                                |--------------------------------------------------------------------------
+                                */}
+
+                                <td className="px-6 py-4">
+
+                                    <ProjectStatusBadge
+
+                                        status={project.status}
+
+                                    />
+
+                                </td>
+
+
+                                {/*
+                                |--------------------------------------------------------------------------
+                                | Members
+                                |--------------------------------------------------------------------------
+                                */}
+
+                                <td className="px-6 py-4">
+
+                                    <div className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+
+                                        <Users
+
+                                            size={16}
+
+                                            aria-hidden="true"
+
                                         />
 
-                                    </td>
+                                        <span className="font-medium">
 
-                                    <td className="px-6 py-4">
+                                            {project.members?.length || 0}
 
-                                        {project.members?.length || 0}
+                                        </span>
 
-                                    </td>
+                                    </div>
 
-                                    <td className="px-6 py-4">
+                                </td>
 
-                                        {
 
-                                            new Date(
+                                {/*
+                                |--------------------------------------------------------------------------
+                                | Created Date
+                                |--------------------------------------------------------------------------
+                                */}
 
-                                                project.createdAt
+                                <td className="px-6 py-4">
 
-                                            ).toLocaleDateString()
+                                    <div className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+
+                                        <CalendarDays
+
+                                            size={16}
+
+                                            aria-hidden="true"
+
+                                        />
+
+                                        {formatDate(
+
+                                            project.createdAt
+
+                                        )}
+
+                                    </div>
+
+                                </td>
+
+
+                                {/*
+                                |--------------------------------------------------------------------------
+                                | Actions
+                                |--------------------------------------------------------------------------
+                                */}
+
+                                <td className="px-6 py-4">
+
+                                    <div
+
+                                        className="flex items-center justify-end gap-2"
+
+                                        onClick={(event) =>
+
+                                            event.stopPropagation()
 
                                         }
 
-                                    </td>
+                                    >
 
-                                    <td className="px-6 py-4">
+                                        <button
 
-                                        <div className="flex justify-end items-center gap-2">
+                                            type="button"
 
-                                            <button
+                                            onClick={() =>
 
-                                                type="button"
+                                                onManageMembers?.(
 
-                                                onClick={() =>
-                                                    onManageMembers?.(project)
-                                                }
+                                                    project
 
-                                                className="
-                                                    inline-flex
-                                                    items-center
-                                                    gap-2
-                                                    rounded-lg
-                                                    border
-                                                    px-3
-                                                    py-2
-                                                    text-sm
-                                                    transition
-                                                    hover:bg-gray-100
-                                                    dark:border-gray-700
-                                                    dark:hover:bg-gray-800
-                                                "
+                                                )
 
-                                            >
+                                            }
 
-                                                <FiUsers />
+                                            className="
+                                                inline-flex
+                                                items-center
+                                                justify-center
+                                                gap-2
+                                                rounded-xl
+                                                border
+                                                border-gray-300
+                                                bg-white
+                                                px-3
+                                                py-2
+                                                text-sm
+                                                font-semibold
+                                                text-gray-700
+                                                transition
+                                                hover:border-blue-300
+                                                hover:bg-blue-50
+                                                hover:text-blue-700
+                                                focus:outline-none
+                                                focus:ring-2
+                                                focus:ring-blue-500/20
+                                                dark:border-gray-700
+                                                dark:bg-gray-900
+                                                dark:text-gray-300
+                                                dark:hover:border-blue-800
+                                                dark:hover:bg-blue-950/30
+                                                dark:hover:text-blue-400
+                                            "
 
-                                                Members
+                                        >
 
-                                            </button>
+                                            <Users
 
-                                            <ProjectMenu
+                                                size={16}
 
-                                                project={project}
-
-                                                onEdit={onEdit}
-
-                                                onDelete={onDelete}
+                                                aria-hidden="true"
 
                                             />
 
-                                        </div>
+                                            Members
 
-                                    </td>
+                                        </button>
 
-                                </tr>
 
-                            ))
+                                        <ProjectMenu
 
-                        }
+                                            project={project}
+
+                                            onEdit={onEdit}
+
+                                            onDelete={onDelete}
+
+                                        />
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        ))}
 
                     </tbody>
 
                 </table>
 
             </div>
+
 
             <ProjectPagination
 

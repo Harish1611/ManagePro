@@ -1,9 +1,13 @@
 import {
+
     createSlice,
+
     createAsyncThunk,
+
 } from "@reduxjs/toolkit";
 
 import taskService from "@/services/taskService";
+
 
 /*
 |--------------------------------------------------------------------------
@@ -31,9 +35,12 @@ const initialState = {
 
     loading: false,
 
+    attachmentLoading: false,
+
     error: null,
 
 };
+
 
 /*
 |--------------------------------------------------------------------------
@@ -51,18 +58,26 @@ export const fetchTasks = createAsyncThunk(
 
     "tasks/fetchTasks",
 
-    async (params = {}, thunkAPI) => {
+    async (
+
+        params = {},
+
+        thunkAPI
+
+    ) => {
 
         try {
 
             const response =
-                await taskService.getTasks(params);
+                await taskService.getTasks(
+
+                    params
+
+                );
 
             return response.data;
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             return thunkAPI.rejectWithValue(
 
@@ -78,6 +93,7 @@ export const fetchTasks = createAsyncThunk(
 
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | Fetch Single Task
@@ -88,18 +104,26 @@ export const fetchTask = createAsyncThunk(
 
     "tasks/fetchTask",
 
-    async (taskId, thunkAPI) => {
+    async (
+
+        taskId,
+
+        thunkAPI
+
+    ) => {
 
         try {
 
             const response =
-                await taskService.getTask(taskId);
+                await taskService.getTask(
+
+                    taskId
+
+                );
 
             return response.data;
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             return thunkAPI.rejectWithValue(
 
@@ -115,6 +139,7 @@ export const fetchTask = createAsyncThunk(
 
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | Create Task
@@ -125,20 +150,26 @@ export const createTask = createAsyncThunk(
 
     "tasks/createTask",
 
-    async (taskData, thunkAPI) => {
+    async (
+
+        taskData,
+
+        thunkAPI
+
+    ) => {
 
         try {
 
             const response =
                 await taskService.createTask(
+
                     taskData
+
                 );
 
             return response.data;
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             return thunkAPI.rejectWithValue(
 
@@ -153,6 +184,7 @@ export const createTask = createAsyncThunk(
     }
 
 );
+
 
 /*
 |--------------------------------------------------------------------------
@@ -191,9 +223,7 @@ export const updateTask = createAsyncThunk(
 
             return response.data;
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             return thunkAPI.rejectWithValue(
 
@@ -208,6 +238,7 @@ export const updateTask = createAsyncThunk(
     }
 
 );
+
 
 /*
 |--------------------------------------------------------------------------
@@ -230,14 +261,14 @@ export const deleteTask = createAsyncThunk(
         try {
 
             await taskService.deleteTask(
+
                 taskId
+
             );
 
             return taskId;
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             return thunkAPI.rejectWithValue(
 
@@ -252,6 +283,129 @@ export const deleteTask = createAsyncThunk(
     }
 
 );
+
+
+/*
+|--------------------------------------------------------------------------
+| Upload Task Attachment
+|--------------------------------------------------------------------------
+*/
+
+export const uploadTaskAttachment = createAsyncThunk(
+
+    "tasks/uploadTaskAttachment",
+
+    async (
+
+        {
+
+            taskId,
+
+            file,
+
+        },
+
+        thunkAPI
+
+    ) => {
+
+        try {
+
+            const response =
+                await taskService.uploadTaskAttachment(
+
+                    taskId,
+
+                    file
+
+                );
+
+            return {
+
+                taskId,
+
+                attachments:
+                    response.data.attachments,
+
+            };
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(
+
+                error.response?.data?.message ||
+
+                "Failed to upload attachment"
+
+            );
+
+        }
+
+    }
+
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Delete Task Attachment
+|--------------------------------------------------------------------------
+*/
+
+export const deleteTaskAttachment = createAsyncThunk(
+
+    "tasks/deleteTaskAttachment",
+
+    async (
+
+        {
+
+            taskId,
+
+            attachmentId,
+
+        },
+
+        thunkAPI
+
+    ) => {
+
+        try {
+
+            const response =
+                await taskService.deleteTaskAttachment(
+
+                    taskId,
+
+                    attachmentId
+
+                );
+
+            return {
+
+                taskId,
+
+                attachments:
+                    response.data.attachments,
+
+            };
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(
+
+                error.response?.data?.message ||
+
+                "Failed to delete attachment"
+
+            );
+
+        }
+
+    }
+
+);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -279,6 +433,7 @@ const taskSlice = createSlice({
 
         },
 
+
         /*
         |--------------------------------------------------------------------------
         | Clear Error
@@ -291,6 +446,7 @@ const taskSlice = createSlice({
 
         },
 
+
         /*
         |--------------------------------------------------------------------------
         | Reset State
@@ -300,253 +456,584 @@ const taskSlice = createSlice({
         resetTasks(state) {
 
             Object.assign(
+
                 state,
+
                 initialState
+
             );
 
         },
 
     },
 
-  extraReducers: (builder) => {
+    extraReducers: (builder) => {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Fetch Tasks
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | Fetch Tasks
+        |--------------------------------------------------------------------------
+        */
 
-    builder.addCase(
+        builder.addCase(
 
-        fetchTasks.fulfilled,
+            fetchTasks.fulfilled,
 
-        (state, action) => {
+            (
 
-            state.tasks =
-                action.payload.tasks;
+                state,
 
-            state.pagination =
-                action.payload.pagination;
+                action
 
-        }
+            ) => {
 
-    );
+                state.tasks =
+                    action.payload.tasks;
 
-    /*
-    |--------------------------------------------------------------------------
-    | Fetch Single Task
-    |--------------------------------------------------------------------------
-    */
+                state.pagination =
+                    action.payload.pagination;
 
-    builder.addCase(
+            }
 
-        fetchTask.fulfilled,
+        );
 
-        (state, action) => {
 
-            state.task =
-                action.payload;
+        /*
+        |--------------------------------------------------------------------------
+        | Fetch Single Task
+        |--------------------------------------------------------------------------
+        */
 
-        }
+        builder.addCase(
 
-    );
+            fetchTask.fulfilled,
 
-    /*
-    |--------------------------------------------------------------------------
-    | Create Task
-    |--------------------------------------------------------------------------
-    */
+            (
 
-    builder.addCase(
+                state,
 
-        createTask.fulfilled,
+                action
 
-        (state, action) => {
+            ) => {
 
-            const task = action.payload;
+                state.task =
+                    action.payload;
 
-            state.task = task;
+            }
 
-            state.tasks.unshift(task);
+        );
 
-            state.pagination.total += 1;
 
-            state.pagination.totalPages = Math.ceil(
+        /*
+        |--------------------------------------------------------------------------
+        | Create Task
+        |--------------------------------------------------------------------------
+        */
 
-                state.pagination.total /
-                state.pagination.limit
+        builder.addCase(
 
-            );
+            createTask.fulfilled,
 
-        }
+            (
 
-    );
+                state,
 
-    /*
-    |--------------------------------------------------------------------------
-    | Update Task
-    |--------------------------------------------------------------------------
-    */
+                action
 
-    builder.addCase(
+            ) => {
 
-        updateTask.fulfilled,
+                const task =
+                    action.payload;
 
-        (state, action) => {
+                state.task = task;
 
-            const updatedTask =
-                action.payload;
+                state.tasks.unshift(
 
-            state.task = updatedTask;
-
-            const index =
-                state.tasks.findIndex(
-
-                    (task) =>
-
-                        task._id ===
-                        updatedTask._id
+                    task
 
                 );
 
-            if (index !== -1) {
+                state.pagination.total += 1;
 
-                state.tasks[index] =
+                state.pagination.totalPages =
+                    Math.ceil(
+
+                        state.pagination.total /
+                        state.pagination.limit
+
+                    );
+
+            }
+
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update Task
+        |--------------------------------------------------------------------------
+        */
+
+        builder.addCase(
+
+            updateTask.fulfilled,
+
+            (
+
+                state,
+
+                action
+
+            ) => {
+
+                const updatedTask =
+                    action.payload;
+
+                state.task =
                     updatedTask;
 
-            }
+                const index =
+                    state.tasks.findIndex(
 
-        }
+                        (task) =>
 
-    );
+                            task._id ===
+                            updatedTask._id
 
-    /*
-    |--------------------------------------------------------------------------
-    | Delete Task
-    |--------------------------------------------------------------------------
-    */
+                    );
 
-    builder.addCase(
+                if (index !== -1) {
 
-        deleteTask.fulfilled,
+                    state.tasks[index] =
+                        updatedTask;
 
-        (state, action) => {
-
-            const deletedId =
-                action.payload;
-
-            state.tasks =
-                state.tasks.filter(
-
-                    (task) =>
-
-                        task._id !==
-                        deletedId
-
-                );
-
-            if (
-                state.task?._id ===
-                deletedId
-            ) {
-
-                state.task = null;
+                }
 
             }
 
-            state.pagination.total = Math.max(
-                0,
-                state.pagination.total - 1
-            );
+        );
 
-            state.pagination.totalPages = Math.max(
-                1,
-                Math.ceil(
 
-                    state.pagination.total /
-                    state.pagination.limit
+        /*
+        |--------------------------------------------------------------------------
+        | Delete Task
+        |--------------------------------------------------------------------------
+        */
 
-                )
-            );
+        builder.addCase(
 
-        }
+            deleteTask.fulfilled,
 
-    );
+            (
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pending
-    |--------------------------------------------------------------------------
-    */
+                state,
 
-    builder.addMatcher(
+                action
 
-        (action) =>
+            ) => {
 
-            action.type.startsWith("tasks/") &&
-            action.type.endsWith("/pending"),
+                const deletedId =
+                    action.payload;
 
-        (state) => {
+                state.tasks =
+                    state.tasks.filter(
 
-            state.loading = true;
+                        (task) =>
 
-            state.error = null;
+                            task._id !==
+                            deletedId
 
-        }
+                    );
 
-    );
+                if (
 
-    /*
-    |--------------------------------------------------------------------------
-    | Rejected
-    |--------------------------------------------------------------------------
-    */
+                    state.task?._id ===
+                    deletedId
 
-    builder.addMatcher(
+                ) {
 
-        (action) =>
+                    state.task = null;
 
-            action.type.startsWith("tasks/") &&
-            action.type.endsWith("/rejected"),
+                }
 
-        (state, action) => {
+                state.pagination.total =
+                    Math.max(
 
-            state.loading = false;
+                        0,
 
-            state.error =
+                        state.pagination.total - 1
 
-                action.payload ||
+                    );
 
-                "Something went wrong";
+                state.pagination.totalPages =
+                    Math.max(
 
-        }
+                        1,
 
-    );
+                        Math.ceil(
 
-    /*
-    |--------------------------------------------------------------------------
-    | Fulfilled
-    |--------------------------------------------------------------------------
-    */
+                            state.pagination.total /
+                            state.pagination.limit
 
-    builder.addMatcher(
+                        )
 
-        (action) =>
+                    );
 
-            action.type.startsWith("tasks/") &&
-            action.type.endsWith("/fulfilled"),
+            }
 
-        (state) => {
+        );
 
-            state.loading = false;
 
-        }
+        /*
+        |--------------------------------------------------------------------------
+        | Upload Attachment Pending
+        |--------------------------------------------------------------------------
+        */
 
-    );
+        builder.addCase(
 
-},
+            uploadTaskAttachment.pending,
+
+            (state) => {
+
+                state.attachmentLoading = true;
+
+                state.error = null;
+
+            }
+
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Upload Attachment Fulfilled
+        |--------------------------------------------------------------------------
+        */
+
+        builder.addCase(
+
+            uploadTaskAttachment.fulfilled,
+
+            (
+
+                state,
+
+                action
+
+            ) => {
+
+                const {
+
+                    taskId,
+
+                    attachments,
+
+                } = action.payload;
+
+
+                state.attachmentLoading = false;
+
+
+                if (
+
+                    state.task?._id ===
+                    taskId
+
+                ) {
+
+                    state.task.attachments =
+                        attachments;
+
+                }
+
+
+                const taskIndex =
+                    state.tasks.findIndex(
+
+                        (task) =>
+
+                            task._id ===
+                            taskId
+
+                    );
+
+
+                if (taskIndex !== -1) {
+
+                    state.tasks[
+                        taskIndex
+                    ].attachments =
+                        attachments;
+
+                }
+
+            }
+
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Upload Attachment Rejected
+        |--------------------------------------------------------------------------
+        */
+
+        builder.addCase(
+
+            uploadTaskAttachment.rejected,
+
+            (
+
+                state,
+
+                action
+
+            ) => {
+
+                state.attachmentLoading = false;
+
+                state.error =
+
+                    action.payload ||
+
+                    "Failed to upload attachment";
+
+            }
+
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete Attachment Pending
+        |--------------------------------------------------------------------------
+        */
+
+        builder.addCase(
+
+            deleteTaskAttachment.pending,
+
+            (state) => {
+
+                state.attachmentLoading = true;
+
+                state.error = null;
+
+            }
+
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete Attachment Fulfilled
+        |--------------------------------------------------------------------------
+        */
+
+        builder.addCase(
+
+            deleteTaskAttachment.fulfilled,
+
+            (
+
+                state,
+
+                action
+
+            ) => {
+
+                const {
+
+                    taskId,
+
+                    attachments,
+
+                } = action.payload;
+
+
+                state.attachmentLoading = false;
+
+
+                if (
+
+                    state.task?._id ===
+                    taskId
+
+                ) {
+
+                    state.task.attachments =
+                        attachments;
+
+                }
+
+
+                const taskIndex =
+                    state.tasks.findIndex(
+
+                        (task) =>
+
+                            task._id ===
+                            taskId
+
+                    );
+
+
+                if (taskIndex !== -1) {
+
+                    state.tasks[
+                        taskIndex
+                    ].attachments =
+                        attachments;
+
+                }
+
+            }
+
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete Attachment Rejected
+        |--------------------------------------------------------------------------
+        */
+
+        builder.addCase(
+
+            deleteTaskAttachment.rejected,
+
+            (
+
+                state,
+
+                action
+
+            ) => {
+
+                state.attachmentLoading = false;
+
+                state.error =
+
+                    action.payload ||
+
+                    "Failed to delete attachment";
+
+            }
+
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | General Pending
+        |--------------------------------------------------------------------------
+        */
+
+        builder.addMatcher(
+
+            (action) =>
+
+                action.type.startsWith(
+                    "tasks/"
+                ) &&
+
+                action.type.endsWith(
+                    "/pending"
+                ) &&
+
+                !action.type.includes(
+                    "TaskAttachment"
+                ),
+
+            (state) => {
+
+                state.loading = true;
+
+                state.error = null;
+
+            }
+
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | General Rejected
+        |--------------------------------------------------------------------------
+        */
+
+        builder.addMatcher(
+
+            (action) =>
+
+                action.type.startsWith(
+                    "tasks/"
+                ) &&
+
+                action.type.endsWith(
+                    "/rejected"
+                ) &&
+
+                !action.type.includes(
+                    "TaskAttachment"
+                ),
+
+            (
+
+                state,
+
+                action
+
+            ) => {
+
+                state.loading = false;
+
+                state.error =
+
+                    action.payload ||
+
+                    "Something went wrong";
+
+            }
+
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | General Fulfilled
+        |--------------------------------------------------------------------------
+        */
+
+        builder.addMatcher(
+
+            (action) =>
+
+                action.type.startsWith(
+                    "tasks/"
+                ) &&
+
+                action.type.endsWith(
+                    "/fulfilled"
+                ) &&
+
+                !action.type.includes(
+                    "TaskAttachment"
+                ),
+
+            (state) => {
+
+                state.loading = false;
+
+            }
+
+        );
+
+    },
 
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -564,6 +1051,7 @@ export const {
 
 } = taskSlice.actions;
 
+
 /*
 |--------------------------------------------------------------------------
 | Selectors
@@ -579,11 +1067,15 @@ export const selectTask = (state) =>
 export const selectTaskLoading = (state) =>
     state.tasks.loading;
 
+export const selectAttachmentLoading = (state) =>
+    state.tasks.attachmentLoading;
+
 export const selectTaskError = (state) =>
     state.tasks.error;
 
 export const selectTaskPagination = (state) =>
     state.tasks.pagination;
+
 
 /*
 |--------------------------------------------------------------------------

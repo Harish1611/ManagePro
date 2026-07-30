@@ -20,11 +20,12 @@ import DashboardCard from "./DashboardCard";
 
 import useDashboard from "@/hooks/useDashboard";
 
+
 export default function StatsGrid() {
 
     const {
 
-        summary,
+        summary = {},
 
         loading,
 
@@ -32,11 +33,13 @@ export default function StatsGrid() {
 
     } = useDashboard();
 
+
     useEffect(() => {
 
         fetchDashboard();
 
-    }, []);
+    }, [ ]);
+
 
     const stats = [
 
@@ -44,11 +47,11 @@ export default function StatsGrid() {
 
             title: "Total Projects",
 
-            value: summary.totalProjects,
+            value: summary.totalProjects ?? 0,
 
             color: "bg-blue-600",
 
-            icon: <FaFolderOpen />,
+            icon: <FaFolderOpen size={24} />,
 
         },
 
@@ -56,11 +59,11 @@ export default function StatsGrid() {
 
             title: "Active Projects",
 
-            value: summary.activeProjects,
+            value: summary.activeProjects ?? 0,
 
             color: "bg-cyan-600",
 
-            icon: <FaProjectDiagram />,
+            icon: <FaProjectDiagram size={24} />,
 
         },
 
@@ -68,11 +71,11 @@ export default function StatsGrid() {
 
             title: "Total Tasks",
 
-            value: summary.totalTasks,
+            value: summary.totalTasks ?? 0,
 
             color: "bg-green-600",
 
-            icon: <FaTasks />,
+            icon: <FaTasks size={24} />,
 
         },
 
@@ -80,11 +83,11 @@ export default function StatsGrid() {
 
             title: "Completed Tasks",
 
-            value: summary.completedTasks,
+            value: summary.completedTasks ?? 0,
 
             color: "bg-emerald-600",
 
-            icon: <FaCheckCircle />,
+            icon: <FaCheckCircle size={24} />,
 
         },
 
@@ -92,11 +95,11 @@ export default function StatsGrid() {
 
             title: "Overdue Tasks",
 
-            value: summary.overdueTasks,
+            value: summary.overdueTasks ?? 0,
 
             color: "bg-red-600",
 
-            icon: <FaExclamationTriangle />,
+            icon: <FaExclamationTriangle size={24} />,
 
         },
 
@@ -104,23 +107,24 @@ export default function StatsGrid() {
 
             title: "My Tasks",
 
-            value: summary.myTasks,
+            value: summary.myTasks ?? 0,
 
             color: "bg-purple-600",
 
-            icon: <FaClipboardList />,
+            icon: <FaClipboardList size={24} />,
 
         },
 
     ];
 
+
     return (
 
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <section aria-label="Dashboard statistics">
 
-            {
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
 
-                stats.map((item) => (
+                {stats.map((item) => (
 
                     <DashboardCard
 
@@ -128,15 +132,7 @@ export default function StatsGrid() {
 
                         title={item.title}
 
-                        value={
-
-                            loading
-
-                                ? "..."
-
-                                : item.value
-
-                        }
+                        value={loading ? "—" : item.value}
 
                         color={item.color}
 
@@ -144,11 +140,11 @@ export default function StatsGrid() {
 
                     />
 
-                ))
+                ))}
 
-            }
+            </div>
 
-        </div>
+        </section>
 
     );
 

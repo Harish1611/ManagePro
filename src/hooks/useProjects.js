@@ -1,34 +1,55 @@
-import { useDispatch, useSelector } from "react-redux";
+import {
+
+    useCallback,
+
+} from "react";
 
 import {
 
-    fetchProjects,
+    useDispatch,
 
-    fetchProject,
+    useSelector,
 
-    fetchProjectMembers,
+} from "react-redux";
 
-    addProjectMembers,
 
-    removeProjectMember,
+import {
 
-    createProject,
+    fetchProjects as fetchProjectsAction,
 
-    updateProject,
+    fetchProject as fetchProjectAction,
 
-    deleteProject,
+    fetchProjectMembers as fetchProjectMembersAction,
 
-    clearProject,
+    addProjectMembers as addProjectMembersAction,
 
-    clearProjectError,
+    removeProjectMember as removeProjectMemberAction,
 
-    resetProjects,
+    createProject as createProjectAction,
+
+    updateProject as updateProjectAction,
+
+    deleteProject as deleteProjectAction,
+
+    clearProject as clearProjectAction,
+
+    clearProjectError as clearProjectErrorAction,
+
+    resetProjects as resetProjectsAction,
 
 } from "@/redux/slices/projectSlice";
+
 
 const useProjects = () => {
 
     const dispatch = useDispatch();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redux State
+    |--------------------------------------------------------------------------
+    */
 
     const {
 
@@ -45,8 +66,262 @@ const useProjects = () => {
         error,
 
     } = useSelector(
+
         (state) => state.projects
+
     );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Project Actions
+    |--------------------------------------------------------------------------
+    */
+
+    const fetchProjects = useCallback(
+
+        (params = {}) => {
+
+            return dispatch(
+
+                fetchProjectsAction(params)
+
+            );
+
+        },
+
+        [dispatch]
+
+    );
+
+
+    const fetchProject = useCallback(
+
+        (projectId) => {
+
+            return dispatch(
+
+                fetchProjectAction(projectId)
+
+            );
+
+        },
+
+        [dispatch]
+
+    );
+
+
+    const createProject = useCallback(
+
+        (projectData) => {
+
+            return dispatch(
+
+                createProjectAction(projectData)
+
+            );
+
+        },
+
+        [dispatch]
+
+    );
+
+
+    const updateProject = useCallback(
+
+        (
+
+            projectId,
+
+            projectData
+
+        ) => {
+
+            return dispatch(
+
+                updateProjectAction({
+
+                    projectId,
+
+                    projectData,
+
+                })
+
+            );
+
+        },
+
+        [dispatch]
+
+    );
+
+
+    const deleteProject = useCallback(
+
+        (projectId) => {
+
+            return dispatch(
+
+                deleteProjectAction(projectId)
+
+            );
+
+        },
+
+        [dispatch]
+
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Project Member Actions
+    |--------------------------------------------------------------------------
+    */
+
+    const fetchProjectMembers = useCallback(
+
+        (projectId) => {
+
+            return dispatch(
+
+                fetchProjectMembersAction(
+
+                    projectId
+
+                )
+
+            );
+
+        },
+
+        [dispatch]
+
+    );
+
+
+    const addProjectMembers = useCallback(
+
+        (
+
+            projectId,
+
+            members
+
+        ) => {
+
+            return dispatch(
+
+                addProjectMembersAction({
+
+                    projectId,
+
+                    members,
+
+                })
+
+            );
+
+        },
+
+        [dispatch]
+
+    );
+
+
+    const removeProjectMember = useCallback(
+
+        (
+
+            projectId,
+
+            userId
+
+        ) => {
+
+            return dispatch(
+
+                removeProjectMemberAction({
+
+                    projectId,
+
+                    userId,
+
+                })
+
+            );
+
+        },
+
+        [dispatch]
+
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Utility Actions
+    |--------------------------------------------------------------------------
+    */
+
+    const clearProject = useCallback(
+
+        () => {
+
+            dispatch(
+
+                clearProjectAction()
+
+            );
+
+        },
+
+        [dispatch]
+
+    );
+
+
+    const clearProjectError = useCallback(
+
+        () => {
+
+            dispatch(
+
+                clearProjectErrorAction()
+
+            );
+
+        },
+
+        [dispatch]
+
+    );
+
+
+    const resetProjects = useCallback(
+
+        () => {
+
+            dispatch(
+
+                resetProjectsAction()
+
+            );
+
+        },
+
+        [dispatch]
+
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Return
+    |--------------------------------------------------------------------------
+    */
 
     return {
 
@@ -68,34 +343,23 @@ const useProjects = () => {
 
         error,
 
+
         /*
         |--------------------------------------------------------------------------
         | Projects
         |--------------------------------------------------------------------------
         */
 
-        fetchProjects: (params = {}) =>
-            dispatch(fetchProjects(params)),
+        fetchProjects,
 
-        fetchProject: (projectId) =>
-            dispatch(fetchProject(projectId)),
+        fetchProject,
 
-        createProject: (projectData) =>
-            dispatch(createProject(projectData)),
+        createProject,
 
-        updateProject: (
-            projectId,
-            projectData
-        ) =>
-            dispatch(
-                updateProject({
-                    projectId,
-                    projectData,
-                })
-            ),
+        updateProject,
 
-        deleteProject: (projectId) =>
-            dispatch(deleteProject(projectId)),
+        deleteProject,
+
 
         /*
         |--------------------------------------------------------------------------
@@ -103,32 +367,12 @@ const useProjects = () => {
         |--------------------------------------------------------------------------
         */
 
-        fetchProjectMembers: (projectId) =>
-            dispatch(
-                fetchProjectMembers(projectId)
-            ),
+        fetchProjectMembers,
 
-        addProjectMembers: (
-            projectId,
-            members
-        ) =>
-            dispatch(
-                addProjectMembers({
-                    projectId,
-                    members,
-                })
-            ),
+        addProjectMembers,
 
-        removeProjectMember: (
-            projectId,
-            userId
-        ) =>
-            dispatch(
-                removeProjectMember({
-                    projectId,
-                    userId,
-                })
-            ),
+        removeProjectMember,
+
 
         /*
         |--------------------------------------------------------------------------
@@ -136,17 +380,15 @@ const useProjects = () => {
         |--------------------------------------------------------------------------
         */
 
-        clearProject: () =>
-            dispatch(clearProject()),
+        clearProject,
 
-        clearProjectError: () =>
-            dispatch(clearProjectError()),
+        clearProjectError,
 
-        resetProjects: () =>
-            dispatch(resetProjects()),
+        resetProjects,
 
     };
 
 };
+
 
 export default useProjects;

@@ -1,23 +1,31 @@
+
 import {
 
     ArrowDownAZ,
+
+    ArrowUpAZ,
 
     CalendarDays,
 
 } from "lucide-react";
 
-import TaskPriorityBadge from "./TaskPriorityBadge";
-import TaskStatusBadge from "./TaskStatusBadge";
+
 import TaskMenu from "./TaskMenu";
+
 import TaskPagination from "./TaskPagination";
+
+import TaskPriorityBadge from "./TaskPriorityBadge";
+
+import TaskStatusBadge from "./TaskStatusBadge";
+
 
 export default function TaskTable({
 
-    tasks,
+    tasks = [],
 
-    pagination,
+    pagination = {},
 
-    filters,
+    filters = {},
 
     setFilters,
 
@@ -25,35 +33,218 @@ export default function TaskTable({
 
     onDelete,
 
+    onView,
+
 }) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sort
+    |--------------------------------------------------------------------------
+    */
 
     const handleSort = (field) => {
 
-        const current = filters.sort || "-createdAt";
+        setFilters((currentFilters) => {
 
-        let nextSort = field;
+            const currentSort =
 
-        if (current === field) {
+                currentFilters.sort ||
 
-            nextSort = `-${field}`;
+                "-createdAt";
 
-        } else if (current === `-${field}`) {
 
-            nextSort = field;
+            const nextSort =
 
-        }
+                currentSort === field
 
-        setFilters({
+                    ? `-${field}`
 
-            ...filters,
+                    : field;
 
-            sort: nextSort,
 
-            page: 1,
+            return {
+
+                ...currentFilters,
+
+                sort: nextSort,
+
+                page: 1,
+
+            };
 
         });
 
     };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | View Task
+    |--------------------------------------------------------------------------
+    */
+
+    const handleView = (task) => {
+
+        if (
+
+            typeof onView === "function"
+
+        ) {
+
+            onView(task);
+
+        }
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Keyboard Navigation
+    |--------------------------------------------------------------------------
+    */
+
+    const handleRowKeyDown = (
+
+        event,
+
+        task
+
+    ) => {
+
+        if (
+
+            event.key !== "Enter" &&
+
+            event.key !== " "
+
+        ) {
+
+            return;
+
+        }
+
+
+        event.preventDefault();
+
+        handleView(task);
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Date Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    const formatDueDate = (dueDate) => {
+
+        if (!dueDate) {
+
+            return "No Due Date";
+
+        }
+
+
+        const date =
+
+            new Date(dueDate);
+
+
+        if (
+
+            Number.isNaN(
+
+                date.getTime()
+
+            )
+
+        ) {
+
+            return "Invalid Date";
+
+        }
+
+
+        return date.toLocaleDateString(
+
+            "en-US",
+
+            {
+
+                year: "numeric",
+
+                month: "short",
+
+                day: "numeric",
+
+            }
+
+        );
+
+    };
+
+
+    const isTaskOverdue = (task) => {
+
+        if (
+
+            !task.dueDate ||
+
+            task.status === "Done"
+
+        ) {
+
+            return false;
+
+        }
+
+
+        const dueDate =
+
+            new Date(task.dueDate);
+
+
+        if (
+
+            Number.isNaN(
+
+                dueDate.getTime()
+
+            )
+
+        ) {
+
+            return false;
+
+        }
+
+
+        dueDate.setHours(
+
+            23,
+
+            59,
+
+            59,
+
+            999
+
+        );
+
+
+        return dueDate < new Date();
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sort Button
+    |--------------------------------------------------------------------------
+    */
 
     const SortButton = ({
 
@@ -61,43 +252,105 @@ export default function TaskTable({
 
         field,
 
-    }) => (
+    }) => {
 
-        <button
+        const isAscending =
 
-            onClick={() =>
+            filters.sort === field;
 
-                handleSort(field)
 
-            }
+        const isDescending =
 
-            className="inline-flex items-center gap-1 font-medium hover:text-blue-600"
+            filters.sort === `-${field}`;
 
-        >
 
-            {label}
+        const SortIcon =
 
-            <ArrowDownAZ size={14} />
+            isAscending
 
-        </button>
+                ? ArrowUpAZ
 
-    );
+                : ArrowDownAZ;
+
+
+        return (
+
+            <button
+
+                type="button"
+
+                onClick={() =>
+
+                    handleSort(field)
+
+                }
+
+                aria-label={`Sort by ${label}`}
+
+                className={`
+                    inline-flex
+                    items-center
+                    gap-1.5
+                    rounded-lg
+                    font-semibold
+                    transition
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-blue-500/20
+                    ${
+                        isAscending ||
+                        isDescending
+
+                            ? "text-blue-600 dark:text-blue-400"
+
+                            : "text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+                    }
+                `}
+
+            >
+
+                {label}
+
+                <SortIcon
+
+                    size={14}
+
+                    aria-hidden="true"
+
+                />
+
+            </button>
+
+        );
+
+    };
+
 
     return (
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow dark:border-gray-800 dark:bg-gray-900">
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
 
-            {/* Horizontal scroll */}
+            {/*
+            |--------------------------------------------------------------------------
+            | Horizontal Scroll
+            |--------------------------------------------------------------------------
+            */}
 
             <div className="overflow-x-auto">
 
-                <table className="min-w-[1000px] w-full">
+                <table className="w-full min-w-[1000px]">
 
-                    <thead className="bg-gray-100 dark:bg-gray-800">
+                    <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/60">
 
                         <tr>
 
-                            <th className="px-6 py-4 text-left">
+                            <th
+
+                                scope="col"
+
+                                className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+
+                            >
 
                                 <SortButton
 
@@ -109,31 +362,66 @@ export default function TaskTable({
 
                             </th>
 
-                            <th className="px-6 py-4 text-left">
+
+                            <th
+
+                                scope="col"
+
+                                className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+
+                            >
 
                                 Project
 
                             </th>
 
-                            <th className="px-6 py-4 text-left">
+
+                            <th
+
+                                scope="col"
+
+                                className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+
+                            >
 
                                 Priority
 
                             </th>
 
-                            <th className="px-6 py-4 text-left">
+
+                            <th
+
+                                scope="col"
+
+                                className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+
+                            >
 
                                 Status
 
                             </th>
 
-                            <th className="px-6 py-4 text-left">
+
+                            <th
+
+                                scope="col"
+
+                                className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+
+                            >
 
                                 Assigned
 
                             </th>
 
-                            <th className="px-6 py-4 text-left">
+
+                            <th
+
+                                scope="col"
+
+                                className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+
+                            >
 
                                 <SortButton
 
@@ -145,7 +433,14 @@ export default function TaskTable({
 
                             </th>
 
-                            <th className="px-6 py-4 text-right">
+
+                            <th
+
+                                scope="col"
+
+                                className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+
+                            >
 
                                 Actions
 
@@ -155,169 +450,343 @@ export default function TaskTable({
 
                     </thead>
 
-                    <tbody>
 
-                        {tasks.map((task) => (
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
 
-                            <tr
+                        {tasks.map((task) => {
 
-                                key={task._id}
+                            const overdue =
 
-                                className="border-t border-gray-200 transition hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800"
+                                isTaskOverdue(task);
 
-                            >
 
-                                {/* Task */}
+                            return (
 
-                                <td className="px-6 py-4">
+                                <tr
 
-                                    <div className="flex items-start gap-3">
+                                    key={task._id}
 
-                                        <div
+                                    tabIndex={0}
 
-                                            className="mt-1 h-4 w-4 rounded-full"
+                                    onClick={() =>
 
-                                            style={{
+                                        handleView(task)
 
-                                                backgroundColor:
+                                    }
 
-                                                    task.project?.color ||
+                                    onKeyDown={(event) =>
 
-                                                    "#3B82F6",
+                                        handleRowKeyDown(
 
-                                            }}
+                                            event,
 
-                                        />
+                                            task
 
-                                        <div>
+                                        )
 
-                                            <p className="font-medium">
+                                    }
 
-                                                {task.title}
+                                    aria-label={`View task ${task.title}`}
 
-                                            </p>
+                                    className="
+                                        group
+                                        cursor-pointer
+                                        transition-colors
+                                        hover:bg-blue-50/50
+                                        focus:bg-blue-50/50
+                                        focus:outline-none
+                                        dark:hover:bg-gray-800/70
+                                        dark:focus:bg-gray-800/70
+                                    "
 
-                                            <p className="mt-1 max-w-xs truncate text-sm text-gray-500">
+                                >
 
-                                                {
+                                    {/*
+                                    |--------------------------------------------------------------------------
+                                    | Task
+                                    |--------------------------------------------------------------------------
+                                    */}
 
-                                                    task.description ||
+                                    <td className="px-6 py-4">
 
-                                                    "-"
+                                        <div className="flex items-start gap-3">
 
-                                                }
+                                            <span
 
-                                            </p>
+                                                className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full ring-4 ring-gray-100 dark:ring-gray-800"
+
+                                                style={{
+
+                                                    backgroundColor:
+
+                                                        task.project?.color ||
+
+                                                        "#3B82F6",
+
+                                                }}
+
+                                                aria-hidden="true"
+
+                                            />
+
+
+                                            <div className="min-w-0">
+
+                                                <p className="font-semibold text-gray-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+
+                                                    {
+
+                                                        task.title ||
+
+                                                        "Untitled Task"
+
+                                                    }
+
+                                                </p>
+
+
+                                                <p className="mt-1 max-w-xs truncate text-sm text-gray-500 dark:text-gray-400">
+
+                                                    {
+
+                                                        task.description ||
+
+                                                        "No description"
+
+                                                    }
+
+                                                </p>
+
+                                            </div>
 
                                         </div>
 
-                                    </div>
+                                    </td>
 
-                                </td>
 
-                                {/* Project */}
+                                    {/*
+                                    |--------------------------------------------------------------------------
+                                    | Project
+                                    |--------------------------------------------------------------------------
+                                    */}
 
-                                <td className="px-6 py-4">
-
-                                    {
-
-                                        task.project?.name ||
-
-                                        "-"
-
-                                    }
-
-                                </td>
-
-                                {/* Priority */}
-
-                                <td className="px-6 py-4">
-
-                                    <TaskPriorityBadge
-
-                                        priority={task.priority}
-
-                                    />
-
-                                </td>
-
-                                {/* Status */}
-
-                                <td className="px-6 py-4">
-
-                                    <TaskStatusBadge
-
-                                        status={task.status}
-
-                                    />
-
-                                </td>
-
-                                {/* Assigned */}
-
-                                <td className="px-6 py-4">
-
-                                    {
-
-                                        task.assignedTo?.name ||
-
-                                        "Unassigned"
-
-                                    }
-
-                                </td>
-
-                                {/* Due */}
-
-                                <td className="px-6 py-4">
-
-                                    <div className="flex items-center gap-2">
-
-                                        <CalendarDays size={16} />
+                                    <td className="px-6 py-4 text-sm font-medium text-gray-700 dark:text-gray-300">
 
                                         {
 
-                                            task.dueDate
+                                            task.project?.name ||
 
-                                                ? new Date(
-
-                                                    task.dueDate
-
-                                                ).toLocaleDateString()
-
-                                                : "-"
+                                            "No Project"
 
                                         }
 
-                                    </div>
+                                    </td>
 
-                                </td>
 
-                                {/* Actions */}
+                                    {/*
+                                    |--------------------------------------------------------------------------
+                                    | Priority
+                                    |--------------------------------------------------------------------------
+                                    */}
 
-                                <td className="px-6 py-4 text-right">
+                                    <td className="px-6 py-4">
 
-                                    <TaskMenu
+                                        <TaskPriorityBadge
 
-                                        task={task}
+                                            priority={task.priority}
 
-                                        onEdit={onEdit}
+                                        />
 
-                                        onDelete={onDelete}
+                                    </td>
 
-                                    />
 
-                                </td>
+                                    {/*
+                                    |--------------------------------------------------------------------------
+                                    | Status
+                                    |--------------------------------------------------------------------------
+                                    */}
 
-                            </tr>
+                                    <td className="px-6 py-4">
 
-                        ))}
+                                        <TaskStatusBadge
+
+                                            status={task.status}
+
+                                        />
+
+                                    </td>
+
+
+                                    {/*
+                                    |--------------------------------------------------------------------------
+                                    | Assigned User
+                                    |--------------------------------------------------------------------------
+                                    */}
+
+                                    <td className="px-6 py-4">
+
+                                        <div className="flex items-center gap-2.5">
+
+                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+
+                                                {
+
+                                                    task.assignedTo?.name
+
+                                                        ?.charAt(0)
+
+                                                        ?.toUpperCase() ||
+
+                                                    "U"
+
+                                                }
+
+                                            </div>
+
+
+                                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+
+                                                {
+
+                                                    task.assignedTo?.name ||
+
+                                                    "Unassigned"
+
+                                                }
+
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    {/*
+                                    |--------------------------------------------------------------------------
+                                    | Due Date
+                                    |--------------------------------------------------------------------------
+                                    */}
+
+                                    <td className="px-6 py-4">
+
+                                        <div
+
+                                            className={`
+                                                inline-flex
+                                                items-center
+                                                gap-2
+                                                text-sm
+                                                font-medium
+                                                ${
+                                                    overdue
+
+                                                        ? "text-red-600 dark:text-red-400"
+
+                                                        : "text-gray-700 dark:text-gray-300"
+                                                }
+                                            `}
+
+                                        >
+
+                                            <CalendarDays
+
+                                                size={16}
+
+                                                className="shrink-0"
+
+                                                aria-hidden="true"
+
+                                            />
+
+
+                                            <span>
+
+                                                {
+
+                                                    formatDueDate(
+
+                                                        task.dueDate
+
+                                                    )
+
+                                                }
+
+                                            </span>
+
+
+                                            {overdue && (
+
+                                                <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-900/30 dark:text-red-300">
+
+                                                    Overdue
+
+                                                </span>
+
+                                            )}
+
+                                        </div>
+
+                                    </td>
+
+
+                                    {/*
+                                    |--------------------------------------------------------------------------
+                                    | Actions
+                                    |--------------------------------------------------------------------------
+                                    */}
+
+                                    <td className="px-6 py-4 text-right">
+
+                                        <div
+
+                                            className="inline-flex"
+
+                                            onClick={(event) =>
+
+                                                event.stopPropagation()
+
+                                            }
+
+                                            onKeyDown={(event) =>
+
+                                                event.stopPropagation()
+
+                                            }
+
+                                        >
+
+                                            <TaskMenu
+
+                                                task={task}
+
+                                                onEdit={onEdit}
+
+                                                onDelete={onDelete}
+
+                                            />
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            );
+
+                        })}
 
                     </tbody>
 
                 </table>
 
             </div>
+
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Pagination
+            |--------------------------------------------------------------------------
+            */}
 
             <TaskPagination
 
@@ -334,3 +803,4 @@ export default function TaskTable({
     );
 
 }
+

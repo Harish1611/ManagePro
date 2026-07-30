@@ -1,51 +1,72 @@
 
-import { useEffect, useMemo, useState } from "react";
+import {
 
-import { useDispatch, useSelector } from "react-redux";
+    useCallback,
+
+    useEffect,
+
+    useMemo,
+
+    useState,
+
+} from "react";
 
 import {
+
+    useDispatch,
+
+    useSelector,
+
+} from "react-redux";
+
+import {
+
     fetchProjects,
+
     selectProjects,
+
 } from "@/redux/slices/projectSlice";
 
 import useTasks from "@/hooks/useTasks";
+
 import useTaskFilters from "@/hooks/useTaskFilters";
 
 import TaskHeader from "@/components/tasks/TaskHeader";
+
 import TaskToolbar from "@/components/tasks/TaskToolbar";
 
 import TaskGrid from "@/components/tasks/TaskGrid";
+
 import TaskTable from "@/components/tasks/TaskTable";
 
 import TaskSkeleton from "@/components/tasks/TaskSkeleton";
+
 import EmptyTasks from "@/components/tasks/EmptyTasks";
+
 import ErrorTasks from "@/components/tasks/ErrorTasks";
 
 import TaskModal from "@/components/tasks/TaskModal";
+
 import DeleteTaskModal from "@/components/tasks/DeleteTaskModal";
 
-/*
-|--------------------------------------------------------------------------
-| Optional Hooks
-|--------------------------------------------------------------------------
-| Used to populate filter dropdowns.
-| If you haven't created these hooks yet,
-| simply replace with empty arrays.
-|--------------------------------------------------------------------------
-*/
+import TaskDetailsModal from "@/components/tasks/TaskDetailsModal";
 
-// import useProjects from "@/hooks/useProjects";
-// import useUsers from "@/hooks/useUsers";
 
 export default function Tasks() {
 
     const dispatch = useDispatch();
 
-    const projects = useSelector(selectProjects);
+
+    const projects = useSelector(
+
+        selectProjects
+
+    );
+
 
     /*
     |--------------------------------------------------------------------------
-    | Redux
+    | Tasks
     |--------------------------------------------------------------------------
     */
 
@@ -59,9 +80,37 @@ export default function Tasks() {
 
         error,
 
-        fetchTasks,
+        getTasks,
 
     } = useTasks();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fetch Tasks When Filters Change
+    |--------------------------------------------------------------------------
+    */
+
+    const handleFiltersChange = useCallback(
+
+        (filterValues) => {
+
+            getTasks(
+
+                filterValues
+
+            );
+
+        },
+
+        [
+
+            getTasks,
+
+        ]
+
+    );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -75,7 +124,12 @@ export default function Tasks() {
 
         setFilters,
 
-    } = useTaskFilters(fetchTasks);
+    } = useTaskFilters(
+
+        handleFiltersChange
+
+    );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -83,7 +137,14 @@ export default function Tasks() {
     |--------------------------------------------------------------------------
     */
 
-    const [view, setView] = useState("grid");
+    const [
+
+        view,
+
+        setView,
+
+    ] = useState("grid");
+
 
     const [
 
@@ -93,6 +154,7 @@ export default function Tasks() {
 
     ] = useState(null);
 
+
     const [
 
         showModal,
@@ -100,6 +162,7 @@ export default function Tasks() {
         setShowModal,
 
     ] = useState(false);
+
 
     const [
 
@@ -109,54 +172,122 @@ export default function Tasks() {
 
     ] = useState(false);
 
+
+    const [
+
+        detailsTaskId,
+
+        setDetailsTaskId,
+
+    ] = useState(null);
+
+
     /*
     |--------------------------------------------------------------------------
-    | Filter Data
+    | Selected Details Task
     |--------------------------------------------------------------------------
     */
 
-   const users = useMemo(() => {
+    const detailsTask = useMemo(() => {
 
-    const map = new Map();
+        if (!detailsTaskId) {
 
-    tasks.forEach((task) => {
-
-        if (task.assignedTo) {
-
-            map.set(
-                task.assignedTo._id,
-                task.assignedTo
-            );
+            return null;
 
         }
 
-    });
 
-    return [...map.values()];
+        return tasks.find(
 
-}, [tasks]);
+            (task) =>
+
+                task._id === detailsTaskId
+
+        ) || null;
+
+    }, [
+
+        detailsTaskId,
+
+        tasks,
+
+    ]);
+
 
     /*
     |--------------------------------------------------------------------------
-    | Initial Fetch
+    | Available Assignees
+    |--------------------------------------------------------------------------
+    */
+
+    const users = useMemo(() => {
+
+        const userMap = new Map();
+
+
+        tasks.forEach((task) => {
+
+            const assignedUser =
+
+                task.assignedTo;
+
+
+            if (
+
+                assignedUser?._id
+
+            ) {
+
+                userMap.set(
+
+                    assignedUser._id,
+
+                    assignedUser
+
+                );
+
+            }
+
+        });
+
+
+        return [
+
+            ...userMap.values(),
+
+        ];
+
+    }, [
+
+        tasks,
+
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fetch Projects
     |--------------------------------------------------------------------------
     */
 
     useEffect(() => {
 
-    dispatch(fetchProjects());
+        dispatch(
 
-}, [dispatch]);
+            fetchProjects()
 
-    useEffect(() => {
+        );
 
-        fetchTasks(filters);
+    }, [
 
-    }, [filters]);
+        dispatch,
+
+    ]);
+
 
     /*
     |--------------------------------------------------------------------------
-    | Create
+    | Create Task
     |--------------------------------------------------------------------------
     */
 
@@ -168,13 +299,16 @@ export default function Tasks() {
 
     };
 
+
     /*
     |--------------------------------------------------------------------------
-    | Edit
+    | Edit Task
     |--------------------------------------------------------------------------
     */
 
     const handleEdit = (task) => {
+
+        setDetailsTaskId(null);
 
         setSelectedTask(task);
 
@@ -182,13 +316,16 @@ export default function Tasks() {
 
     };
 
+
     /*
     |--------------------------------------------------------------------------
-    | Delete
+    | Delete Task
     |--------------------------------------------------------------------------
     */
 
     const handleDelete = (task) => {
+
+        setDetailsTaskId(null);
 
         setSelectedTask(task);
 
@@ -196,17 +333,93 @@ export default function Tasks() {
 
     };
 
+
     /*
     |--------------------------------------------------------------------------
-    | Render
+    | View Task
     |--------------------------------------------------------------------------
     */
 
+    const handleView = (task) => {
+
+        setDetailsTaskId(
+
+            task._id
+
+        );
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Retry Fetch
+    |--------------------------------------------------------------------------
+    */
+
+    const handleRetry = () => {
+
+        getTasks(
+
+            filters
+
+        );
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close Task Modal
+    |--------------------------------------------------------------------------
+    */
+
+    const handleCloseTaskModal = () => {
+
+        setShowModal(false);
+
+        setSelectedTask(null);
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close Delete Modal
+    |--------------------------------------------------------------------------
+    */
+
+    const handleCloseDeleteModal = () => {
+
+        setDeleteModal(false);
+
+        setSelectedTask(null);
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close Details Modal
+    |--------------------------------------------------------------------------
+    */
+
+    const handleCloseDetailsModal = () => {
+
+        setDetailsTaskId(null);
+
+    };
+
+
     return (
 
-        <div className="space-y-6">
+        <div className="min-h-full space-y-6 text-slate-900 dark:text-slate-100">
 
-            {/* Header */}
+            {/*
+            |--------------------------------------------------------------------------
+            | Header
+            |--------------------------------------------------------------------------
+            */}
 
             <TaskHeader
 
@@ -214,7 +427,12 @@ export default function Tasks() {
 
             />
 
-            {/* Toolbar */}
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Toolbar
+            |--------------------------------------------------------------------------
+            */}
 
             <TaskToolbar
 
@@ -232,39 +450,44 @@ export default function Tasks() {
 
             />
 
-            {/* Loading */}
 
-            {
+            {/*
+            |--------------------------------------------------------------------------
+            | Loading State
+            |--------------------------------------------------------------------------
+            */}
 
-                loading &&
+            {loading && (
 
                 <TaskSkeleton />
 
-            }
+            )}
 
-            {/* Error */}
 
-            {
+            {/*
+            |--------------------------------------------------------------------------
+            | Error State
+            |--------------------------------------------------------------------------
+            */}
 
-                !loading &&
-
-                error &&
+            {!loading && error && (
 
                 <ErrorTasks
 
                     message={error}
 
-                    retry={() =>
-
-                        fetchTasks(filters)
-
-                    }
+                    retry={handleRetry}
 
                 />
 
-            }
+            )}
 
-            {/* Empty */}
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Empty State
+            |--------------------------------------------------------------------------
+            */}
 
             {
 
@@ -272,65 +495,114 @@ export default function Tasks() {
 
                 !error &&
 
-                tasks.length === 0 &&
+                tasks.length === 0 && (
 
-                <EmptyTasks
+                    <EmptyTasks
 
-                    onCreate={handleCreate}
+                        onCreate={handleCreate}
 
-                />
-
-            }
-
-            {/* Content */}
-
-            {
-
-                !loading &&
-
-                !error &&
-
-                tasks.length > 0 &&
-
-                (
-
-                    view === "grid"
-
-                        ?
-
-                        <TaskGrid
-
-                            tasks={tasks}
-
-                            onEdit={handleEdit}
-
-                            onDelete={handleDelete}
-
-                        />
-
-                        :
-
-                        <TaskTable
-
-                            tasks={tasks}
-
-                            pagination={pagination}
-
-                            filters={filters}
-
-                            setFilters={setFilters}
-
-                            onEdit={handleEdit}
-
-                            onDelete={handleDelete}
-
-                        />
+                    />
 
                 )
 
             }
 
-            {/* Create / Edit */}
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Task Content
+            |--------------------------------------------------------------------------
+            */}
+
+            {
+
+                !loading &&
+
+                !error &&
+
+                tasks.length > 0 && (
+
+                    view === "grid"
+
+                        ? (
+
+                            <TaskGrid
+
+                                tasks={tasks}
+
+                                onEdit={handleEdit}
+
+                                onDelete={handleDelete}
+
+                                onView={handleView}
+ pagination={pagination}
+
+   filters={filters}
+
+                                setFilters={setFilters}
+                            />
+
+                        )
+
+                        : (
+
+                            <TaskTable
+
+                                tasks={tasks}
+
+                                pagination={pagination}
+
+                                filters={filters}
+
+                                setFilters={setFilters}
+
+                                onEdit={handleEdit}
+
+                                onDelete={handleDelete}
+
+                                onView={handleView}
+
+                            />
+
+                        )
+
+                )
+
+            }
+
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Task Details Modal
+            |--------------------------------------------------------------------------
+            */}
+
+            <TaskDetailsModal
+
+                open={Boolean(
+
+                    detailsTaskId
+
+                )}
+
+                task={detailsTask}
+
+                onClose={
+
+                    handleCloseDetailsModal
+
+                }
+
+                onEdit={handleEdit}
+
+            />
+
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Create / Edit Task Modal
+            |--------------------------------------------------------------------------
+            */}
 
             <TaskModal
 
@@ -340,17 +612,20 @@ export default function Tasks() {
 
                 loading={loading}
 
-                onClose={() => {
+                onClose={
 
-                    setShowModal(false);
+                    handleCloseTaskModal
 
-                    setSelectedTask(null);
-
-                }}
+                }
 
             />
 
-            {/* Delete */}
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Delete Task Modal
+            |--------------------------------------------------------------------------
+            */}
 
             <DeleteTaskModal
 
@@ -360,13 +635,11 @@ export default function Tasks() {
 
                 loading={loading}
 
-                onClose={() => {
+                onClose={
 
-                    setDeleteModal(false);
+                    handleCloseDeleteModal
 
-                    setSelectedTask(null);
-
-                }}
+                }
 
             />
 
@@ -375,3 +648,4 @@ export default function Tasks() {
     );
 
 }
+

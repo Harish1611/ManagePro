@@ -1,3 +1,12 @@
+import {
+
+    ChevronLeft,
+
+    ChevronRight,
+
+} from "lucide-react";
+
+
 export default function ProjectPagination({
 
     pagination,
@@ -17,19 +26,32 @@ export default function ProjectPagination({
     } = pagination;
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Change Page
+    |--------------------------------------------------------------------------
+    */
+
     const changePage = (newPage) => {
 
         if (
+
             newPage < 1 ||
-            newPage > totalPages
+
+            newPage > totalPages ||
+
+            newPage === page
+
         ) {
+
             return;
+
         }
 
 
-        setFilters((prev) => ({
+        setFilters((currentFilters) => ({
 
-            ...prev,
+            ...currentFilters,
 
             page: newPage,
 
@@ -38,47 +60,154 @@ export default function ProjectPagination({
     };
 
 
+    if (totalPages <= 1) {
+
+        return null;
+
+    }
+
+
     return (
 
-        <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4 dark:border-gray-800">
+        <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 shadow-sm sm:flex-row dark:border-gray-700 dark:bg-gray-900">
+
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+
+                Page{" "}
+
+                <span className="font-semibold text-gray-900 dark:text-white">
+
+                    {page}
+
+                </span>{" "}
+
+                of{" "}
+
+                <span className="font-semibold text-gray-900 dark:text-white">
+
+                    {totalPages}
+
+                </span>
+
+            </p>
 
 
-            <button
+            <div className="flex items-center gap-3">
 
-                disabled={page === 1}
+                <button
 
-                onClick={() => changePage(page - 1)}
+                    type="button"
 
-                className="rounded-lg border px-4 py-2 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-gray-800"
+                    disabled={page === 1}
 
-            >
+                    onClick={() =>
 
-                Previous
+                        changePage(
 
-            </button>
+                            page - 1
+
+                        )
+
+                    }
+
+                    className="
+                        inline-flex
+                        items-center
+                        gap-2
+                        rounded-xl
+                        border
+                        border-gray-300
+                        bg-white
+                        px-4
+                        py-2
+                        text-sm
+                        font-medium
+                        text-gray-700
+                        transition
+                        hover:bg-gray-100
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-blue-500/20
+                        disabled:cursor-not-allowed
+                        disabled:opacity-50
+                        dark:border-gray-700
+                        dark:bg-gray-900
+                        dark:text-gray-300
+                        dark:hover:bg-gray-800
+                    "
+
+                >
+
+                    <ChevronLeft
+
+                        size={16}
+
+                        aria-hidden="true"
+
+                    />
+
+                    Previous
+
+                </button>
 
 
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+                <button
 
-                Page {page} of {totalPages}
+                    type="button"
 
-            </span>
+                    disabled={page === totalPages}
 
+                    onClick={() =>
 
-            <button
+                        changePage(
 
-                disabled={page === totalPages}
+                            page + 1
 
-                onClick={() => changePage(page + 1)}
+                        )
 
-                className="rounded-lg border px-4 py-2 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-gray-800"
+                    }
 
-            >
+                    className="
+                        inline-flex
+                        items-center
+                        gap-2
+                        rounded-xl
+                        border
+                        border-gray-300
+                        bg-white
+                        px-4
+                        py-2
+                        text-sm
+                        font-medium
+                        text-gray-700
+                        transition
+                        hover:bg-gray-100
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-blue-500/20
+                        disabled:cursor-not-allowed
+                        disabled:opacity-50
+                        dark:border-gray-700
+                        dark:bg-gray-900
+                        dark:text-gray-300
+                        dark:hover:bg-gray-800
+                    "
 
-                Next
+                >
 
-            </button>
+                    Next
 
+                    <ChevronRight
+
+                        size={16}
+
+                        aria-hidden="true"
+
+                    />
+
+                </button>
+
+            </div>
 
         </div>
 

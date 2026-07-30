@@ -1,3 +1,4 @@
+
 import {
 
     Grid2X2,
@@ -6,11 +7,35 @@ import {
 
     Search,
 
+    X,
+
 } from "lucide-react";
+
+
+const selectClassName = `
+    min-h-10
+    rounded-xl
+    border
+    border-gray-300
+    bg-white
+    px-3
+    py-2
+    text-sm
+    text-gray-700
+    outline-none
+    transition
+    focus:border-blue-500
+    focus:ring-2
+    focus:ring-blue-500/20
+    dark:border-gray-700
+    dark:bg-gray-900
+    dark:text-gray-300
+`;
+
 
 export default function TaskToolbar({
 
-    filters,
+    filters = {},
 
     setFilters,
 
@@ -24,11 +49,23 @@ export default function TaskToolbar({
 
 }) {
 
-    const handleChange = (key, value) => {
+    /*
+    |--------------------------------------------------------------------------
+    | Update Filters
+    |--------------------------------------------------------------------------
+    */
 
-        setFilters((prev) => ({
+    const handleChange = (
 
-            ...prev,
+        key,
+
+        value
+
+    ) => {
+
+        setFilters((currentFilters) => ({
+
+            ...currentFilters,
 
             page: 1,
 
@@ -38,73 +75,170 @@ export default function TaskToolbar({
 
     };
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Clear Search
+    |--------------------------------------------------------------------------
+    */
+
+    const clearSearch = () => {
+
+        handleChange(
+
+            "search",
+
+            ""
+
+        );
+
+    };
+
+
     return (
 
-        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
 
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
 
-                {/* Search */}
+                {/*
+                |--------------------------------------------------------------------------
+                | Search
+                |--------------------------------------------------------------------------
+                */}
 
-                <div className="relative w-full lg:max-w-sm">
+                <div className="relative w-full xl:max-w-sm">
 
                     <Search
 
                         size={18}
 
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                        aria-hidden="true"
+
+                        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
 
                     />
 
+
                     <input
 
-                        type="text"
+                        type="search"
 
                         placeholder="Search tasks..."
 
-                        value={filters.search}
+                        value={filters.search || ""}
 
-                        onChange={(e) =>
+                        onChange={(event) =>
 
                             handleChange(
 
                                 "search",
 
-                                e.target.value
+                                event.target.value
 
                             )
 
                         }
 
-                        className="w-full rounded-lg border border-gray-300 bg-transparent py-2 pl-10 pr-3 outline-none focus:border-blue-500 dark:border-gray-700"
+                        aria-label="Search tasks"
+
+                        className="
+                            w-full
+                            rounded-xl
+                            border
+                            border-gray-300
+                            bg-white
+                            py-2.5
+                            pl-11
+                            pr-10
+                            text-sm
+                            text-gray-900
+                            outline-none
+                            transition
+                            placeholder:text-gray-400
+                            focus:border-blue-500
+                            focus:ring-2
+                            focus:ring-blue-500/20
+                            dark:border-gray-700
+                            dark:bg-gray-900
+                            dark:text-white
+                            dark:placeholder:text-gray-500
+                        "
 
                     />
 
+
+                    {filters.search && (
+
+                        <button
+
+                            type="button"
+
+                            onClick={clearSearch}
+
+                            aria-label="Clear task search"
+
+                            className="
+                                absolute
+                                right-3
+                                top-1/2
+                                inline-flex
+                                h-7
+                                w-7
+                                -translate-y-1/2
+                                items-center
+                                justify-center
+                                rounded-lg
+                                text-gray-400
+                                transition
+                                hover:bg-gray-100
+                                hover:text-gray-700
+                                focus:outline-none
+                                focus:ring-2
+                                focus:ring-blue-500/20
+                                dark:text-gray-500
+                                dark:hover:bg-gray-800
+                                dark:hover:text-gray-300
+                            "
+
+                        >
+
+                            <X size={15} />
+
+                        </button>
+
+                    )}
+
                 </div>
 
-                {/* Filters */}
+
+                {/*
+                |--------------------------------------------------------------------------
+                | Filters
+                |--------------------------------------------------------------------------
+                */}
 
                 <div className="flex flex-wrap items-center gap-3">
 
-                    {/* Project */}
-
                     <select
 
-                        value={filters.project}
+                        value={filters.project || ""}
 
-                        onChange={(e) =>
+                        onChange={(event) =>
 
                             handleChange(
 
                                 "project",
 
-                                e.target.value
+                                event.target.value
 
                             )
 
                         }
 
-                        className="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700"
+                        aria-label="Filter tasks by project"
+
+                        className={selectClassName}
 
                     >
 
@@ -113,6 +247,7 @@ export default function TaskToolbar({
                             All Projects
 
                         </option>
+
 
                         {projects.map((project) => (
 
@@ -132,31 +267,32 @@ export default function TaskToolbar({
 
                     </select>
 
-                    {/* Status */}
 
                     <select
 
-                        value={filters.status}
+                        value={filters.status || ""}
 
-                        onChange={(e) =>
+                        onChange={(event) =>
 
                             handleChange(
 
                                 "status",
 
-                                e.target.value
+                                event.target.value
 
                             )
 
                         }
 
-                        className="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700"
+                        aria-label="Filter tasks by status"
+
+                        className={selectClassName}
 
                     >
 
                         <option value="">
 
-                            All Status
+                            All Statuses
 
                         </option>
 
@@ -184,33 +320,40 @@ export default function TaskToolbar({
 
                         </option>
 
+                        <option value="Blocked">
+
+                            Blocked
+
+                        </option>
+
                     </select>
 
-                    {/* Priority */}
 
                     <select
 
-                        value={filters.priority}
+                        value={filters.priority || ""}
 
-                        onChange={(e) =>
+                        onChange={(event) =>
 
                             handleChange(
 
                                 "priority",
 
-                                e.target.value
+                                event.target.value
 
                             )
 
                         }
 
-                        className="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700"
+                        aria-label="Filter tasks by priority"
+
+                        className={selectClassName}
 
                     >
 
                         <option value="">
 
-                            All Priority
+                            All Priorities
 
                         </option>
 
@@ -232,7 +375,7 @@ export default function TaskToolbar({
 
                         </option>
 
-                         <option value="Critical">
+                        <option value="Critical">
 
                             Critical
 
@@ -240,25 +383,26 @@ export default function TaskToolbar({
 
                     </select>
 
-                    {/* Assignee */}
 
                     <select
 
-                        value={filters.assignedTo}
+                        value={filters.assignedTo || ""}
 
-                        onChange={(e) =>
+                        onChange={(event) =>
 
                             handleChange(
 
                                 "assignedTo",
 
-                                e.target.value
+                                event.target.value
 
                             )
 
                         }
 
-                        className="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700"
+                        aria-label="Filter tasks by assignee"
+
+                        className={selectClassName}
 
                     >
 
@@ -267,6 +411,7 @@ export default function TaskToolbar({
                             All Members
 
                         </option>
+
 
                         {users.map((user) => (
 
@@ -286,25 +431,26 @@ export default function TaskToolbar({
 
                     </select>
 
-                    {/* Sort */}
 
                     <select
 
-                        value={filters.sort}
+                        value={filters.sort || "-createdAt"}
 
-                        onChange={(e) =>
+                        onChange={(event) =>
 
                             handleChange(
 
                                 "sort",
 
-                                e.target.value
+                                event.target.value
 
                             )
 
                         }
 
-                        className="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700"
+                        aria-label="Sort tasks"
+
+                        className={selectClassName}
 
                     >
 
@@ -322,35 +468,50 @@ export default function TaskToolbar({
 
                         <option value="dueDate">
 
-                            Due Date ↑
+                            Due Date Ascending
 
                         </option>
 
                         <option value="-dueDate">
 
-                            Due Date ↓
+                            Due Date Descending
 
                         </option>
 
                         <option value="priority">
 
-                            Priority ↑
+                            Priority Ascending
 
                         </option>
 
                         <option value="-priority">
 
-                            Priority ↓
+                            Priority Descending
 
                         </option>
 
                     </select>
 
-                    {/* View Toggle */}
 
-                    <div className="flex overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700">
+                    {/*
+                    |--------------------------------------------------------------------------
+                    | View Toggle
+                    |--------------------------------------------------------------------------
+                    */}
+
+                    <div
+
+                        role="group"
+
+                        aria-label="Task view options"
+
+                        className="flex overflow-hidden rounded-xl border border-gray-300 bg-white p-1 dark:border-gray-700 dark:bg-gray-900"
+
+                    >
 
                         <button
+
+                            type="button"
 
                             onClick={() =>
 
@@ -358,13 +519,29 @@ export default function TaskToolbar({
 
                             }
 
-                            className={`p-2 transition ${
-                                view === "grid"
+                            aria-label="Show task grid"
 
-                                    ? "bg-blue-600 text-white"
+                            aria-pressed={view === "grid"}
 
-                                    : ""
-                            }`}
+                            className={`
+                                inline-flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-lg
+                                transition
+                                focus:outline-none
+                                focus:ring-2
+                                focus:ring-blue-500/20
+                                ${
+                                    view === "grid"
+
+                                        ? "bg-blue-600 text-white shadow-sm"
+
+                                        : "text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                                }
+                            `}
 
                         >
 
@@ -372,7 +549,10 @@ export default function TaskToolbar({
 
                         </button>
 
+
                         <button
+
+                            type="button"
 
                             onClick={() =>
 
@@ -380,13 +560,29 @@ export default function TaskToolbar({
 
                             }
 
-                            className={`p-2 transition ${
-                                view === "table"
+                            aria-label="Show task table"
 
-                                    ? "bg-blue-600 text-white"
+                            aria-pressed={view === "table"}
 
-                                    : ""
-                            }`}
+                            className={`
+                                inline-flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-lg
+                                transition
+                                focus:outline-none
+                                focus:ring-2
+                                focus:ring-blue-500/20
+                                ${
+                                    view === "table"
+
+                                        ? "bg-blue-600 text-white shadow-sm"
+
+                                        : "text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                                }
+                            `}
 
                         >
 
@@ -405,3 +601,4 @@ export default function TaskToolbar({
     );
 
 }
+

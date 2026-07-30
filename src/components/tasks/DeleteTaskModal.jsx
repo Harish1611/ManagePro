@@ -4,6 +4,8 @@ import {
 
     Loader2,
 
+    X,
+
 } from "lucide-react";
 
 import {
@@ -12,13 +14,14 @@ import {
 
 } from "react-redux";
 
-import { toast } from "react-hot-toast";
-
 import {
 
     deleteTask,
 
 } from "@/redux/slices/taskSlice";
+
+import useNotifications from "@/hooks/useNotifications";
+
 
 export default function DeleteTaskModal({
 
@@ -34,6 +37,14 @@ export default function DeleteTaskModal({
 
     const dispatch = useDispatch();
 
+
+    const {
+
+        notify,
+
+    } = useNotifications();
+
+
     /*
     |--------------------------------------------------------------------------
     | Delete Task
@@ -42,19 +53,51 @@ export default function DeleteTaskModal({
 
     const handleDelete = async () => {
 
-        if (!task?._id) return;
+        if (
+
+            !task?._id ||
+
+            loading
+
+        ) {
+
+            return;
+
+        }
+
 
         try {
 
+            const taskTitle =
+
+                task.title || "Task";
+
+
             await dispatch(
 
-                deleteTask(task._id)
+                deleteTask(
+
+                    task._id
+
+                )
 
             ).unwrap();
 
-            toast.success(
-                "Task deleted successfully"
-            );
+
+            notify({
+
+                title: "Task Deleted",
+
+                message: `${taskTitle} was deleted successfully.`,
+
+                type: "success",
+
+                entityType: "task",
+
+                entityId: task._id,
+
+            });
+
 
             onClose();
 
@@ -62,72 +105,181 @@ export default function DeleteTaskModal({
 
         catch (error) {
 
-            toast.error(
-                error ||
-                "Failed to delete task"
-            );
+            notify({
+
+                title: "Delete Failed",
+
+                message:
+
+                    typeof error === "string"
+
+                        ? error
+
+                        : error?.message ||
+
+                          "Failed to delete the task.",
+
+                type: "error",
+
+            });
 
         }
 
     };
 
-    if (!open) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close Modal
+    |--------------------------------------------------------------------------
+    */
+
+    const handleClose = () => {
+
+        if (
+
+            loading
+
+        ) {
+
+            return;
+
+        }
+
+
+        onClose();
+
+    };
+
+
+    if (
+
+        !open
+
+    ) {
 
         return null;
 
     }
 
+
     return (
 
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
 
-            <div className="w-full max-w-md rounded-xl bg-white shadow-xl dark:bg-gray-900">
+            role="dialog"
 
-                {/* Header */}
+            aria-modal="true"
 
-                <div className="flex items-center gap-3 border-b border-gray-200 px-6 py-5 dark:border-gray-800">
+            aria-labelledby="delete-task-title"
 
-                    <div className="rounded-full bg-red-100 p-3 dark:bg-red-900/20">
+            className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/60 p-4 backdrop-blur-sm"
 
-                        <AlertTriangle
+            onMouseDown={(event) => {
 
-                            size={24}
+                if (
 
-                            className="text-red-600"
+                    event.target === event.currentTarget
+
+                ) {
+
+                    handleClose();
+
+                }
+
+            }}
+
+        >
+
+            <div className="w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-900">
+
+                {/*
+                |--------------------------------------------------------------------------
+                | Header
+                |--------------------------------------------------------------------------
+                */}
+
+                <div className="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-5 dark:border-gray-800">
+
+                    <div className="flex items-center gap-4">
+
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">
+
+                            <AlertTriangle
+
+                                size={24}
+
+                            />
+
+                        </div>
+
+
+                        <div>
+
+                            <h2
+
+                                id="delete-task-title"
+
+                                className="text-lg font-semibold text-gray-900 dark:text-white"
+
+                            >
+
+                                Delete Task
+
+                            </h2>
+
+
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+
+                                This action cannot be undone.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+
+                        type="button"
+
+                        onClick={handleClose}
+
+                        disabled={loading}
+
+                        aria-label="Close delete task modal"
+
+                        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+
+                    >
+
+                        <X
+
+                            size={19}
 
                         />
 
-                    </div>
-
-                    <div>
-
-                        <h2 className="text-lg font-semibold">
-
-                            Delete Task
-
-                        </h2>
-
-                        <p className="text-sm text-gray-500">
-
-                            This action cannot be undone.
-
-                        </p>
-
-                    </div>
+                    </button>
 
                 </div>
 
-                {/* Body */}
 
-                <div className="px-6 py-5">
+                {/*
+                |--------------------------------------------------------------------------
+                | Body
+                |--------------------------------------------------------------------------
+                */}
 
-                    <p className="text-gray-700 dark:text-gray-300">
+                <div className="px-6 py-6">
+
+                    <p className="text-sm leading-6 text-gray-600 dark:text-gray-300">
 
                         Are you sure you want to delete
 
-                        <span className="mx-1 font-semibold">
+                        <span className="mx-1 font-semibold text-gray-900 dark:text-white">
 
-                            "{task?.title}"
+                            &quot;{task?.title}&quot;
 
                         </span>
 
@@ -135,27 +287,40 @@ export default function DeleteTaskModal({
 
                     </p>
 
+
+                    <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+
+                        The task and its related information will be permanently removed.
+
+                    </div>
+
                 </div>
 
-                {/* Footer */}
 
-                <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4 dark:border-gray-800">
+                {/*
+                |--------------------------------------------------------------------------
+                | Footer
+                |--------------------------------------------------------------------------
+                */}
+
+                <div className="flex flex-col-reverse gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-800 dark:bg-gray-900/50 sm:flex-row sm:justify-end">
 
                     <button
 
                         type="button"
 
-                        onClick={onClose}
+                        onClick={handleClose}
 
                         disabled={loading}
 
-                        className="rounded-lg border border-gray-300 px-5 py-2 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                        className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400/30 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
 
                     >
 
                         Cancel
 
                     </button>
+
 
                     <button
 
@@ -165,25 +330,22 @@ export default function DeleteTaskModal({
 
                         disabled={loading}
 
-                        className="flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2 text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/30 disabled:cursor-not-allowed disabled:opacity-60"
 
                     >
 
-                        {
+                        {loading && (
 
-                            loading && (
+                            <Loader2
 
-                                <Loader2
+                                size={18}
 
-                                    size={18}
+                                className="animate-spin"
 
-                                    className="animate-spin"
+                            />
 
-                                />
+                        )}
 
-                            )
-
-                        }
 
                         {
 
@@ -206,3 +368,4 @@ export default function DeleteTaskModal({
     );
 
 }
+

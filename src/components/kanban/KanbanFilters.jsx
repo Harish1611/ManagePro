@@ -1,22 +1,36 @@
-import { RotateCcw, Search } from "lucide-react";
+import {
 
-import { TASK_PRIORITY } from "@/constants/taskConstants";
+    RotateCcw,
+
+    Search,
+
+} from "lucide-react";
+
+import {
+
+    TASK_PRIORITY,
+
+} from "@/constants/taskConstants";
+
+
+const DEFAULT_FILTERS = {
+
+    search: "",
+
+    project: "",
+
+    assignedTo: "",
+
+    priority: "",
+
+};
+
 
 export default function KanbanFilters({
 
-    filters = {
+    filters = DEFAULT_FILTERS,
 
-        search: "",
-
-        project: "",
-
-        assignedTo: "",
-
-        priority: "",
-
-    },
-
-    setFilters = () => { },
+    setFilters = () => {},
 
     projects = [],
 
@@ -24,11 +38,51 @@ export default function KanbanFilters({
 
 }) {
 
+    /*
+    |--------------------------------------------------------------------------
+    | Input Classes
+    |--------------------------------------------------------------------------
+    */
+
+    const inputClassName = `
+        h-11
+        w-full
+        rounded-xl
+        border
+        border-gray-200
+        bg-white
+        px-3
+        text-sm
+        text-gray-900
+        shadow-sm
+        outline-none
+        transition-all
+        duration-200
+        placeholder:text-gray-400
+        hover:border-gray-300
+        focus:border-indigo-500
+        focus:ring-4
+        focus:ring-indigo-500/10
+        dark:border-gray-700
+        dark:bg-slate-800
+        dark:text-white
+        dark:placeholder:text-gray-500
+        dark:hover:border-gray-600
+        dark:focus:border-indigo-500
+    `;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filter Handlers
+    |--------------------------------------------------------------------------
+    */
+
     const handleChange = (key, value) => {
 
-        setFilters((prev) => ({
+        setFilters((previousFilters) => ({
 
-            ...prev,
+            ...previousFilters,
 
             [key]: value,
 
@@ -36,92 +90,192 @@ export default function KanbanFilters({
 
     };
 
+
     const handleReset = () => {
 
-        setFilters({
-
-            search: "",
-
-            project: "",
-
-            assignedTo: "",
-
-            priority: "",
-
-        });
+        setFilters(DEFAULT_FILTERS);
 
     };
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Active Filters
+    |--------------------------------------------------------------------------
+    */
+
+    const hasActiveFilters =
+
+        Boolean(filters.search) ||
+
+        Boolean(filters.project) ||
+
+        Boolean(filters.assignedTo) ||
+
+        Boolean(filters.priority);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
+
     return (
 
-        <div className="rounded-xl border bg-white p-4 shadow-sm">
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-                {/* Search */}
+        <div className="w-full">
 
-                <div className="relative">
+            <div
+                className="
+                    grid
+                    gap-4
+                    sm:grid-cols-2
+                    xl:grid-cols-[minmax(220px,1.4fr)_repeat(3,minmax(160px,1fr))_auto]
+                    xl:items-end
+                "
+            >
 
-                    <Search
-                        size={18}
-                        className="absolute left-3 top-3 text-gray-400"
-                    />
+                {/*
+                |--------------------------------------------------------------------------
+                | Search
+                |--------------------------------------------------------------------------
+                */}
 
-                    <input
+                <div className="sm:col-span-2 xl:col-span-1">
 
-                        type="text"
+                    <label
+                        htmlFor="kanban-search"
+                        className="
+                            mb-2
+                            block
+                            text-xs
+                            font-semibold
+                            uppercase
+                            tracking-wide
+                            text-gray-500
+                            dark:text-gray-400
+                        "
+                    >
 
-                        placeholder="Search tasks..."
+                        Search
 
-                        value={filters.search}
+                    </label>
 
-                        onChange={(e) =>
+
+                    <div className="relative">
+
+                        <Search
+                            size={17}
+                            className="
+                                pointer-events-none
+                                absolute
+                                left-3.5
+                                top-1/2
+                                -translate-y-1/2
+                                text-gray-400
+                                dark:text-gray-500
+                            "
+                            aria-hidden="true"
+                        />
+
+
+                        <input
+
+                            id="kanban-search"
+
+                            type="search"
+
+                            placeholder="Search tasks..."
+
+                            value={filters.search || ""}
+
+                            onChange={(event) =>
+
+                                handleChange(
+
+                                    "search",
+
+                                    event.target.value
+
+                                )
+
+                            }
+
+                            className={`
+                                ${inputClassName}
+                                pl-10
+                                pr-4
+                            `}
+
+                            autoComplete="off"
+
+                        />
+
+                    </div>
+
+                </div>
+
+
+                {/*
+                |--------------------------------------------------------------------------
+                | Project
+                |--------------------------------------------------------------------------
+                */}
+
+                <div>
+
+                    <label
+                        htmlFor="kanban-project"
+                        className="
+                            mb-2
+                            block
+                            text-xs
+                            font-semibold
+                            uppercase
+                            tracking-wide
+                            text-gray-500
+                            dark:text-gray-400
+                        "
+                    >
+
+                        Project
+
+                    </label>
+
+
+                    <select
+
+                        id="kanban-project"
+
+                        value={filters.project || ""}
+
+                        onChange={(event) =>
 
                             handleChange(
 
-                                "search",
+                                "project",
 
-                                e.target.value
+                                event.target.value
 
                             )
 
                         }
 
-                        className="w-full rounded-lg border py-2 pl-10 pr-3"
+                        className={`
+                            ${inputClassName}
+                            cursor-pointer
+                        `}
 
-                    />
+                    >
 
-                </div>
+                        <option value="">
 
-                {/* Project */}
+                            All Projects
 
-                <select
+                        </option>
 
-                    value={filters.project}
 
-                    onChange={(e) =>
-
-                        handleChange(
-
-                            "project",
-
-                            e.target.value
-
-                        )
-
-                    }
-
-                    className="rounded-lg border px-3 py-2"
-
-                >
-
-                    <option value="">
-
-                        All Projects
-
-                    </option>
-
-                    {
-
-                        projects.map((project) => (
+                        {projects.map((project) => (
 
                             <option
 
@@ -135,43 +289,73 @@ export default function KanbanFilters({
 
                             </option>
 
-                        ))
+                        ))}
 
-                    }
+                    </select>
 
-                </select>
+                </div>
 
-                {/* Assignee */}
 
-                <select
+                {/*
+                |--------------------------------------------------------------------------
+                | Assignee
+                |--------------------------------------------------------------------------
+                */}
 
-                    value={filters.assignedTo}
+                <div>
 
-                    onChange={(e) =>
+                    <label
+                        htmlFor="kanban-assignee"
+                        className="
+                            mb-2
+                            block
+                            text-xs
+                            font-semibold
+                            uppercase
+                            tracking-wide
+                            text-gray-500
+                            dark:text-gray-400
+                        "
+                    >
 
-                        handleChange(
+                        Assignee
 
-                            "assignedTo",
+                    </label>
 
-                            e.target.value
 
-                        )
+                    <select
 
-                    }
+                        id="kanban-assignee"
 
-                    className="rounded-lg border px-3 py-2"
+                        value={filters.assignedTo || ""}
 
-                >
+                        onChange={(event) =>
 
-                    <option value="">
+                            handleChange(
 
-                        All Members
+                                "assignedTo",
 
-                    </option>
+                                event.target.value
 
-                    {
+                            )
 
-                        members.map((member) => (
+                        }
+
+                        className={`
+                            ${inputClassName}
+                            cursor-pointer
+                        `}
+
+                    >
+
+                        <option value="">
+
+                            All Members
+
+                        </option>
+
+
+                        {members.map((member) => (
 
                             <option
 
@@ -185,43 +369,73 @@ export default function KanbanFilters({
 
                             </option>
 
-                        ))
+                        ))}
 
-                    }
+                    </select>
 
-                </select>
+                </div>
 
-                {/* Priority */}
 
-                <select
+                {/*
+                |--------------------------------------------------------------------------
+                | Priority
+                |--------------------------------------------------------------------------
+                */}
 
-                    value={filters.priority}
+                <div>
 
-                    onChange={(e) =>
+                    <label
+                        htmlFor="kanban-priority"
+                        className="
+                            mb-2
+                            block
+                            text-xs
+                            font-semibold
+                            uppercase
+                            tracking-wide
+                            text-gray-500
+                            dark:text-gray-400
+                        "
+                    >
 
-                        handleChange(
+                        Priority
 
-                            "priority",
+                    </label>
 
-                            e.target.value
 
-                        )
+                    <select
 
-                    }
+                        id="kanban-priority"
 
-                    className="rounded-lg border px-3 py-2"
+                        value={filters.priority || ""}
 
-                >
+                        onChange={(event) =>
 
-                    <option value="">
+                            handleChange(
 
-                        All Priorities
+                                "priority",
 
-                    </option>
+                                event.target.value
 
-                    {
+                            )
 
-                        TASK_PRIORITY.map((priority) => (
+                        }
+
+                        className={`
+                            ${inputClassName}
+                            cursor-pointer
+                        `}
+
+                    >
+
+                        <option value="">
+
+                            All Priorities
+
+                        </option>
+
+
+                        {TASK_PRIORITY.map((priority) => (
 
                             <option
 
@@ -235,29 +449,85 @@ export default function KanbanFilters({
 
                             </option>
 
-                        ))
+                        ))}
 
-                    }
+                    </select>
 
-                </select>
+                </div>
 
-                {/* Reset */}
 
-                <button
+                {/*
+                |--------------------------------------------------------------------------
+                | Reset
+                |--------------------------------------------------------------------------
+                */}
 
-                    type="button"
+                <div className="sm:col-span-2 xl:col-span-1">
 
-                    onClick={handleReset}
+                    <button
 
-                    className="flex items-center justify-center gap-2 rounded-lg border px-4 py-2 hover:bg-gray-50"
+                        type="button"
 
-                >
+                        onClick={handleReset}
 
-                    <RotateCcw size={16} />
+                        disabled={!hasActiveFilters}
 
-                    Reset
+                        className="
+                            inline-flex
+                            h-11
+                            w-full
+                            items-center
+                            justify-center
+                            gap-2
+                            whitespace-nowrap
+                            rounded-xl
+                            border
+                            border-gray-200
+                            bg-white
+                            px-4
+                            text-sm
+                            font-semibold
+                            text-gray-600
+                            shadow-sm
+                            transition-all
+                            duration-200
+                            hover:border-gray-300
+                            hover:bg-gray-50
+                            hover:text-gray-900
+                            focus:outline-none
+                            focus:ring-4
+                            focus:ring-indigo-500/10
+                            disabled:cursor-not-allowed
+                            disabled:opacity-50
+                            dark:border-gray-700
+                            dark:bg-slate-800
+                            dark:text-gray-300
+                            dark:hover:border-gray-600
+                            dark:hover:bg-slate-700
+                            dark:hover:text-white
+                            xl:w-auto
+                        "
 
-                </button>
+                    >
+
+                        <RotateCcw
+
+                            size={15}
+
+                            aria-hidden="true"
+
+                        />
+
+
+                        <span>
+
+                            Reset
+
+                        </span>
+
+                    </button>
+
+                </div>
 
             </div>
 

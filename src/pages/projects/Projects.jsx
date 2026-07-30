@@ -1,140 +1,250 @@
-import { useEffect, useState } from "react";
 
-import useProjects from "@/hooks/useProjects";
+import {
+
+    useCallback,
+    useState,
+
+} from "react";
+
+
 import useProjectFilters from "@/hooks/useProjectFilters";
 
-import ProjectHeader from "@/components/projects/ProjectHeader";
-import ProjectToolbar from "@/components/projects/ProjectToolbar";
+import useProjects from "@/hooks/useProjects";
 
-import ProjectSkeleton from "@/components/projects/ProjectSkeleton";
+
+import DeleteProjectModal from "@/components/projects/DeleteProjectModal";
+
 import EmptyProjects from "@/components/projects/EmptyProjects";
+
 import ErrorProjects from "@/components/projects/ErrorProjects";
 
 import ProjectGrid from "@/components/projects/ProjectGrid";
-import ProjectTable from "@/components/projects/ProjectTable";
+
+import ProjectHeader from "@/components/projects/ProjectHeader";
+
+import ProjectMembersModal from "@/components/projects/ProjectMembersModal";
 
 import ProjectModal from "@/components/projects/ProjectModal";
-import DeleteProjectModal from "@/components/projects/DeleteProjectModal";
-import ProjectMembersModal from "@/components/projects/ProjectMembersModal";
+
+import ProjectSkeleton from "@/components/projects/ProjectSkeleton";
+
+import ProjectTable from "@/components/projects/ProjectTable";
+
+import ProjectToolbar from "@/components/projects/ProjectToolbar";
+
 
 export default function Projects() {
 
-
-   
+    /*
+    |--------------------------------------------------------------------------
+    | Project Data
+    |--------------------------------------------------------------------------
+    */
 
     const {
 
-projects,
-pagination,
-loading,
-error,
-fetchProjects,
+        projects = [],
 
-} = useProjects();
+        pagination,
+
+        loading,
+
+        error,
+
+        fetchProjects,
+
+    } = useProjects();
 
 
-
-    const [view, setView] = useState("grid");
-
+    /*
+    |--------------------------------------------------------------------------
+    | View State
+    |--------------------------------------------------------------------------
+    */
 
     const [
+
+        view,
+
+        setView,
+
+    ] = useState("grid");
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Selected Project
+    |--------------------------------------------------------------------------
+    */
+
+    const [
+
         selectedProject,
-        setSelectedProject
+
+        setSelectedProject,
+
     ] = useState(null);
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Modal States
+    |--------------------------------------------------------------------------
+    */
 
     const [
-        showModal,
-        setShowModal
+
+        showProjectModal,
+
+        setShowProjectModal,
+
     ] = useState(false);
 
 
+    const [
+
+        showDeleteModal,
+
+        setShowDeleteModal,
+
+    ] = useState(false);
+
 
     const [
-        deleteModal,
-        setDeleteModal
+
+        showMembersModal,
+
+        setShowMembersModal,
+
     ] = useState(false);
-const [
-    showMembersModal,
-    setShowMembersModal,
-] = useState(false);
 
 
-    const {
+    /*
+    |--------------------------------------------------------------------------
+    | Filters
+    |--------------------------------------------------------------------------
+    */
 
-        filters,
+const {
 
-        setFilters,
+    filters,
 
-    } = useProjectFilters(fetchProjects);
+    setFilters,
+
+} = useProjectFilters(fetchProjects);
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Load Projects
+    |--------------------------------------------------------------------------
+    */
 
-    useEffect(() => {
-
-        fetchProjects(filters);
-
-    }, [filters]);
 
 
 
     /*
-        CREATE PROJECT
+    |--------------------------------------------------------------------------
+    | Create Project
+    |--------------------------------------------------------------------------
     */
 
     const handleCreate = () => {
 
         setSelectedProject(null);
 
-        setShowModal(true);
+        setShowProjectModal(true);
 
     };
 
 
-
     /*
-        EDIT PROJECT
+    |--------------------------------------------------------------------------
+    | Edit Project
+    |--------------------------------------------------------------------------
     */
 
     const handleEdit = (project) => {
 
         setSelectedProject(project);
 
-        setShowModal(true);
+        setShowProjectModal(true);
 
     };
 
 
-
     /*
-        DELETE PROJECT
+    |--------------------------------------------------------------------------
+    | Delete Project
+    |--------------------------------------------------------------------------
     */
 
     const handleDelete = (project) => {
 
         setSelectedProject(project);
 
-        setDeleteModal(true);
+        setShowDeleteModal(true);
 
     };
 
-/*
-    MANAGE MEMBERS
-*/
 
-const handleManageMembers = (project) => {
+    /*
+    |--------------------------------------------------------------------------
+    | Manage Members
+    |--------------------------------------------------------------------------
+    */
 
-    setSelectedProject(project);
+    const handleManageMembers = (project) => {
 
-    setShowMembersModal(true);
+        setSelectedProject(project);
 
-};
+        setShowMembersModal(true);
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close Modals
+    |--------------------------------------------------------------------------
+    */
+
+    const closeProjectModal = useCallback(() => {
+
+        setShowProjectModal(false);
+
+        setSelectedProject(null);
+
+    }, []);
+
+
+    const closeDeleteModal = useCallback(() => {
+
+        setShowDeleteModal(false);
+
+        setSelectedProject(null);
+
+    }, []);
+
+
+    const closeMembersModal = useCallback(() => {
+
+        setShowMembersModal(false);
+
+        setSelectedProject(null);
+
+    }, []);
+
 
     return (
 
         <div className="space-y-6">
 
+            {/*
+            |--------------------------------------------------------------------------
+            | Header
+            |--------------------------------------------------------------------------
+            */}
 
             <ProjectHeader
 
@@ -143,6 +253,11 @@ const handleManageMembers = (project) => {
             />
 
 
+            {/*
+            |--------------------------------------------------------------------------
+            | Toolbar
+            |--------------------------------------------------------------------------
+            */}
 
             <ProjectToolbar
 
@@ -157,163 +272,181 @@ const handleManageMembers = (project) => {
             />
 
 
+            {/*
+            |--------------------------------------------------------------------------
+            | Loading State
+            |--------------------------------------------------------------------------
+            */}
 
-            {
-                loading &&
+            {loading && (
 
                 <ProjectSkeleton />
 
-            }
+            )}
 
 
+            {/*
+            |--------------------------------------------------------------------------
+            | Error State
+            |--------------------------------------------------------------------------
+            */}
 
-            {
-                !loading &&
-                error &&
+            {!loading && error && (
 
                 <ErrorProjects
 
                     message={error}
 
                     retry={() =>
+
                         fetchProjects(filters)
+
                     }
 
                 />
 
-            }
+            )}
 
 
+            {/*
+            |--------------------------------------------------------------------------
+            | Empty State
+            |--------------------------------------------------------------------------
+            */}
 
-            {
-                !loading &&
+            {!loading &&
+
                 !error &&
-                projects.length === 0 &&
 
-                <EmptyProjects
+                projects.length === 0 && (
 
-                    onCreate={handleCreate}
+                    <EmptyProjects
 
-                />
+                        onCreate={handleCreate}
 
-            }
+                    />
+
+                )}
 
 
+            {/*
+            |--------------------------------------------------------------------------
+            | Projects
+            |--------------------------------------------------------------------------
+            */}
 
-            {
-                !loading &&
+            {!loading &&
+
                 !error &&
-                projects.length > 0 &&
 
-                (
+                projects.length > 0 && (
 
-                    view === "grid"
+                    view === "grid" ? (
 
-                    ?
+                        <ProjectGrid
 
-                    <ProjectGrid
+                            projects={projects}
 
-    projects={projects}
+                            pagination={pagination}
 
-    onEdit={handleEdit}
+                            filters={filters}
 
-    onDelete={handleDelete}
+                            setFilters={setFilters}
 
-    onManageMembers={handleManageMembers}
+                            onEdit={handleEdit}
 
-/>
+                            onDelete={handleDelete}
+
+                            onManageMembers={
+                                handleManageMembers
+                            }
+
+                        />
+
+                    ) : (
+
+                        <ProjectTable
+
+                            projects={projects}
+
+                            pagination={pagination}
+
+                            filters={filters}
+
+                            setFilters={setFilters}
+
+                            onEdit={handleEdit}
+
+                            onDelete={handleDelete}
+
+                            onManageMembers={
+                                handleManageMembers
+                            }
+
+                        />
+
+                    )
+
+                )}
 
 
-                    :
-
-
-                   <ProjectTable
-
-    projects={projects}
-
-    pagination={pagination}
-
-    filters={filters}
-
-    setFilters={setFilters}
-
-    onEdit={handleEdit}
-
-    onDelete={handleDelete}
-
-    onManageMembers={handleManageMembers}
-
-/>
-
-                )
-
-            }
-
-
-
-            {/* CREATE / EDIT MODAL */}
+            {/*
+            |--------------------------------------------------------------------------
+            | Create / Edit Modal
+            |--------------------------------------------------------------------------
+            */}
 
             <ProjectModal
 
-                open={showModal}
+                open={showProjectModal}
 
                 project={selectedProject}
 
                 loading={loading}
 
-                onClose={() => {
-
-                    setShowModal(false);
-
-                    setSelectedProject(null);
-
-                }}
+                onClose={closeProjectModal}
 
             />
 
 
-
-            {/* DELETE MODAL */}
+            {/*
+            |--------------------------------------------------------------------------
+            | Delete Modal
+            |--------------------------------------------------------------------------
+            */}
 
             <DeleteProjectModal
 
-                open={deleteModal}
+                open={showDeleteModal}
 
                 project={selectedProject}
 
                 loading={loading}
 
-                onClose={() => {
-
-                    setDeleteModal(false);
-
-                    setSelectedProject(null);
-
-                }}
+                onClose={closeDeleteModal}
 
             />
 
-            {/* PROJECT MEMBERS */}
 
-<ProjectMembersModal
+            {/*
+            |--------------------------------------------------------------------------
+            | Project Members Modal
+            |--------------------------------------------------------------------------
+            */}
 
-    open={showMembersModal}
+            <ProjectMembersModal
 
-    project={selectedProject}
+                open={showMembersModal}
 
-    onClose={() => {
+                project={selectedProject}
 
-        setShowMembersModal(false);
+                onClose={closeMembersModal}
 
-        setSelectedProject(null);
-
-    }}
-
-/>
-
+            />
 
         </div>
 
     );
 
 }
+

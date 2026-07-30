@@ -1,10 +1,11 @@
 import {
 
-    FiGrid,
+    Grid2X2,
 
-    FiList,
+    List,
 
-} from "react-icons/fi";
+} from "lucide-react";
+
 
 export default function ViewToggle({
 
@@ -14,37 +15,109 @@ export default function ViewToggle({
 
 }) {
 
+    const buttonClass = (active) => `
+        inline-flex
+        h-10
+        w-10
+        items-center
+        justify-center
+        transition
+        focus:outline-none
+        focus:ring-2
+        focus:ring-blue-500/20
+        ${
+            active
+                ? "bg-blue-600 text-white"
+                : "bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+        }
+    `;
+
+
     return (
 
-        <div className="flex overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700">
+        <div
+
+            role="group"
+
+            aria-label="Project view"
+
+            className="inline-flex overflow-hidden rounded-xl border border-gray-300 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
+
+        >
 
             <button
 
-                onClick={() => setView("grid")}
+                type="button"
 
-                className={`p-2 ${view === "grid"
-                    ? "bg-blue-600 text-white"
-                    : ""
-                    }`}
+                aria-label="Grid view"
+
+                aria-pressed={view === "grid"}
+
+                onClick={() =>
+
+                    setView("grid")
+
+                }
+
+                className={
+
+                    buttonClass(
+
+                        view === "grid"
+
+                    )
+
+                }
 
             >
 
-                <FiGrid />
+                <Grid2X2
+
+                    size={18}
+
+                    aria-hidden="true"
+
+                />
 
             </button>
 
+
+            <div className="w-px bg-gray-200 dark:bg-gray-700" />
+
+
             <button
 
-                onClick={() => setView("list")}
+                type="button"
 
-                className={`p-2 ${view === "list"
-                    ? "bg-blue-600 text-white"
-                    : ""
-                    }`}
+                aria-label="List view"
+
+                aria-pressed={view === "list"}
+
+                onClick={() =>
+
+                    setView("list")
+
+                }
+
+                className={
+
+                    buttonClass(
+
+                        view === "list"
+
+                    )
+
+                }
 
             >
 
-                <FiList />
+                <List
+
+                    size={18}
+
+                    aria-hidden="true"
+
+                />
 
             </button>
 

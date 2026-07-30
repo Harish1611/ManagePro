@@ -19,7 +19,21 @@ import {
 } from "react-redux";
 
 
+import {
+
+    KeyRound,
+
+    LoaderCircle,
+
+    LockKeyhole,
+
+} from "lucide-react";
+
+
 import toast from "react-hot-toast";
+
+
+import useNotifications from "@/hooks/useNotifications";
 
 
 import {
@@ -41,8 +55,14 @@ import getErrorMessage from "@/utils/getErrorMessage";
 
 export default function ChangePasswordForm() {
 
-
     const dispatch = useDispatch();
+
+
+    const {
+
+        notify,
+
+    } = useNotifications();
 
 
     const {
@@ -109,7 +129,7 @@ export default function ChangePasswordForm() {
             };
 
 
-            await dispatch(
+            const response = await dispatch(
 
                 changePassword(
 
@@ -120,22 +140,38 @@ export default function ChangePasswordForm() {
             ).unwrap();
 
 
-            toast.success(
+            notify({
 
-                "Password changed successfully"
+                title: "Password Updated",
 
-            );
+                message: "Your account password was changed successfully.",
+
+                type: "success",
+
+                entityType: "profile",
+
+                entityId:
+
+                    response?._id ||
+
+                    response?.user?._id ||
+
+                    null,
+
+            });
 
 
             reset();
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             toast.error(
 
-                getErrorMessage(error)
+                getErrorMessage(
+
+                    error
+
+                )
 
             );
 
@@ -144,49 +180,115 @@ export default function ChangePasswordForm() {
     };
 
 
+    const inputClassName = (error) => `
+
+        mt-2
+        w-full
+        rounded-xl
+        border
+        bg-white
+        px-4
+        py-3
+        text-sm
+        text-gray-900
+        shadow-sm
+        outline-none
+        transition-all
+        duration-200
+        placeholder:text-gray-400
+        focus:ring-4
+        disabled:cursor-not-allowed
+        disabled:bg-gray-100
+        disabled:text-gray-500
+        dark:bg-gray-950
+        dark:text-white
+        dark:placeholder:text-gray-500
+        dark:disabled:bg-gray-800
+
+        ${error
+
+            ? `
+                border-red-500
+                focus:border-red-500
+                focus:ring-red-500/10
+            `
+
+            : `
+                border-gray-300
+                focus:border-indigo-600
+                focus:ring-indigo-500/10
+                dark:border-gray-700
+            `
+        }
+
+    `;
+
+
     return (
 
         <section
             className="
+                overflow-hidden
                 rounded-2xl
                 border
                 border-gray-200
                 bg-white
-                p-5
                 shadow-sm
-                dark:border-gray-700
+                dark:border-gray-800
                 dark:bg-gray-900
-                sm:p-6
             "
         >
 
-            <div className="mb-6">
+            <div
+                className="
+                    flex
+                    items-start
+                    gap-4
+                    border-b
+                    border-gray-200
+                    px-6
+                    py-5
+                    dark:border-gray-800
+                "
+            >
 
-                <h2
+                <div
                     className="
-                        text-xl
-                        font-semibold
-                        text-gray-900
-                        dark:text-white
+                        flex
+                        h-11
+                        w-11
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-xl
+                        bg-indigo-100
+                        text-indigo-600
+                        dark:bg-indigo-950/50
+                        dark:text-indigo-400
                     "
                 >
 
-                    Change Password
+                    <KeyRound size={21} />
 
-                </h2>
+                </div>
 
-                <p
-                    className="
-                        mt-1
-                        text-sm
-                        text-gray-500
-                        dark:text-gray-400
-                    "
-                >
 
-                    Use a strong password that you do not use elsewhere.
+                <div>
 
-                </p>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+
+                        Change Password
+
+                    </h2>
+
+
+                    <p className="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
+
+                        Use a strong password that you do not use elsewhere.
+
+                    </p>
+
+                </div>
 
             </div>
 
@@ -203,332 +305,250 @@ export default function ChangePasswordForm() {
 
                 }
 
-                className="space-y-5"
+                className="p-6"
 
             >
 
-                {/*
-                |--------------------------------------------------------------------------
-                | Current Password
-                |--------------------------------------------------------------------------
-                */}
+                <div
+                    className="
+                        grid
+                        grid-cols-1
+                        gap-5
+                        lg:grid-cols-2
+                    "
+                >
 
-                <div>
+                    <div className="lg:col-span-2">
 
-                    <label
-                        htmlFor="currentPassword"
-                        className="
-                            block
-                            text-sm
-                            font-medium
-                            text-gray-700
-                            dark:text-gray-300
-                        "
-                    >
+                        <label
 
-                        Current Password
+                            htmlFor="currentPassword"
 
-                    </label>
+                            className="
+                                block
+                                text-sm
+                                font-semibold
+                                text-gray-700
+                                dark:text-gray-300
+                            "
 
-                    <input
+                        >
 
-                        id="currentPassword"
+                            Current Password
 
-                        type="password"
+                        </label>
 
-                        autoComplete="current-password"
 
-                        {...register(
+                        <input
 
-                            "currentPassword"
+                            id="currentPassword"
 
-                        )}
+                            type="password"
 
-                        placeholder="Enter your current password"
+                            autoComplete="current-password"
 
-                        className={`
-                            mt-2
-                            w-full
-                            rounded-lg
-                            border
-                            bg-white
-                            px-4
-                            py-2.5
-                            text-gray-900
-                            outline-none
-                            transition
-                            focus:ring-2
-                            dark:bg-gray-800
-                            dark:text-white
-                            ${
-                                errors.currentPassword
+                            disabled={isSubmitting}
 
-                                    ? `
-                                        border-red-500
-                                        focus:border-red-500
-                                        focus:ring-red-500/20
-                                    `
+                            {...register(
 
-                                    : `
-                                        border-gray-300
-                                        focus:border-blue-500
-                                        focus:ring-blue-500/20
-                                        dark:border-gray-700
-                                    `
+                                "currentPassword"
+
+                            )}
+
+                            placeholder="Enter your current password"
+
+                            className={
+
+                                inputClassName(
+
+                                    errors.currentPassword
+
+                                )
+
                             }
-                        `}
 
-                    />
+                        />
 
-                    {
 
-                        errors.currentPassword && (
+                        {errors.currentPassword && (
 
-                            <p
-                                className="
-                                    mt-1.5
-                                    text-sm
-                                    text-red-500
-                                "
-                            >
+                            <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-400">
 
-                                {
-
-                                    errors
-                                        .currentPassword
-                                        .message
-
-                                }
+                                {errors.currentPassword.message}
 
                             </p>
 
-                        )
-
-                    }
-
-                </div>
-
-
-                {/*
-                |--------------------------------------------------------------------------
-                | New Password
-                |--------------------------------------------------------------------------
-                */}
-
-                <div>
-
-                    <label
-                        htmlFor="newPassword"
-                        className="
-                            block
-                            text-sm
-                            font-medium
-                            text-gray-700
-                            dark:text-gray-300
-                        "
-                    >
-
-                        New Password
-
-                    </label>
-
-                    <input
-
-                        id="newPassword"
-
-                        type="password"
-
-                        autoComplete="new-password"
-
-                        {...register(
-
-                            "newPassword"
-
                         )}
 
-                        placeholder="Enter your new password"
+                    </div>
 
-                        className={`
-                            mt-2
-                            w-full
-                            rounded-lg
-                            border
-                            bg-white
-                            px-4
-                            py-2.5
-                            text-gray-900
-                            outline-none
-                            transition
-                            focus:ring-2
-                            dark:bg-gray-800
-                            dark:text-white
-                            ${
-                                errors.newPassword
 
-                                    ? `
-                                        border-red-500
-                                        focus:border-red-500
-                                        focus:ring-red-500/20
-                                    `
+                    <div>
 
-                                    : `
-                                        border-gray-300
-                                        focus:border-blue-500
-                                        focus:ring-blue-500/20
-                                        dark:border-gray-700
-                                    `
+                        <label
+
+                            htmlFor="newPassword"
+
+                            className="
+                                block
+                                text-sm
+                                font-semibold
+                                text-gray-700
+                                dark:text-gray-300
+                            "
+
+                        >
+
+                            New Password
+
+                        </label>
+
+
+                        <input
+
+                            id="newPassword"
+
+                            type="password"
+
+                            autoComplete="new-password"
+
+                            disabled={isSubmitting}
+
+                            {...register(
+
+                                "newPassword"
+
+                            )}
+
+                            placeholder="Enter your new password"
+
+                            className={
+
+                                inputClassName(
+
+                                    errors.newPassword
+
+                                )
+
                             }
-                        `}
 
-                    />
+                        />
 
-                    {
 
-                        errors.newPassword && (
+                        {errors.newPassword && (
 
-                            <p
-                                className="
-                                    mt-1.5
-                                    text-sm
-                                    text-red-500
-                                "
-                            >
+                            <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-400">
 
-                                {
-
-                                    errors
-                                        .newPassword
-                                        .message
-
-                                }
+                                {errors.newPassword.message}
 
                             </p>
 
-                        )
-
-                    }
-
-                </div>
-
-
-                {/*
-                |--------------------------------------------------------------------------
-                | Confirm Password
-                |--------------------------------------------------------------------------
-                */}
-
-                <div>
-
-                    <label
-                        htmlFor="confirmPassword"
-                        className="
-                            block
-                            text-sm
-                            font-medium
-                            text-gray-700
-                            dark:text-gray-300
-                        "
-                    >
-
-                        Confirm New Password
-
-                    </label>
-
-                    <input
-
-                        id="confirmPassword"
-
-                        type="password"
-
-                        autoComplete="new-password"
-
-                        {...register(
-
-                            "confirmPassword"
-
                         )}
 
-                        placeholder="Confirm your new password"
+                    </div>
 
-                        className={`
-                            mt-2
-                            w-full
-                            rounded-lg
-                            border
-                            bg-white
-                            px-4
-                            py-2.5
-                            text-gray-900
-                            outline-none
-                            transition
-                            focus:ring-2
-                            dark:bg-gray-800
-                            dark:text-white
-                            ${
-                                errors.confirmPassword
 
-                                    ? `
-                                        border-red-500
-                                        focus:border-red-500
-                                        focus:ring-red-500/20
-                                    `
+                    <div>
 
-                                    : `
-                                        border-gray-300
-                                        focus:border-blue-500
-                                        focus:ring-blue-500/20
-                                        dark:border-gray-700
-                                    `
+                        <label
+
+                            htmlFor="confirmPassword"
+
+                            className="
+                                block
+                                text-sm
+                                font-semibold
+                                text-gray-700
+                                dark:text-gray-300
+                            "
+
+                        >
+
+                            Confirm New Password
+
+                        </label>
+
+
+                        <input
+
+                            id="confirmPassword"
+
+                            type="password"
+
+                            autoComplete="new-password"
+
+                            disabled={isSubmitting}
+
+                            {...register(
+
+                                "confirmPassword"
+
+                            )}
+
+                            placeholder="Confirm your new password"
+
+                            className={
+
+                                inputClassName(
+
+                                    errors.confirmPassword
+
+                                )
+
                             }
-                        `}
 
-                    />
+                        />
 
-                    {
 
-                        errors.confirmPassword && (
+                        {errors.confirmPassword && (
 
-                            <p
-                                className="
-                                    mt-1.5
-                                    text-sm
-                                    text-red-500
-                                "
-                            >
+                            <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-400">
 
-                                {
-
-                                    errors
-                                        .confirmPassword
-                                        .message
-
-                                }
+                                {errors.confirmPassword.message}
 
                             </p>
 
-                        )
+                        )}
 
-                    }
+                    </div>
 
                 </div>
 
-
-                {/*
-                |--------------------------------------------------------------------------
-                | Submit
-                |--------------------------------------------------------------------------
-                */}
 
                 <div
                     className="
+                        mt-6
                         flex
-                        justify-end
+                        flex-col
+                        gap-3
                         border-t
                         border-gray-200
                         pt-5
-                        dark:border-gray-700
+                        sm:flex-row
+                        sm:items-center
+                        sm:justify-between
+                        dark:border-gray-800
                     "
                 >
+
+                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+
+                        <LockKeyhole
+
+                            size={16}
+
+                            className="shrink-0"
+
+                        />
+
+                        <span>
+
+                            Your password is securely encrypted.
+
+                        </span>
+
+                    </div>
+
 
                     <button
 
@@ -537,28 +557,52 @@ export default function ChangePasswordForm() {
                         disabled={isSubmitting}
 
                         className="
-                            rounded-lg
-                            bg-blue-600
-                            px-6
-                            py-2.5
+                            inline-flex
+                            h-11
+                            items-center
+                            justify-center
+                            gap-2
+                            rounded-xl
+                            bg-indigo-600
+                            px-5
                             text-sm
                             font-medium
+                            leading-none
                             text-white
-                            transition
-                            hover:bg-blue-700
+                            shadow-sm
+                            transition-all
+                            duration-200
+                            hover:-translate-y-0.5
+                            hover:bg-indigo-700
+                            hover:shadow-md
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-indigo-500/40
+                            disabled:translate-y-0
                             disabled:cursor-not-allowed
-                            disabled:opacity-50
+                            disabled:opacity-60
                         "
 
                     >
 
-                        {
+                        {isSubmitting && (
 
-                            isSubmitting
+                            <LoaderCircle
 
-                                ? "Changing..."
+                                size={17}
 
-                                : "Change Password"
+                                className="shrink-0 animate-spin"
+
+                            />
+
+                        )}
+
+
+                        {isSubmitting
+
+                            ? "Changing Password..."
+
+                            : "Change Password"
 
                         }
 

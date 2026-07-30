@@ -1,41 +1,77 @@
 import {
+
+    useCallback,
+
     useEffect,
+
     useMemo,
+
     useState,
+
 } from "react";
 
 import {
+
+    KanbanSquare,
+
+    Plus,
+
+} from "lucide-react";
+import {
+
     useDispatch,
+
     useSelector,
+
 } from "react-redux";
 
+
 import {
+
     fetchProjects,
+
     selectProjects,
+
 } from "@/redux/slices/projectSlice";
 
+
 import PageHeader from "@/components/ui/PageHeader";
+
 import KanbanHeader from "@/components/kanban/KanbanHeader";
+
 import KanbanBoard from "@/components/kanban/KanbanBoard";
+
 import TaskModal from "@/components/tasks/TaskModal";
 
 import useTasks from "@/hooks/useTasks";
 
+
 export default function Kanban() {
 
-    const dispatch = useDispatch();
+    const dispatch =
+
+        useDispatch();
+
 
     const {
 
-        tasks,
+        tasks = [],
 
         loading,
 
-        fetchTasks,
+        getTasks,
 
     } = useTasks();
 
-    const projects = useSelector(selectProjects);
+
+    const projects =
+
+        useSelector(
+
+            selectProjects
+
+        ) || [];
+
 
     /*
     |--------------------------------------------------------------------------
@@ -43,7 +79,13 @@ export default function Kanban() {
     |--------------------------------------------------------------------------
     */
 
-    const [filters, setFilters] = useState({
+    const [
+
+        filters,
+
+        setFilters,
+
+    ] = useState({
 
         search: "",
 
@@ -55,13 +97,21 @@ export default function Kanban() {
 
     });
 
+
     /*
     |--------------------------------------------------------------------------
     | Create Task Modal
     |--------------------------------------------------------------------------
     */
 
-    const [taskModalOpen, setTaskModalOpen] = useState(false);
+    const [
+
+        taskModalOpen,
+
+        setTaskModalOpen,
+
+    ] = useState(false);
+
 
     /*
     |--------------------------------------------------------------------------
@@ -69,43 +119,85 @@ export default function Kanban() {
     |--------------------------------------------------------------------------
     */
 
-   useEffect(() => {
+    useEffect(() => {
 
-    fetchTasks({
-        limit: 1000,
-    });
+        getTasks({
 
-    dispatch(fetchProjects());
+            limit: 1000,
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
+        });
+
+
+        dispatch(
+
+            fetchProjects()
+
+        );
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    }, [
+
+        dispatch,
+
+    ]);
+
+
     /*
     |--------------------------------------------------------------------------
-    | Members (Unique)
+    | Members
     |--------------------------------------------------------------------------
     */
 
     const members = useMemo(() => {
 
-        const map = new Map();
+        const memberMap =
+
+            new Map();
+
 
         tasks.forEach((task) => {
 
-            if (task.assignedTo) {
+            const assignedUser =
 
-                map.set(
+                task?.assignedTo;
 
-                    task.assignedTo._id,
 
-                    task.assignedTo
+            if (!assignedUser?._id) {
 
-                );
+                return;
 
             }
 
+
+            memberMap.set(
+
+                assignedUser._id,
+
+                assignedUser
+
+            );
+
         });
 
-        return [...map.values()];
+
+        return Array.from(
+
+            memberMap.values()
+
+        ).sort((firstMember, secondMember) =>
+
+            (
+
+                firstMember?.name || ""
+
+            ).localeCompare(
+
+                secondMember?.name || ""
+
+            )
+
+        );
 
     }, [
 
@@ -113,17 +205,112 @@ export default function Kanban() {
 
     ]);
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Modal Handlers
+    |--------------------------------------------------------------------------
+    */
+
+    const openTaskModal = useCallback(() => {
+
+        setTaskModalOpen(true);
+
+    }, []);
+
+
+    const closeTaskModal = useCallback(() => {
+
+        setTaskModalOpen(false);
+
+    }, []);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
+
     return (
 
-        <>
+        <div
+            className="
+                mx-auto
+                w-full
+                space-y-6
+                pb-6
+            "
+        >
 
-            <PageHeader
+            {/*
+            |--------------------------------------------------------------------------
+            | Page Header
+            |--------------------------------------------------------------------------
+            */}
 
-                title="Kanban"
+           <PageHeader
 
-                subtitle="Manage tasks visually."
+    title="Kanban Board"
+
+    subtitle="Manage and track tasks visually across every workflow stage."
+
+    icon={KanbanSquare}
+
+    action={
+
+        <button
+
+            type="button"
+
+            onClick={() => setTaskModalOpen(true)}
+
+            className="
+                inline-flex
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                bg-indigo-600
+                px-5
+                py-2.5
+                text-sm
+                font-semibold
+                text-white
+                shadow-sm
+                transition
+                hover:bg-indigo-700
+                focus:outline-none
+                focus:ring-2
+                focus:ring-indigo-500/30
+                sm:w-auto
+            "
+
+        >
+
+            <Plus
+
+                size={18}
+
+                aria-hidden="true"
 
             />
+
+            New Task
+
+        </button>
+
+    }
+
+/>
+
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Filters and Actions
+            |--------------------------------------------------------------------------
+            */}
 
             <KanbanHeader
 
@@ -135,19 +322,45 @@ export default function Kanban() {
 
                 members={members}
 
-                onCreateTask={() =>
-
-                    setTaskModalOpen(true)
-
-                }
+                onCreateTask={openTaskModal}
 
             />
 
-            <KanbanBoard
 
-                filters={filters}
+            {/*
+            |--------------------------------------------------------------------------
+            | Kanban Board
+            |--------------------------------------------------------------------------
+            */}
 
-            />
+            <div
+                className="
+                    min-w-0
+                    overflow-hidden
+                    rounded-2xl
+                    border
+                    border-gray-200
+                    bg-white
+                    shadow-sm
+                    dark:border-gray-800
+                    dark:bg-gray-900
+                "
+            >
+
+                <KanbanBoard
+
+                    filters={filters}
+
+                />
+
+            </div>
+
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Create Task Modal
+            |--------------------------------------------------------------------------
+            */}
 
             <TaskModal
 
@@ -157,15 +370,11 @@ export default function Kanban() {
 
                 loading={loading}
 
-                onClose={() =>
-
-                    setTaskModalOpen(false)
-
-                }
+                onClose={closeTaskModal}
 
             />
 
-        </>
+        </div>
 
     );
 

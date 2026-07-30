@@ -1,9 +1,13 @@
 import {
-    createSlice,
+
     createAsyncThunk,
+
+    createSlice,
+
 } from "@reduxjs/toolkit";
 
 import authService from "@/services/authService";
+
 import {
 
     resetProjects,
@@ -11,12 +15,29 @@ import {
 } from "./projectSlice";
 
 import {
+
     resetDashboard,
+
 } from "./dashboardSlice";
 
-const user = JSON.parse(
-    localStorage.getItem("user")
-);
+
+/*
+|--------------------------------------------------------------------------
+| Local User
+|--------------------------------------------------------------------------
+*/
+
+const storedUser =
+
+    localStorage.getItem("user");
+
+
+const user = storedUser
+
+    ? JSON.parse(storedUser)
+
+    : null;
+
 
 const initialState = {
 
@@ -24,9 +45,10 @@ const initialState = {
 
     loading: false,
 
-    error: null
+    error: null,
 
 };
+
 
 /*
 |--------------------------------------------------------------------------
@@ -38,17 +60,30 @@ export const register = createAsyncThunk(
 
     "auth/register",
 
-    async (userData, thunkAPI) => {
+    async (
+
+        userData,
+
+        thunkAPI
+
+    ) => {
 
         try {
 
-            return await authService.register(userData);
+            return await authService.register(
 
-        } catch (error) {
+                userData
+
+            );
+
+        }
+
+        catch (error) {
 
             return thunkAPI.rejectWithValue(
 
                 error.response?.data?.message ||
+
                 error.message
 
             );
@@ -58,6 +93,7 @@ export const register = createAsyncThunk(
     }
 
 );
+
 
 /*
 |--------------------------------------------------------------------------
@@ -69,11 +105,21 @@ export const login = createAsyncThunk(
 
     "auth/login",
 
-    async (userData, thunkAPI) => {
+    async (
+
+        userData,
+
+        thunkAPI
+
+    ) => {
 
         try {
 
-            return await authService.login(userData);
+            return await authService.login(
+
+                userData
+
+            );
 
         }
 
@@ -82,6 +128,7 @@ export const login = createAsyncThunk(
             return thunkAPI.rejectWithValue(
 
                 error.response?.data?.message ||
+
                 error.message
 
             );
@@ -92,17 +139,24 @@ export const login = createAsyncThunk(
 
 );
 
+
 /*
 |--------------------------------------------------------------------------
-| Profile
+| Fetch Profile
 |--------------------------------------------------------------------------
 */
 
 export const fetchProfile = createAsyncThunk(
 
-    "auth/profile",
+    "auth/fetchProfile",
 
-    async (_, thunkAPI) => {
+    async (
+
+        _,
+
+        thunkAPI
+
+    ) => {
 
         try {
 
@@ -115,6 +169,7 @@ export const fetchProfile = createAsyncThunk(
             return thunkAPI.rejectWithValue(
 
                 error.response?.data?.message ||
+
                 error.message
 
             );
@@ -125,25 +180,65 @@ export const fetchProfile = createAsyncThunk(
 
 );
 
+
+/*
+|--------------------------------------------------------------------------
+| Logout
+|--------------------------------------------------------------------------
+*/
+
 export const logoutUser = createAsyncThunk(
 
-    "auth/logout",
+    "auth/logoutUser",
 
-    async (_, thunkAPI) => {
+    async (
 
-        authService.logout();
+        _,
 
-        thunkAPI.dispatch(
-            resetProjects()
-        );
+        thunkAPI
 
-        thunkAPI.dispatch(
-            resetDashboard()
-        );
+    ) => {
+
+        try {
+
+            authService.logout();
+
+
+            thunkAPI.dispatch(
+
+                resetProjects()
+
+            );
+
+
+            thunkAPI.dispatch(
+
+                resetDashboard()
+
+            );
+
+        }
+
+        catch (error) {
+
+            return thunkAPI.rejectWithValue(
+
+                error.message
+
+            );
+
+        }
 
     }
 
 );
+
+
+/*
+|--------------------------------------------------------------------------
+| Auth Slice
+|--------------------------------------------------------------------------
+*/
 
 const authSlice = createSlice({
 
@@ -153,100 +248,436 @@ const authSlice = createSlice({
 
     reducers: {
 
-        logout(state) {
+        /*
+        |--------------------------------------------------------------------------
+        | Synchronous Logout
+        |--------------------------------------------------------------------------
+        */
+
+        logout: (state) => {
 
             state.user = null;
 
+            state.loading = false;
+
+            state.error = null;
+
+
             authService.logout();
 
-        }
+        },
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update User Locally
+        |--------------------------------------------------------------------------
+        */
+
+        updateAuthUser: (
+
+            state,
+
+            action
+
+        ) => {
+
+            state.user = {
+
+                ...state.user,
+
+                ...action.payload,
+
+            };
+
+
+            localStorage.setItem(
+
+                "user",
+
+                JSON.stringify(
+
+                    state.user
+
+                )
+
+            );
+
+        },
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Reset Auth Error
+        |--------------------------------------------------------------------------
+        */
+
+        clearAuthError: (
+
+            state
+
+        ) => {
+
+            state.error = null;
+
+        },
 
     },
 
-    extraReducers: (builder) => {
+
+    extraReducers: (
 
         builder
 
-            .addCase(login.pending, (state) => {
+    ) => {
 
-                state.loading = true;
+        builder
 
-            })
+            /*
+            |--------------------------------------------------------------------------
+            | Login
+            |--------------------------------------------------------------------------
+            */
 
-            .addCase(login.fulfilled, (state, action) => {
+            .addCase(
 
-                state.loading = false;
+                login.pending,
 
-                state.user = action.payload.data;
+                (state) => {
 
-                localStorage.setItem(
+                    state.loading = true;
 
-                    "user",
+                    state.error = null;
 
-                    JSON.stringify(action.payload.data)
+                }
 
-                );
+            )
 
-            })
+            .addCase(
 
-            .addCase(login.rejected, (state, action) => {
+                login.fulfilled,
 
-                state.loading = false;
+                (
 
-                state.error = action.payload;
+                    state,
 
-            })
+                    action
 
-            .addCase(register.pending, (state) => {
+                ) => {
 
-                state.loading = true;
+                    state.loading = false;
 
-            })
+                    state.error = null;
 
-            .addCase(register.fulfilled, (state, action) => {
 
-                state.loading = false;
+                    const loggedInUser =
 
-                state.user = action.payload.data;
+                        action.payload?.data?.user ||
 
-                localStorage.setItem(
+                        action.payload?.data ||
 
-                    "user",
+                        action.payload;
 
-                    JSON.stringify(action.payload.data)
 
-                );
+                    state.user = loggedInUser;
 
-            })
 
-            .addCase(register.rejected, (state, action) => {
+                    localStorage.setItem(
 
-                state.loading = false;
+                        "user",
 
-                state.error = action.payload;
+                        JSON.stringify(
 
-            })
+                            loggedInUser
 
-            .addCase(fetchProfile.fulfilled, (state, action) => {
+                        )
 
-                state.user = {
+                    );
 
-                    ...state.user,
+                }
 
-                    ...action.payload.data
+            )
 
-                };
+            .addCase(
 
-            });
+                login.rejected,
 
-    }
+                (
+
+                    state,
+
+                    action
+
+                ) => {
+
+                    state.loading = false;
+
+                    state.error =
+
+                        action.payload;
+
+                }
+
+            )
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Register
+            |--------------------------------------------------------------------------
+            */
+
+            .addCase(
+
+                register.pending,
+
+                (state) => {
+
+                    state.loading = true;
+
+                    state.error = null;
+
+                }
+
+            )
+
+            .addCase(
+
+                register.fulfilled,
+
+                (
+
+                    state,
+
+                    action
+
+                ) => {
+
+                    state.loading = false;
+
+                    state.error = null;
+
+
+                    const registeredUser =
+
+                        action.payload?.data?.user ||
+
+                        action.payload?.data ||
+
+                        action.payload;
+
+
+                    state.user = registeredUser;
+
+
+                    localStorage.setItem(
+
+                        "user",
+
+                        JSON.stringify(
+
+                            registeredUser
+
+                        )
+
+                    );
+
+                }
+
+            )
+
+            .addCase(
+
+                register.rejected,
+
+                (
+
+                    state,
+
+                    action
+
+                ) => {
+
+                    state.loading = false;
+
+                    state.error =
+
+                        action.payload;
+
+                }
+
+            )
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Fetch Profile
+            |--------------------------------------------------------------------------
+            */
+
+            .addCase(
+
+                fetchProfile.pending,
+
+                (state) => {
+
+                    state.loading = true;
+
+                    state.error = null;
+
+                }
+
+            )
+
+            .addCase(
+
+                fetchProfile.fulfilled,
+
+                (
+
+                    state,
+
+                    action
+
+                ) => {
+
+                    state.loading = false;
+
+                    state.error = null;
+
+
+                    const profileUser =
+
+                        action.payload?.data?.user ||
+
+                        action.payload?.data ||
+
+                        action.payload;
+
+
+                    state.user = {
+
+                        ...state.user,
+
+                        ...profileUser,
+
+                    };
+
+
+                    localStorage.setItem(
+
+                        "user",
+
+                        JSON.stringify(
+
+                            state.user
+
+                        )
+
+                    );
+
+                }
+
+            )
+
+            .addCase(
+
+                fetchProfile.rejected,
+
+                (
+
+                    state,
+
+                    action
+
+                ) => {
+
+                    state.loading = false;
+
+                    state.error =
+
+                        action.payload;
+
+                }
+
+            )
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Logout
+            |--------------------------------------------------------------------------
+            */
+
+            .addCase(
+
+                logoutUser.fulfilled,
+
+                (state) => {
+
+                    state.user = null;
+
+                    state.loading = false;
+
+                    state.error = null;
+
+                }
+
+            );
+
+    },
 
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| Actions
+|--------------------------------------------------------------------------
+*/
+
 export const {
 
-    logout
+    logout,
+
+    updateAuthUser,
+
+    clearAuthError,
 
 } = authSlice.actions;
+
+
+/*
+|--------------------------------------------------------------------------
+| Selectors
+|--------------------------------------------------------------------------
+*/
+
+export const selectCurrentUser = (
+
+    state
+
+) =>
+
+    state.auth.user;
+
+
+export const selectAuthLoading = (
+
+    state
+
+) =>
+
+    state.auth.loading;
+
+
+export const selectAuthError = (
+
+    state
+
+) =>
+
+    state.auth.error;
+
 
 export default authSlice.reducer;

@@ -24,15 +24,22 @@ const getTasks = async (params = {}) => {
     );
 
     const response = await api.get(
+
         "/tasks",
+
         {
+
             params: filteredParams,
+
         }
+
     );
 
     return response.data;
 
 };
+
+
 /*
 |--------------------------------------------------------------------------
 | Get Single Task
@@ -42,12 +49,15 @@ const getTasks = async (params = {}) => {
 const getTask = async (taskId) => {
 
     const response = await api.get(
+
         `/tasks/${taskId}`
+
     );
 
     return response.data;
 
 };
+
 
 /*
 |--------------------------------------------------------------------------
@@ -58,13 +68,17 @@ const getTask = async (taskId) => {
 const createTask = async (taskData) => {
 
     const response = await api.post(
+
         "/tasks",
+
         taskData
+
     );
 
     return response.data;
 
 };
+
 
 /*
 |--------------------------------------------------------------------------
@@ -73,18 +87,25 @@ const createTask = async (taskData) => {
 */
 
 const updateTask = async (
+
     taskId,
+
     taskData
+
 ) => {
 
     const response = await api.put(
+
         `/tasks/${taskId}`,
+
         taskData
+
     );
 
     return response.data;
 
 };
+
 
 /*
 |--------------------------------------------------------------------------
@@ -95,12 +116,91 @@ const updateTask = async (
 const deleteTask = async (taskId) => {
 
     const response = await api.delete(
+
         `/tasks/${taskId}`
+
     );
 
     return response.data;
 
 };
+
+
+/*
+|--------------------------------------------------------------------------
+| Upload Task Attachment
+|--------------------------------------------------------------------------
+*/
+
+const uploadTaskAttachment = async (
+
+    taskId,
+
+    file
+
+) => {
+
+    const formData = new FormData();
+
+
+    formData.append(
+
+        "attachment",
+
+        file
+
+    );
+
+
+    const response = await api.post(
+
+        `/tasks/${taskId}/attachments`,
+
+        formData,
+
+        {
+
+            headers: {
+
+                "Content-Type": "multipart/form-data",
+
+            },
+
+        }
+
+    );
+
+
+    return response.data;
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Delete Task Attachment
+|--------------------------------------------------------------------------
+*/
+
+const deleteTaskAttachment = async (
+
+    taskId,
+
+    attachmentId
+
+) => {
+
+    const response = await api.delete(
+
+        `/tasks/${taskId}/attachments/${attachmentId}`
+
+    );
+
+
+    return response.data;
+
+};
+
 
 export default {
 
@@ -113,5 +213,9 @@ export default {
     updateTask,
 
     deleteTask,
+
+    uploadTaskAttachment,
+
+    deleteTaskAttachment,
 
 };

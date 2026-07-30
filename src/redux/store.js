@@ -16,6 +16,7 @@ import teamReducer from "@/redux/slices/teamSlice";
 
 import profileReducer from "@/redux/slices/profileSlice";
 
+import notificationReducer from "./slices/notificationSlice";
 
 export const store = configureStore({
 
@@ -36,6 +37,8 @@ export const store = configureStore({
         team: teamReducer,
 
         profile: profileReducer,
+
+        notifications: notificationReducer,
 
     },
 

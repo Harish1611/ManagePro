@@ -11,11 +11,12 @@ import Register from "@/pages/auth/Register";
 import Projects from "@/pages/projects/Projects";
 import Tasks from "@/pages/tasks/Tasks";
 import Teams from "@/pages/teams/Teams";
-import Notifications from "@/pages/notifications/Notifications";
 import Settings from "@/pages/settings/Settings";
 import Profile from "@/pages/profile/Profile";
 import Kanban from "@/pages/Kanban";
 import MemberProfile from "@/pages/teams/MemberProfile";
+import ProjectDetailsPage from "@/pages/projects/ProjectDetailsPage";
+
 
 export default function AppRoutes() {
   return (
@@ -39,6 +40,11 @@ export default function AppRoutes() {
             path="/projects"
             element={<Projects />}
         />
+           <Route
+        path="/projects/:projectId"
+        element={<ProjectDetailsPage />}
+    />
+
 
         <Route
             path="/tasks"
@@ -55,10 +61,7 @@ export default function AppRoutes() {
     element={<MemberProfile />}
 />
 
-        <Route
-            path="/notifications"
-            element={<Notifications />}
-        />
+      
 
         <Route
             path="/settings"

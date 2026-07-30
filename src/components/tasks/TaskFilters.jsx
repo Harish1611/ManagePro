@@ -1,4 +1,32 @@
+
 import TaskSearch from "./TaskSearch";
+
+
+const selectClassName = `
+    min-w-[170px]
+    flex-1
+    rounded-xl
+    border
+    border-gray-200
+    bg-white
+    px-4
+    py-2.5
+    text-sm
+    text-gray-700
+    outline-none
+    transition
+    hover:border-gray-300
+    focus:border-blue-500
+    focus:ring-2
+    focus:ring-blue-500/20
+    dark:border-gray-700
+    dark:bg-gray-800
+    dark:text-gray-100
+    dark:hover:border-gray-600
+    dark:focus:border-blue-500
+    dark:[color-scheme:dark]
+`;
+
 
 export default function TaskFilters({
 
@@ -12,308 +40,421 @@ export default function TaskFilters({
 
 }) {
 
+    /*
+    |--------------------------------------------------------------------------
+    | Update Filter
+    |--------------------------------------------------------------------------
+    */
+
+    const updateFilter = (
+
+        field,
+
+        value
+
+    ) => {
+
+        setFilters({
+
+            ...filters,
+
+            [field]: value,
+
+            page: 1,
+
+        });
+
+    };
+
+
     return (
 
-        <div className="flex flex-col gap-4 lg:flex-row lg:flex-wrap">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
 
-            <TaskSearch
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
 
-                value={filters.search}
+                {/*
+                |--------------------------------------------------------------------------
+                | Search
+                |--------------------------------------------------------------------------
+                */}
 
-                onChange={(e) =>
+                <div className="w-full sm:min-w-[260px] sm:flex-[2]">
 
-                    setFilters({
+                    <TaskSearch
 
-                        ...filters,
+                        value={
 
-                        search: e.target.value,
+                            filters.search
 
-                    })
+                        }
 
-                }
+                        onChange={(event) =>
 
-            />
+                            updateFilter(
 
-            {/* Project */}
+                                "search",
 
-            <select
+                                event.target.value
 
-                value={filters.project}
+                            )
 
-                onChange={(e) =>
+                        }
 
-                    setFilters({
+                    />
 
-                        ...filters,
+                </div>
 
-                        project: e.target.value,
 
-                        page: 1,
+                {/*
+                |--------------------------------------------------------------------------
+                | Project
+                |--------------------------------------------------------------------------
+                */}
 
-                    })
+                <select
 
-                }
+                    value={
 
-                className="rounded-lg border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+                        filters.project
 
-            >
+                    }
 
-                <option value="">
+                    onChange={(event) =>
 
-                    All Projects
+                        updateFilter(
 
-                </option>
+                            "project",
 
-                {
+                            event.target.value
 
-                    projects.map((project) => (
+                        )
 
-                        <option
+                    }
 
-                            key={project._id}
+                    className={selectClassName}
 
-                            value={project._id}
+                    aria-label="Filter tasks by project"
 
-                        >
+                >
 
-                            {project.name}
+                    <option value="" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 
-                        </option>
+                        All Projects
 
-                    ))
+                    </option>
 
-                }
 
-            </select>
+                    {projects.map(
 
-            {/* Status */}
+                        (project) => (
 
-            <select
+                            <option
 
-                value={filters.status}
+                                key={
 
-                onChange={(e) =>
+                                    project._id
 
-                    setFilters({
+                                }
 
-                        ...filters,
+                                value={
 
-                        status: e.target.value,
+                                    project._id
 
-                        page: 1,
+                                }
 
-                    })
+                                className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
 
-                }
+                            >
 
-                className="rounded-lg border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+                                {project.name}
 
-            >
+                            </option>
 
-                <option value="">
+                        )
 
-                    All Status
+                    )}
 
-                </option>
+                </select>
 
-                <option value="Todo">
 
-                    Todo
+                {/*
+                |--------------------------------------------------------------------------
+                | Status
+                |--------------------------------------------------------------------------
+                */}
 
-                </option>
+                <select
 
-                <option value="In Progress">
+                    value={
 
-                    In Progress
+                        filters.status
 
-                </option>
+                    }
 
-                <option value="Review">
+                    onChange={(event) =>
 
-                    Review
+                        updateFilter(
 
-                </option>
+                            "status",
 
-                <option value="Done">
+                            event.target.value
 
-                    Done
+                        )
 
-                </option>
+                    }
 
-            </select>
+                    className={selectClassName}
 
-            {/* Priority */}
+                    aria-label="Filter tasks by status"
 
-            <select
+                >
 
-                value={filters.priority}
+                    <option value="" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 
-                onChange={(e) =>
+                        All Statuses
 
-                    setFilters({
+                    </option>
 
-                        ...filters,
+                    <option value="Todo" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 
-                        priority: e.target.value,
+                        Todo
 
-                        page: 1,
+                    </option>
 
-                    })
+                    <option value="In Progress" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 
-                }
+                        In Progress
 
-                className="rounded-lg border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+                    </option>
 
-            >
+                    <option value="Review" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 
-                <option value="">
+                        Review
 
-                    All Priority
+                    </option>
 
-                </option>
+                    <option value="Done" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 
-                <option value="Low">
+                        Done
 
-                    Low
+                    </option>
 
-                </option>
+                </select>
 
-                <option value="Medium">
 
-                    Medium
+                {/*
+                |--------------------------------------------------------------------------
+                | Priority
+                |--------------------------------------------------------------------------
+                */}
 
-                </option>
+                <select
 
-                <option value="High">
+                    value={
 
-                    High
+                        filters.priority
 
-                </option>
+                    }
 
-                <option value="Critical">
+                    onChange={(event) =>
 
-                    Critical
+                        updateFilter(
 
-                </option>
+                            "priority",
 
-            </select>
+                            event.target.value
 
-            {/* Assigned */}
+                        )
 
-            <select
+                    }
 
-                value={filters.assignedTo}
+                    className={selectClassName}
 
-                onChange={(e) =>
+                    aria-label="Filter tasks by priority"
 
-                    setFilters({
+                >
 
-                        ...filters,
+                    <option value="" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 
-                        assignedTo: e.target.value,
+                        All Priorities
 
-                        page: 1,
+                    </option>
 
-                    })
+                    <option value="Low" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 
-                }
+                        Low
 
-                className="rounded-lg border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+                    </option>
 
-            >
+                    <option value="Medium" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 
-                <option value="">
+                        Medium
 
-                    All Members
+                    </option>
 
-                </option>
+                    <option value="High" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 
-                {
+                        High
 
-                    users.map((user) => (
+                    </option>
 
-                        <option
+                    <option value="Critical" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100" >
 
-                            key={user._id}
+                        Critical
 
-                            value={user._id}
+                    </option>
 
-                        >
+                </select>
 
-                            {user.name}
 
-                        </option>
+                {/*
+                |--------------------------------------------------------------------------
+                | Assigned Member
+                |--------------------------------------------------------------------------
+                */}
 
-                    ))
+                <select
 
-                }
+                    value={
 
-            </select>
+                        filters.assignedTo
 
-            {/* Sort */}
+                    }
 
-            <select
+                    onChange={(event) =>
 
-                value={filters.sort}
+                        updateFilter(
 
-                onChange={(e) =>
+                            "assignedTo",
 
-                    setFilters({
+                            event.target.value
 
-                        ...filters,
+                        )
 
-                        sort: e.target.value,
+                    }
 
-                        page: 1,
+                    className={selectClassName}
 
-                    })
+                    aria-label="Filter tasks by assigned member"
 
-                }
+                >
 
-                className="rounded-lg border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+                    <option value="" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100" >
 
-            >
+                        All Members
 
-                <option value="-createdAt">
+                    </option>
 
-                    Newest
 
-                </option>
+                    {users.map(
 
-                <option value="createdAt">
+                        (user) => (
 
-                    Oldest
+                            <option
 
-                </option>
+                                key={
 
-                <option value="title">
+                                    user._id
 
-                    Title A-Z
+                                }
 
-                </option>
+                                value={
 
-                <option value="-title">
+                                    user._id
 
-                    Title Z-A
+                                }
 
-                </option>
+                                className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
 
-                <option value="dueDate">
+                            >
 
-                    Due Date ↑
+                                {user.name}
 
-                </option>
+                            </option>
 
-                <option value="-dueDate">
+                        )
 
-                    Due Date ↓
+                    )}
 
-                </option>
+                </select>
 
-            </select>
+
+                {/*
+                |--------------------------------------------------------------------------
+                | Sort
+                |--------------------------------------------------------------------------
+                */}
+
+                <select
+
+                    value={
+
+                        filters.sort
+
+                    }
+
+                    onChange={(event) =>
+
+                        updateFilter(
+
+                            "sort",
+
+                            event.target.value
+
+                        )
+
+                    }
+
+                    className={selectClassName}
+
+                    aria-label="Sort tasks"
+
+                >
+
+                    <option value="-createdAt" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100" >
+
+                        Newest First
+
+                    </option>
+
+                    <option value="createdAt" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100" >
+
+                        Oldest First
+
+                    </option>
+
+                    <option value="title" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100" >
+
+                        Title A-Z
+
+                    </option>
+
+                    <option value="-title" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100" >
+
+                        Title Z-A
+
+                    </option>
+
+                    <option value="dueDate" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100" >
+
+                        Due Date Ascending
+
+                    </option>
+
+                    <option value="-dueDate" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100" >
+
+                        Due Date Descending
+
+                    </option>
+
+                </select>
+
+            </div>
 
         </div>
 
     );
 
 }
+

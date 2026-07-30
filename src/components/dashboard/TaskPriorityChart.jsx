@@ -1,4 +1,5 @@
 import Card from "@/components/ui/Card";
+
 import useDashboard from "@/hooks/useDashboard";
 
 import {
@@ -21,6 +22,7 @@ import {
 
 } from "recharts";
 
+
 const COLORS = {
 
     Low: "#10B981",
@@ -33,15 +35,17 @@ const COLORS = {
 
 };
 
+
 export default function TaskPriorityChart() {
 
     const {
 
-        priorityChart,
+        priorityChart = [],
 
         loading,
 
     } = useDashboard();
+
 
     if (loading) {
 
@@ -51,7 +55,17 @@ export default function TaskPriorityChart() {
 
                 <div className="flex h-80 items-center justify-center">
 
-                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+                    <div className="text-center">
+
+                        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent dark:border-blue-400 dark:border-t-transparent" />
+
+                        <p className="mt-4 text-sm font-medium text-gray-500 dark:text-gray-400">
+
+                            Loading task priorities...
+
+                        </p>
+
+                    </div>
 
                 </div>
 
@@ -60,6 +74,7 @@ export default function TaskPriorityChart() {
         );
 
     }
+
 
     if (!priorityChart.length) {
 
@@ -67,9 +82,23 @@ export default function TaskPriorityChart() {
 
             <Card title="Tasks by Priority">
 
-                <div className="flex h-80 items-center justify-center text-gray-500">
+                <div className="flex h-80 items-center justify-center">
 
-                    No task data available
+                    <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-8 py-10 text-center dark:border-gray-700 dark:bg-gray-800/40">
+
+                        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+
+                            No task data available
+
+                        </p>
+
+                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+
+                            Task priority statistics will appear here.
+
+                        </p>
+
+                    </div>
 
                 </div>
 
@@ -79,13 +108,20 @@ export default function TaskPriorityChart() {
 
     }
 
+
     return (
 
         <Card title="Tasks by Priority">
 
-            <div className="h-80">
+            <div className="h-80 w-full">
 
-                <ResponsiveContainer>
+                <ResponsiveContainer
+
+                    width="100%"
+
+                    height="100%"
+
+                >
 
                     <BarChart
 
@@ -105,43 +141,131 @@ export default function TaskPriorityChart() {
 
                     >
 
-                        <CartesianGrid strokeDasharray="3 3" />
+                        <CartesianGrid
 
-                        <XAxis dataKey="priority" />
+                            strokeDasharray="4 4"
 
-                        <YAxis allowDecimals={false} />
+                            vertical={false}
 
-                        <Tooltip />
+                            stroke="currentColor"
+
+                            className="text-gray-200 dark:text-gray-700"
+
+                        />
+
+
+                        <XAxis
+
+                            dataKey="priority"
+
+                            axisLine={false}
+
+                            tickLine={false}
+
+                            tick={{
+
+                                fill: "currentColor",
+
+                                fontSize: 12,
+
+                            }}
+
+                            className="text-gray-500 dark:text-gray-400"
+
+                        />
+
+
+                        <YAxis
+
+                            allowDecimals={false}
+
+                            axisLine={false}
+
+                            tickLine={false}
+
+                            tick={{
+
+                                fill: "currentColor",
+
+                                fontSize: 12,
+
+                            }}
+
+                            className="text-gray-500 dark:text-gray-400"
+
+                        />
+
+
+                        <Tooltip
+
+                            cursor={{
+
+                                fill: "rgba(59, 130, 246, 0.06)",
+
+                            }}
+
+                            formatter={(value) => [
+
+                                value,
+
+                                "Tasks",
+
+                            ]}
+
+                            contentStyle={{
+
+                                borderRadius: "12px",
+
+                                border: "1px solid rgb(229 231 235)",
+
+                                backgroundColor: "var(--chart-tooltip-bg, white)",
+
+                                boxShadow:
+
+                                    "0 10px 25px rgba(0, 0, 0, 0.08)",
+
+                                fontSize: "13px",
+
+                            }}
+
+                            labelStyle={{
+
+                                fontWeight: 600,
+
+                                marginBottom: "4px",
+
+                            }}
+
+                        />
+
 
                         <Bar
 
                             dataKey="count"
 
-                            radius={[6, 6, 0, 0]}
+                            radius={[8, 8, 0, 0]}
+
+                            maxBarSize={52}
 
                         >
 
-                            {
+                            {priorityChart.map((item) => (
 
-                                priorityChart.map((item) => (
+                                <Cell
 
-                                    <Cell
+                                    key={item.priority}
 
-                                        key={item.priority}
+                                    fill={
 
-                                        fill={
+                                        COLORS[item.priority] ||
 
-                                            COLORS[item.priority] ||
+                                        "#3B82F6"
 
-                                            "#3B82F6"
+                                    }
 
-                                        }
+                                />
 
-                                    />
-
-                                ))
-
-                            }
+                            ))}
 
                         </Bar>
 

@@ -1,29 +1,45 @@
 import {
+
     useEffect,
+
     useMemo,
+
+    useRef,
+
     useState,
+
 } from "react";
 
-import { useDispatch, useSelector  } from "react-redux";
-
-
-
 import {
+
     DndContext,
-    PointerSensor,
-    closestCorners,
+
     DragOverlay,
+
+    PointerSensor,
+
+    closestCorners,
+
     useSensor,
+
     useSensors,
+
 } from "@dnd-kit/core";
 
 import {
+
     restrictToWindowEdges,
+
 } from "@dnd-kit/modifiers";
 
 import {
+
     SortableContext,
+
+    arrayMove,
+
     verticalListSortingStrategy,
+
 } from "@dnd-kit/sortable";
 
 import { toast } from "react-hot-toast";
@@ -39,22 +55,22 @@ import KanbanTaskCard from "./KanbanTaskCard";
 import TaskModal from "@/components/tasks/TaskModal";
 import DeleteTaskModal from "@/components/tasks/DeleteTaskModal";
 
+
 export default function KanbanBoard({
 
     filters,
 
 }) {
 
-    const {
+const {
 
-        tasks,
+    tasks = [],
 
-        loading,
+    loading,
 
-        updateTask,
+    editTask,
 
-    } = useTasks();
-
+} = useTasks();
 
 
     /*
@@ -63,80 +79,33 @@ export default function KanbanBoard({
     |--------------------------------------------------------------------------
     */
 
-    const [board, setBoard] = useState({});
+    const [
 
-    const [activeTask, setActiveTask] = useState(null);
+        board,
 
-   
+        setBoard,
+
+    ] = useState({});
 
 
-const filteredTasks = useMemo(() => {
+    const [
 
-    return tasks.filter((task) => {
+        activeTask,
 
-        if (
+        setActiveTask,
 
-            filters.search &&
+    ] = useState(null);
 
-            !task.title
 
-                .toLowerCase()
+    const originalBoardRef =
 
-                .includes(filters.search.toLowerCase())
+        useRef(null);
 
-        ) {
 
-            return false;
+    const originalStatusRef =
 
-        }
+        useRef(null);
 
-        if (
-
-            filters.project &&
-
-            task.project?._id !== filters.project
-
-        ) {
-
-            return false;
-
-        }
-
-        if (
-
-            filters.priority &&
-
-            task.priority !== filters.priority
-
-        ) {
-
-            return false;
-
-        }
-
-        if (
-
-            filters.assignedTo &&
-
-            task.assignedTo?._id !== filters.assignedTo
-
-        ) {
-
-            return false;
-
-        }
-
-        return true;
-
-    });
-
-}, [
-
-    tasks,
-
-    filters,
-
-]);
 
     /*
     |--------------------------------------------------------------------------
@@ -144,9 +113,23 @@ const filteredTasks = useMemo(() => {
     |--------------------------------------------------------------------------
     */
 
-    const [editingTask, setEditingTask] = useState(null);
+    const [
 
-    const [taskModalOpen, setTaskModalOpen] = useState(false);
+        editingTask,
+
+        setEditingTask,
+
+    ] = useState(null);
+
+
+    const [
+
+        taskModalOpen,
+
+        setTaskModalOpen,
+
+    ] = useState(false);
+
 
     /*
     |--------------------------------------------------------------------------
@@ -154,9 +137,23 @@ const filteredTasks = useMemo(() => {
     |--------------------------------------------------------------------------
     */
 
-    const [deleteTask, setDeleteTask] = useState(null);
+    const [
 
-    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+        taskToDelete,
+
+        setTaskToDelete,
+
+    ] = useState(null);
+
+
+    const [
+
+        deleteModalOpen,
+
+        setDeleteModalOpen,
+
+    ] = useState(false);
+
 
     /*
     |--------------------------------------------------------------------------
@@ -167,18 +164,111 @@ const filteredTasks = useMemo(() => {
     const sensors = useSensors(
 
         useSensor(
+
             PointerSensor,
+
             {
+
                 activationConstraint: {
-                    distance: 6,
+
+                    distance: 5,
+
                 },
+
             }
+
         )
 
     );
 
- 
-    
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filter Tasks
+    |--------------------------------------------------------------------------
+    */
+
+    const filteredTasks = useMemo(() => {
+
+        const searchValue =
+
+            filters?.search
+                ?.trim()
+                ?.toLowerCase() || "";
+
+
+        return tasks.filter((task) => {
+
+            const taskTitle =
+
+                task?.title
+                    ?.toLowerCase() || "";
+
+
+            if (
+
+                searchValue &&
+
+                !taskTitle.includes(searchValue)
+
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+
+                filters?.project &&
+
+                task?.project?._id !== filters.project
+
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+
+                filters?.priority &&
+
+                task?.priority !== filters.priority
+
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+
+                filters?.assignedTo &&
+
+                task?.assignedTo?._id !== filters.assignedTo
+
+            ) {
+
+                return false;
+
+            }
+
+
+            return true;
+
+        });
+
+    }, [
+
+        tasks,
+
+        filters,
+
+    ]);
+
 
     /*
     |--------------------------------------------------------------------------
@@ -188,27 +278,35 @@ const filteredTasks = useMemo(() => {
 
     useEffect(() => {
 
-        const grouped = {};
+        const groupedTasks = {};
 
-        TASK_STATUS.forEach(status => {
 
-            grouped[status] = [];
+        TASK_STATUS.forEach((status) => {
+
+            groupedTasks[status] = [];
 
         });
 
-       filteredTasks.forEach((task) => {
 
-    if (grouped[task.status]) {
+        filteredTasks.forEach((task) => {
 
-        grouped[task.status].push(task);
+            if (groupedTasks[task?.status]) {
 
-    }
+                groupedTasks[task.status].push(task);
 
-});
+            }
 
-        setBoard(grouped);
+        });
 
-    }, [filteredTasks]);
+
+        setBoard(groupedTasks);
+
+    }, [
+
+        filteredTasks,
+
+    ]);
+
 
     /*
     |--------------------------------------------------------------------------
@@ -216,37 +314,93 @@ const filteredTasks = useMemo(() => {
     |--------------------------------------------------------------------------
     */
 
-    const getTasksByStatus = (status) =>
+    const getTasksByStatus = (status) => {
 
-        board[status] || [];
+        return board?.[status] || [];
 
-    const findTask = (taskId) => {
+    };
 
-        for (const status of TASK_STATUS) {
 
-            const task = board[status]?.find(
+    const findContainer = (
 
-                t => t._id === taskId
+        id,
 
-            );
+        currentBoard = board
 
-            if (task) {
+    ) => {
 
-                return {
+        if (TASK_STATUS.includes(id)) {
 
-                    task,
-
-                    status,
-
-                };
-
-            }
+            return id;
 
         }
 
-        return null;
+
+        return TASK_STATUS.find((status) =>
+
+            currentBoard?.[status]?.some(
+
+                (task) => task._id === id
+
+            )
+
+        ) || null;
 
     };
+
+
+    const findTask = (
+
+        taskId,
+
+        currentBoard = board
+
+    ) => {
+
+        const status =
+
+            findContainer(
+
+                taskId,
+
+                currentBoard
+
+            );
+
+
+        if (!status) {
+
+            return null;
+
+        }
+
+
+        const task =
+
+            currentBoard?.[status]?.find(
+
+                (item) => item._id === taskId
+
+            );
+
+
+        if (!task) {
+
+            return null;
+
+        }
+
+
+        return {
+
+            task,
+
+            status,
+
+        };
+
+    };
+
 
     /*
     |--------------------------------------------------------------------------
@@ -254,17 +408,43 @@ const filteredTasks = useMemo(() => {
     |--------------------------------------------------------------------------
     */
 
-    const handleDragStart = ({ active }) => {
+    const handleDragStart = ({
 
-        const result = findTask(active.id);
+        active,
 
-        if (result) {
+    }) => {
 
-            setActiveTask(result.task);
+        const activeId =
+
+            String(active.id);
+
+
+        const result =
+
+            findTask(activeId);
+
+
+        if (!result) {
+
+            return;
 
         }
 
+
+        setActiveTask(result.task);
+
+
+        originalStatusRef.current =
+
+            result.status;
+
+
+        originalBoardRef.current =
+
+            structuredClone(board);
+
     };
+
 
     /*
     |--------------------------------------------------------------------------
@@ -272,69 +452,232 @@ const filteredTasks = useMemo(() => {
     |--------------------------------------------------------------------------
     */
 
-    const handleDragOver = ({ active, over }) => {
+    const handleDragOver = ({
 
-        if (!over) return;
+        active,
 
-        const activeResult = findTask(active.id);
+        over,
 
-        if (!activeResult) return;
+    }) => {
 
-        const from = activeResult.status;
+        if (!over) {
 
-        let to = over.id;
-
-        if (!TASK_STATUS.includes(to)) {
-
-            const overTask = findTask(over.id);
-
-            if (!overTask) return;
-
-            to = overTask.status;
+            return;
 
         }
 
-        if (from === to) return;
 
-        setBoard(prev => {
+        const activeId =
 
-            const next = {
+            String(active.id);
 
-                ...prev,
 
-            };
+        const overId =
 
-            const task = prev[from].find(
+            String(over.id);
 
-                t => t._id === active.id
 
-            );
+        if (activeId === overId) {
 
-            next[from] = prev[from].filter(
+            return;
 
-                t => t._id !== active.id
+        }
 
-            );
 
-            next[to] = [
+        setBoard((previousBoard) => {
+
+            const activeContainer =
+
+                findContainer(
+
+                    activeId,
+
+                    previousBoard
+
+                );
+
+
+            const overContainer =
+
+                findContainer(
+
+                    overId,
+
+                    previousBoard
+
+                );
+
+
+            if (
+
+                !activeContainer ||
+
+                !overContainer
+
+            ) {
+
+                return previousBoard;
+
+            }
+
+
+            const activeItems =
+
+                previousBoard[activeContainer] || [];
+
+
+            const overItems =
+
+                previousBoard[overContainer] || [];
+
+
+            const activeIndex =
+
+                activeItems.findIndex(
+
+                    (task) => task._id === activeId
+
+                );
+
+
+            if (activeIndex === -1) {
+
+                return previousBoard;
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Reorder Inside Same Column
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+
+                activeContainer === overContainer
+
+            ) {
+
+                const overIndex =
+
+                    overItems.findIndex(
+
+                        (task) => task._id === overId
+
+                    );
+
+
+                if (
+
+                    overIndex === -1 ||
+
+                    activeIndex === overIndex
+
+                ) {
+
+                    return previousBoard;
+
+                }
+
+
+                return {
+
+                    ...previousBoard,
+
+                    [activeContainer]:
+
+                        arrayMove(
+
+                            activeItems,
+
+                            activeIndex,
+
+                            overIndex
+
+                        ),
+
+                };
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Move Between Columns
+            |--------------------------------------------------------------------------
+            */
+
+            const activeTaskItem =
+
+                activeItems[activeIndex];
+
+
+            const updatedActiveItems =
+
+                activeItems.filter(
+
+                    (task) => task._id !== activeId
+
+                );
+
+
+            const overIndex =
+
+                overItems.findIndex(
+
+                    (task) => task._id === overId
+
+                );
+
+
+            const insertIndex =
+
+                overIndex >= 0
+                    ? overIndex
+                    : overItems.length;
+
+
+            const updatedOverItems =
+
+                [...overItems];
+
+
+            updatedOverItems.splice(
+
+                insertIndex,
+
+                0,
 
                 {
 
-                    ...task,
+                    ...activeTaskItem,
 
-                    status: to,
+                    status: overContainer,
 
-                },
+                }
 
-                ...prev[to],
+            );
 
-            ];
 
-            return next;
+            return {
+
+                ...previousBoard,
+
+                [activeContainer]:
+
+                    updatedActiveItems,
+
+                [overContainer]:
+
+                    updatedOverItems,
+
+            };
 
         });
 
     };
+
 
     /*
     |--------------------------------------------------------------------------
@@ -342,71 +685,206 @@ const filteredTasks = useMemo(() => {
     |--------------------------------------------------------------------------
     */
 
-    const handleDragEnd = async ({ active, over }) => {
+const handleDragEnd = async ({
 
-        setActiveTask(null);
+    active,
 
-        if (!over) return;
+    over,
 
-        const taskInfo = findTask(active.id);
+}) => {
 
-        if (!taskInfo) return;
+    setActiveTask(null);
 
-        const previousStatus = taskInfo.status;
 
-        let newStatus = over.id;
+    const activeId =
 
-        if (!TASK_STATUS.includes(newStatus)) {
+        String(active.id);
 
-            const overTask = findTask(over.id);
 
-            if (!overTask) return;
+    if (!over) {
 
-            newStatus = overTask.status;
+        if (originalBoardRef.current) {
 
-        }
+            setBoard(
 
-        if (previousStatus === newStatus) {
-
-            return;
-
-        }
-
-        const previousBoard = structuredClone(board);
-
-        try {
-
-            await updateTask(
-
-                active.id,
-
-                {
-
-                    status: newStatus,
-
-                }
-
-            ).unwrap();
-
-        }
-
-        catch {
-
-            toast.error(
-
-                "Failed to update task"
+                originalBoardRef.current
 
             );
 
-            setBoard(previousBoard);
+        }
+
+
+        originalBoardRef.current = null;
+
+        originalStatusRef.current = null;
+
+        return;
+
+    }
+
+
+    const previousStatus =
+
+        originalStatusRef.current;
+
+
+    const currentStatus =
+
+        findContainer(activeId);
+
+
+    if (
+
+        !previousStatus ||
+
+        !currentStatus
+
+    ) {
+
+        if (originalBoardRef.current) {
+
+            setBoard(
+
+                originalBoardRef.current
+
+            );
 
         }
 
-    };
+
+        originalBoardRef.current = null;
+
+        originalStatusRef.current = null;
+
+        return;
+
+    }
+
 
     /*
     |--------------------------------------------------------------------------
-    | Edit/Delete
+    | Same Column Reordering
+    |--------------------------------------------------------------------------
+    */
+
+    if (previousStatus === currentStatus) {
+
+        originalBoardRef.current = null;
+
+        originalStatusRef.current = null;
+
+        return;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update Task Status
+    |--------------------------------------------------------------------------
+    */
+
+   try {
+
+    await editTask(
+
+        activeId,
+
+        {
+
+            status: currentStatus,
+
+        }
+
+    );
+
+
+    toast.success(
+
+        "Task status updated successfully."
+
+    );
+
+}
+
+catch (error) {
+
+    console.error(
+
+        "Task status update error:",
+
+        error
+
+    );
+
+
+    const errorMessage =
+
+        error?.message ||
+
+        error?.response?.data?.message ||
+
+        "Failed to update task status.";
+
+
+    toast.error(errorMessage);
+
+
+    if (originalBoardRef.current) {
+
+        setBoard(
+
+            originalBoardRef.current
+
+        );
+
+    }
+
+}
+
+finally {
+
+    originalBoardRef.current = null;
+
+    originalStatusRef.current = null;
+
+}
+
+};
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Drag Cancel
+    |--------------------------------------------------------------------------
+    */
+
+    const handleDragCancel = () => {
+
+        setActiveTask(null);
+
+
+        if (originalBoardRef.current) {
+
+            setBoard(
+
+                originalBoardRef.current
+
+            );
+
+        }
+
+
+        originalBoardRef.current = null;
+
+        originalStatusRef.current = null;
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Edit Task
     |--------------------------------------------------------------------------
     */
 
@@ -418,13 +896,39 @@ const filteredTasks = useMemo(() => {
 
     };
 
+
+    const closeTaskModal = () => {
+
+        setTaskModalOpen(false);
+
+        setEditingTask(null);
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Delete Task
+    |--------------------------------------------------------------------------
+    */
+
     const handleDelete = (task) => {
 
-        setDeleteTask(task);
+        setTaskToDelete(task);
 
         setDeleteModalOpen(true);
 
     };
+
+
+    const closeDeleteModal = () => {
+
+        setDeleteModalOpen(false);
+
+        setTaskToDelete(null);
+
+    };
+
 
     /*
     |--------------------------------------------------------------------------
@@ -432,11 +936,18 @@ const filteredTasks = useMemo(() => {
     |--------------------------------------------------------------------------
     */
 
-    if (loading) {
+    if (
+
+        loading &&
+
+        !tasks.length
+
+    ) {
 
         return <KanbanSkeleton />;
 
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -448,14 +959,17 @@ const filteredTasks = useMemo(() => {
 
         <>
 
-
             <DndContext
 
                 sensors={sensors}
 
                 collisionDetection={closestCorners}
 
-                modifiers={[restrictToWindowEdges]}
+                modifiers={[
+
+                    restrictToWindowEdges,
+
+                ]}
 
                 onDragStart={handleDragStart}
 
@@ -463,84 +977,102 @@ const filteredTasks = useMemo(() => {
 
                 onDragEnd={handleDragEnd}
 
+                onDragCancel={handleDragCancel}
+
             >
 
-                <div className="grid gap-6 lg:grid-cols-4">
+                <div
+                    className="
+                        grid
+                        min-w-[1100px]
+                        grid-cols-4
+                        gap-5
+                        xl:min-w-0
+                    "
+                >
 
-                    {
+                    {TASK_STATUS.map((status) => {
 
-                        TASK_STATUS.map(status => {
+                        const columnTasks =
 
-                            const columnTasks =
+                            getTasksByStatus(status);
 
-                                getTasksByStatus(status);
 
-                            return (
+                        return (
 
-                                <SortableContext
+                            <SortableContext
 
-                                    key={status}
+                                key={status}
 
-                                    id={status}
+                                id={status}
 
-                                    items={
+                                items={
 
-                                        columnTasks.map(
+                                    columnTasks.map(
 
-                                            task => task._id
+                                        (task) => task._id
 
-                                        )
+                                    )
 
-                                    }
+                                }
 
-                                    strategy={
+                                strategy={
 
-                                        verticalListSortingStrategy
+                                    verticalListSortingStrategy
 
-                                    }
+                                }
 
-                                >
+                            >
 
-                                  <KanbanColumn
-    status={status}
-    tasks={columnTasks}
-    onEdit={handleEdit}
-    onDelete={handleDelete}
-/>
+                                <KanbanColumn
 
-                                </SortableContext>
+                                    status={status}
 
-                            );
+                                    tasks={columnTasks}
 
-                        })
+                                    onEdit={handleEdit}
 
-                    }
-
-                </div>
-
-                <DragOverlay>
-
-                    {
-
-                        activeTask && (
-
-                            <div className="rotate-2 opacity-90 shadow-2xl">
-
-                                <KanbanTaskCard
-
-                                    task={activeTask}
+                                    onDelete={handleDelete}
 
                                 />
 
-                            </div>
+                            </SortableContext>
 
-                        )
+                        );
 
-                    }
+                    })}
+
+                </div>
+
+
+                <DragOverlay>
+
+                    {activeTask ? (
+
+                        <div
+                            className="
+                                w-[280px]
+                                cursor-grabbing
+                                opacity-95
+                            "
+                        >
+
+                            <KanbanTaskCard
+
+                                task={activeTask}
+
+                                overlay
+
+                            />
+
+                        </div>
+
+                    ) : null}
 
                 </DragOverlay>
 
             </DndContext>
+
 
             <TaskModal
 
@@ -550,29 +1082,18 @@ const filteredTasks = useMemo(() => {
 
                 loading={loading}
 
-                onClose={() => {
-
-                    setTaskModalOpen(false);
-
-                    setEditingTask(null);
-
-                }}
+                onClose={closeTaskModal}
 
             />
+
 
             <DeleteTaskModal
 
                 open={deleteModalOpen}
 
-                task={deleteTask}
+                task={taskToDelete}
 
-                onClose={() => {
-
-                    setDeleteModalOpen(false);
-
-                    setDeleteTask(null);
-
-                }}
+                onClose={closeDeleteModal}
 
             />
 

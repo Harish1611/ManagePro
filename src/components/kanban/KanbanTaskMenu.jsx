@@ -1,11 +1,25 @@
-import { useEffect, useRef, useState } from "react";
+import {
+
+    useEffect,
+
+    useRef,
+
+    useState,
+
+} from "react";
 
 import {
-    FiMoreVertical,
+
     FiEdit2,
-    FiTrash2,
+
     FiEye,
+
+    FiMoreVertical,
+
+    FiTrash2,
+
 } from "react-icons/fi";
+
 
 export default function KanbanTaskMenu({
 
@@ -17,17 +31,46 @@ export default function KanbanTaskMenu({
 
 }) {
 
-    const [open, setOpen] = useState(false);
+    const [
 
-    const menuRef = useRef(null);
+        open,
+
+        setOpen,
+
+    ] = useState(false);
+
+
+    const menuRef =
+
+        useRef(null);
+
+
+    const firstMenuItemRef =
+
+        useRef(null);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close Menu
+    |--------------------------------------------------------------------------
+    */
 
     useEffect(() => {
+
+        if (!open) {
+
+            return undefined;
+
+        }
+
 
         const handleClickOutside = (event) => {
 
             if (
 
                 menuRef.current &&
+
                 !menuRef.current.contains(event.target)
 
             ) {
@@ -38,6 +81,18 @@ export default function KanbanTaskMenu({
 
         };
 
+
+        const handleEscape = (event) => {
+
+            if (event.key === "Escape") {
+
+                setOpen(false);
+
+            }
+
+        };
+
+
         document.addEventListener(
 
             "mousedown",
@@ -45,6 +100,19 @@ export default function KanbanTaskMenu({
             handleClickOutside
 
         );
+
+
+        document.addEventListener(
+
+            "keydown",
+
+            handleEscape
+
+        );
+
+
+        firstMenuItemRef.current?.focus();
+
 
         return () => {
 
@@ -56,39 +124,56 @@ export default function KanbanTaskMenu({
 
             );
 
+
+            document.removeEventListener(
+
+                "keydown",
+
+                handleEscape
+
+            );
+
         };
 
-    }, []);
+    }, [
 
-    const handleView = (e) => {
+        open,
 
-        e.stopPropagation();
+    ]);
 
-        onView?.();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Action Handler
+    |--------------------------------------------------------------------------
+    */
+
+    const handleAction = (
+
+        event,
+
+        callback
+
+    ) => {
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+
+        callback?.();
+
 
         setOpen(false);
 
     };
 
-    const handleEdit = (e) => {
 
-        e.stopPropagation();
-
-        onEdit?.();
-
-        setOpen(false);
-
-    };
-
-    const handleDelete = (e) => {
-
-        e.stopPropagation();
-
-        onDelete?.();
-
-        setOpen(false);
-
-    };
+    /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
 
     return (
 
@@ -98,97 +183,387 @@ export default function KanbanTaskMenu({
 
             className="relative"
 
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) =>
+
+                event.stopPropagation()
+
+            }
 
         >
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Menu Trigger
+            |--------------------------------------------------------------------------
+            */}
 
             <button
 
                 type="button"
 
-                onPointerDown={(e) => e.stopPropagation()}
+                onPointerDown={(event) =>
 
-                onClick={(e) => {
+                    event.stopPropagation()
 
-                    e.stopPropagation();
+                }
 
-                    setOpen((prev) => !prev);
+                onClick={(event) => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    setOpen(
+
+                        (previousOpen) =>
+
+                            !previousOpen
+
+                    );
 
                 }}
 
-                className="rounded p-1 transition hover:bg-gray-100"
+                className={`
+                    flex
+                    h-8
+                    w-8
+                    items-center
+                    justify-center
+                    rounded-lg
+                    text-gray-400
+                    transition-all
+                    duration-200
+                    hover:bg-gray-100
+                    hover:text-gray-700
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-indigo-500/30
+                    dark:text-gray-500
+                    dark:hover:bg-slate-800
+                    dark:hover:text-gray-200
+                    ${
+                        open
+
+                            ? `
+                                bg-gray-100
+                                text-gray-700
+                                dark:bg-slate-800
+                                dark:text-gray-200
+                            `
+
+                            : ""
+                    }
+                `}
+
+                aria-label="Open task actions"
+
+                aria-haspopup="menu"
+
+                aria-expanded={open}
 
             >
 
-                <FiMoreVertical size={18} />
+                <FiMoreVertical
+
+                    size={18}
+
+                    aria-hidden="true"
+
+                />
 
             </button>
 
-            {
 
-                open && (
+            {/*
+            |--------------------------------------------------------------------------
+            | Menu
+            |--------------------------------------------------------------------------
+            */}
 
-                    <div className="absolute right-0 top-8 z-50 w-44 overflow-hidden rounded-lg border bg-white shadow-xl">
+            {open && (
 
-                        {/* <button
+                <div
+                    role="menu"
+                    className="
+                        absolute
+                        right-0
+                        top-10
+                        z-[60]
+                        w-44
+                        overflow-hidden
+                        rounded-xl
+                        border
+                        border-gray-200
+                        bg-white
+                        p-1.5
+                        shadow-xl
+                        shadow-gray-900/10
+                        dark:border-gray-700
+                        dark:bg-slate-900
+                        dark:shadow-black/30
+                    "
+                >
 
-                            type="button"
-
-                            onPointerDown={(e) => e.stopPropagation()}
-
-                            onClick={handleView}
-
-                            className="flex w-full items-center gap-2 px-4 py-2 text-left hover:bg-gray-100"
-
-                        >
-
-                            <FiEye />
-
-                            View
-
-                        </button> */}
-
-                        <button
-
-                            type="button"
-
-                            onPointerDown={(e) => e.stopPropagation()}
-
-                            onClick={handleEdit}
-
-                            className="flex w-full items-center gap-2 px-4 py-2 text-left hover:bg-gray-100"
-
-                        >
-
-                            <FiEdit2 />
-
-                            Edit
-
-                        </button>
+                    {onView && (
 
                         <button
 
+                            ref={firstMenuItemRef}
+
                             type="button"
 
-                            onPointerDown={(e) => e.stopPropagation()}
+                            role="menuitem"
 
-                            onClick={handleDelete}
+                            onPointerDown={(event) =>
 
-                            className="flex w-full items-center gap-2 px-4 py-2 text-left text-red-600 hover:bg-red-50"
+                                event.stopPropagation()
+
+                            }
+
+                            onClick={(event) =>
+
+                                handleAction(
+
+                                    event,
+
+                                    onView
+
+                                )
+
+                            }
+
+                            className="
+                                flex
+                                w-full
+                                items-center
+                                gap-3
+                                rounded-lg
+                                px-3
+                                py-2.5
+                                text-left
+                                text-sm
+                                font-medium
+                                text-gray-700
+                                transition-colors
+                                hover:bg-gray-100
+                                focus:bg-gray-100
+                                focus:outline-none
+                                dark:text-gray-300
+                                dark:hover:bg-slate-800
+                                dark:focus:bg-slate-800
+                            "
 
                         >
 
-                            <FiTrash2 />
+                            <FiEye
 
-                            Delete
+                                size={16}
+
+                                className="
+                                    shrink-0
+                                    text-gray-400
+                                    dark:text-gray-500
+                                "
+
+                                aria-hidden="true"
+
+                            />
+
+
+                            <span>
+
+                                View Task
+
+                            </span>
 
                         </button>
 
-                    </div>
+                    )}
 
-                )
 
-            }
+                    {onEdit && (
+
+                        <button
+
+                            ref={
+
+                                !onView
+
+                                    ? firstMenuItemRef
+
+                                    : undefined
+
+                            }
+
+                            type="button"
+
+                            role="menuitem"
+
+                            onPointerDown={(event) =>
+
+                                event.stopPropagation()
+
+                            }
+
+                            onClick={(event) =>
+
+                                handleAction(
+
+                                    event,
+
+                                    onEdit
+
+                                )
+
+                            }
+
+                            className="
+                                flex
+                                w-full
+                                items-center
+                                gap-3
+                                rounded-lg
+                                px-3
+                                py-2.5
+                                text-left
+                                text-sm
+                                font-medium
+                                text-gray-700
+                                transition-colors
+                                hover:bg-gray-100
+                                focus:bg-gray-100
+                                focus:outline-none
+                                dark:text-gray-300
+                                dark:hover:bg-slate-800
+                                dark:focus:bg-slate-800
+                            "
+
+                        >
+
+                            <FiEdit2
+
+                                size={16}
+
+                                className="
+                                    shrink-0
+                                    text-gray-400
+                                    dark:text-gray-500
+                                "
+
+                                aria-hidden="true"
+
+                            />
+
+
+                            <span>
+
+                                Edit Task
+
+                            </span>
+
+                        </button>
+
+                    )}
+
+
+                    {onDelete && (
+
+                        <>
+
+                            <div
+                                className="
+                                    my-1
+                                    border-t
+                                    border-gray-100
+                                    dark:border-gray-800
+                                "
+                            />
+
+
+                            <button
+
+                                ref={
+
+                                    !onView && !onEdit
+
+                                        ? firstMenuItemRef
+
+                                        : undefined
+
+                                }
+
+                                type="button"
+
+                                role="menuitem"
+
+                                onPointerDown={(event) =>
+
+                                    event.stopPropagation()
+
+                                }
+
+                                onClick={(event) =>
+
+                                    handleAction(
+
+                                        event,
+
+                                        onDelete
+
+                                    )
+
+                                }
+
+                                className="
+                                    flex
+                                    w-full
+                                    items-center
+                                    gap-3
+                                    rounded-lg
+                                    px-3
+                                    py-2.5
+                                    text-left
+                                    text-sm
+                                    font-medium
+                                    text-red-600
+                                    transition-colors
+                                    hover:bg-red-50
+                                    focus:bg-red-50
+                                    focus:outline-none
+                                    dark:text-red-400
+                                    dark:hover:bg-red-500/10
+                                    dark:focus:bg-red-500/10
+                                "
+
+                            >
+
+                                <FiTrash2
+
+                                    size={16}
+
+                                    className="shrink-0"
+
+                                    aria-hidden="true"
+
+                                />
+
+
+                                <span>
+
+                                    Delete Task
+
+                                </span>
+
+                            </button>
+
+                        </>
+
+                    )}
+
+                </div>
+
+            )}
 
         </div>
 

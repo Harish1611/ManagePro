@@ -1,18 +1,27 @@
 import {
+
+    useCallback,
+
+} from "react";
+
+import {
+
     useDispatch,
+
     useSelector,
+
 } from "react-redux";
 
 
 import {
 
-    fetchUsers,
+    fetchUsers as fetchUsersAction,
 
-    fetchUser,
+    fetchUser as fetchUserAction,
 
-    clearUser,
+    clearUser as clearUserAction,
 
-    clearUserError,
+    clearUserError as clearUserErrorAction,
 
 
     selectUsers,
@@ -25,16 +34,12 @@ import {
 
     selectUserError,
 
-
 } from "@/redux/slices/userSlice";
-
 
 
 export default function useUsers() {
 
-
     const dispatch = useDispatch();
-
 
 
     /*
@@ -42,7 +47,6 @@ export default function useUsers() {
     | Redux State
     |--------------------------------------------------------------------------
     */
-
 
     const users = useSelector(
 
@@ -79,32 +83,44 @@ export default function useUsers() {
     );
 
 
-
     /*
     |--------------------------------------------------------------------------
     | API Actions
     |--------------------------------------------------------------------------
     */
 
+    const fetchUsers = useCallback(
 
-    const getUsers = (params = {}) =>
+        (params = {}) => {
 
-        dispatch(
+            return dispatch(
 
-            fetchUsers(params)
+                fetchUsersAction(params)
 
-        );
+            );
+
+        },
+
+        [dispatch]
+
+    );
 
 
+    const fetchUser = useCallback(
 
-    const getUser = (userId) =>
+        (userId) => {
 
-        dispatch(
+            return dispatch(
 
-            fetchUser(userId)
+                fetchUserAction(userId)
 
-        );
+            );
 
+        },
+
+        [dispatch]
+
+    );
 
 
     /*
@@ -113,25 +129,38 @@ export default function useUsers() {
     |--------------------------------------------------------------------------
     */
 
+    const clearUser = useCallback(
 
-    const resetSelectedUser = () =>
+        () => {
 
-        dispatch(
+            dispatch(
 
-            clearUser()
+                clearUserAction()
 
-        );
+            );
+
+        },
+
+        [dispatch]
+
+    );
 
 
+    const clearError = useCallback(
 
-    const clearError = () =>
+        () => {
 
-        dispatch(
+            dispatch(
 
-            clearUserError()
+                clearUserErrorAction()
 
-        );
+            );
 
+        },
+
+        [dispatch]
+
+    );
 
 
     /*
@@ -139,10 +168,8 @@ export default function useUsers() {
     | Return
     |--------------------------------------------------------------------------
     */
-console.log("x Redux users:", users);
 
     return {
-
 
         /*
         |--------------------------------------------------------------------------
@@ -150,21 +177,15 @@ console.log("x Redux users:", users);
         |--------------------------------------------------------------------------
         */
 
-
         users,
-
 
         user,
 
-
         pagination,
-
 
         loading,
 
-
         error,
-
 
 
         /*
@@ -173,12 +194,9 @@ console.log("x Redux users:", users);
         |--------------------------------------------------------------------------
         */
 
+        fetchUsers,
 
-        fetchUsers: getUsers,
-
-
-        fetchUser: getUser,
-
+        fetchUser,
 
 
         /*
@@ -187,15 +205,10 @@ console.log("x Redux users:", users);
         |--------------------------------------------------------------------------
         */
 
-
-        clearUser: resetSelectedUser,
-
+        clearUser,
 
         clearError,
 
-
     };
 
-
 }
-

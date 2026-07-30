@@ -1,15 +1,22 @@
 import { navigation } from "@/constants/navigation";
+
 import NavItem from "./NavItem";
+
 
 export default function MobileSidebar({
 
     open,
 
-    setOpen
+    setOpen,
 
 }) {
 
-    if (!open) return null;
+    if (!open) {
+
+        return null;
+
+    }
+
 
     return (
 
@@ -17,27 +24,101 @@ export default function MobileSidebar({
 
             <div
 
-                className="fixed inset-0 bg-black/50 z-40"
+                className="
+                    fixed
+                    inset-0
+                    z-40
+                    bg-black/60
+                    backdrop-blur-sm
+                "
 
                 onClick={() => setOpen(false)}
 
             />
 
+
             <aside
-
-                className="fixed left-0 top-0 z-50 h-full w-64 bg-white dark:bg-slate-900 p-4"
-
+                className="
+                    fixed
+                    left-0
+                    top-0
+                    z-50
+                    flex
+                    h-full
+                    w-72
+                    flex-col
+                    border-r
+                    border-gray-200
+                    bg-white
+                    shadow-2xl
+                    dark:border-gray-800
+                    dark:bg-gray-950
+                "
             >
 
-                <h2 className="text-xl font-bold mb-8">
+                <div
+                    className="
+                        flex
+                        h-20
+                        items-center
+                        border-b
+                        border-gray-200
+                        px-6
+                        dark:border-gray-800
+                    "
+                >
 
-                    TeamTask
+                    <div
+                        className="
+                            flex
+                            h-11
+                            w-11
+                            items-center
+                            justify-center
+                            rounded-xl
+                            bg-indigo-600
+                            text-sm
+                            font-bold
+                            text-white
+                            shadow-sm
+                        "
+                    >
 
-                </h2>
+                        TM
 
-                <div className="space-y-2">
+                    </div>
 
-                    {navigation.map(item => (
+
+                    <div className="ml-3">
+
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+
+                            TeamTask
+
+                        </h2>
+
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+
+                            Project Management
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <nav
+                    className="
+                        flex-1
+                        space-y-1.5
+                        overflow-y-auto
+                        px-4
+                        py-6
+                    "
+                >
+
+                    {navigation.map((item) => (
 
                         <NavItem
 
@@ -45,13 +126,30 @@ export default function MobileSidebar({
 
                             item={item}
 
-                            onClick={() =>
-                                setOpen(false)
-                            }
+                            onClick={() => setOpen(false)}
 
                         />
 
                     ))}
+
+                </nav>
+
+
+                <div
+                    className="
+                        border-t
+                        border-gray-200
+                        px-6
+                        py-4
+                        dark:border-gray-800
+                    "
+                >
+
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+
+                        © 2026 TeamTask
+
+                    </p>
 
                 </div>
 

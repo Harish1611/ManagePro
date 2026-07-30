@@ -1,12 +1,16 @@
+import { useEffect } from "react";
+
 import {
 
-    useEffect,
+    FiAlertCircle,
 
-} from "react";
+    FiRefreshCw,
 
+} from "react-icons/fi";
 
 import useProfile from "@/hooks/useProfile";
 
+import Button from "@/components/common/Button";
 
 import ProfileHeader from "@/components/profile/ProfileHeader";
 
@@ -20,8 +24,8 @@ import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
 
 import AvatarUploader from "@/components/profile/AvatarUploader";
 
-export default function Profile() {
 
+export default function Profile() {
 
     const {
 
@@ -36,24 +40,12 @@ export default function Profile() {
     } = useProfile();
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Fetch Profile
-    |--------------------------------------------------------------------------
-    */
-
     useEffect(() => {
 
         fetchProfile();
 
     }, []);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Loading
-    |--------------------------------------------------------------------------
-    */
 
     if (
 
@@ -65,18 +57,16 @@ export default function Profile() {
 
         return (
 
-            <ProfileSkeleton />
+            <div className="mx-auto w-full ">
+
+                <ProfileSkeleton />
+
+            </div>
 
         );
 
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Error
-    |--------------------------------------------------------------------------
-    */
 
     if (
 
@@ -88,69 +78,92 @@ export default function Profile() {
 
         return (
 
-            <div
-                className="
-                    rounded-2xl
-                    border
-                    border-red-200
-                    bg-red-50
-                    p-6
-                    text-center
-                    dark:border-red-900/50
-                    dark:bg-red-950/20
-                "
-            >
+            <div className="flex min-h-[65vh] items-center justify-center">
 
-                <h2
+                <div
                     className="
-                        text-lg
-                        font-semibold
-                        text-red-700
-                        dark:text-red-400
+                        w-full
+                        max-w-lg
+                        rounded-3xl
+                        border
+                        border-red-200
+                        bg-white
+                        p-8
+                        text-center
+                        shadow-sm
+                        dark:border-red-900/50
+                        dark:bg-gray-900
                     "
                 >
 
-                    Unable to load profile
+                    <div
+                        className="
+                            mx-auto
+                            flex
+                            h-14
+                            w-14
+                            items-center
+                            justify-center
+                            rounded-2xl
+                            bg-red-100
+                            text-red-600
+                            dark:bg-red-950/40
+                            dark:text-red-400
+                        "
+                    >
 
-                </h2>
+                        <FiAlertCircle size={26} />
 
-                <p
-                    className="
-                        mt-2
-                        text-sm
-                        text-red-600
-                        dark:text-red-300
-                    "
-                >
+                    </div>
 
-                    {error}
 
-                </p>
+                    <h2 className="mt-5 text-xl font-bold text-gray-900 dark:text-white">
 
-                <button
+                        Unable to load profile
 
-                    type="button"
+                    </h2>
 
-                    onClick={fetchProfile}
 
-                    className="
-                        mt-4
-                        rounded-lg
-                        bg-red-600
-                        px-5
-                        py-2.5
-                        text-sm
-                        font-medium
-                        text-white
-                        transition
-                        hover:bg-red-700
-                    "
+                    <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
 
-                >
+                        {typeof error === "string"
+                            ? error
+                            : error?.message ||
+                              "Something went wrong while loading your profile."
+                        }
 
-                    Try Again
+                    </p>
 
-                </button>
+
+                    <Button
+
+                        type="button"
+
+                        onClick={fetchProfile}
+
+                        loading={loading}
+
+                        className="mt-6"
+
+                    >
+
+                        {!loading && (
+
+                            <FiRefreshCw
+
+                                size={16}
+
+                                className="shrink-0"
+
+                            />
+
+                        )}
+
+                        Try Again
+
+                    </Button>
+
+                </div>
 
             </div>
 
@@ -161,7 +174,7 @@ export default function Profile() {
 
     return (
 
-        <div className="space-y-6">
+        <div className="mx-auto w-full  space-y-6 pb-8">
 
             <ProfileHeader
 
@@ -169,28 +182,49 @@ export default function Profile() {
 
             />
 
+
             <ProfileStats
 
                 profile={profile}
 
             />
-           
-
-            <ProfileForm
-
-    profile={profile}
-
-/>
- <AvatarUploader
-
-        profile={profile}
-
-    />
 
 
+           <div
+    className="
+        grid
+        grid-cols-1
+        items-stretch
+        gap-6
+        xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.8fr)]
+    "
+>
+
+                <div className="min-w-0">
+
+                    <ProfileForm
+
+                        profile={profile}
+
+                    />
+
+                </div>
 
 
-<ChangePasswordForm />
+               <div className="min-w-0 h-full">
+
+                    <AvatarUploader
+
+                        profile={profile}
+
+                    />
+
+                </div>
+
+            </div>
+
+
+            <ChangePasswordForm />
 
         </div>
 

@@ -22,15 +22,23 @@ import {
 
 } from "recharts";
 
+
 export default function ProjectProgressChart() {
 
     const {
 
-        projectProgress,
+        projectProgress = [],
 
         loading,
 
     } = useDashboard();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Loading State
+    |--------------------------------------------------------------------------
+    */
 
     if (loading) {
 
@@ -40,7 +48,18 @@ export default function ProjectProgressChart() {
 
                 <div className="flex h-96 items-center justify-center">
 
-                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+                    <div className="text-center">
+
+                        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent dark:border-blue-400 dark:border-t-transparent" />
+
+
+                        <p className="mt-4 text-sm font-medium text-gray-500 dark:text-gray-400">
+
+                            Loading project progress...
+
+                        </p>
+
+                    </div>
 
                 </div>
 
@@ -49,6 +68,13 @@ export default function ProjectProgressChart() {
         );
 
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Empty State
+    |--------------------------------------------------------------------------
+    */
 
     if (!projectProgress.length) {
 
@@ -56,9 +82,24 @@ export default function ProjectProgressChart() {
 
             <Card title="Project Progress">
 
-                <div className="flex h-96 items-center justify-center text-gray-500">
+                <div className="flex h-96 items-center justify-center">
 
-                    No projects found
+                    <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-8 py-10 text-center dark:border-gray-700 dark:bg-gray-800/40">
+
+                        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+
+                            No projects found
+
+                        </p>
+
+
+                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+
+                            Project progress will appear here once projects are available.
+
+                        </p>
+
+                    </div>
 
                 </div>
 
@@ -68,13 +109,20 @@ export default function ProjectProgressChart() {
 
     }
 
+
     return (
 
         <Card title="Project Progress">
 
-            <div className="h-96">
+            <div className="h-96 w-full">
 
-                <ResponsiveContainer>
+                <ResponsiveContainer
+
+                    width="100%"
+
+                    height="100%"
+
+                >
 
                     <BarChart
 
@@ -86,9 +134,9 @@ export default function ProjectProgressChart() {
 
                             top: 20,
 
-                            right: 30,
+                            right: 50,
 
-                            left: 50,
+                            left: 30,
 
                             bottom: 10,
 
@@ -96,7 +144,18 @@ export default function ProjectProgressChart() {
 
                     >
 
-                        <CartesianGrid strokeDasharray="3 3" />
+                        <CartesianGrid
+
+                            strokeDasharray="4 4"
+
+                            horizontal={false}
+
+                            stroke="currentColor"
+
+                            className="text-gray-200 dark:text-gray-700"
+
+                        />
+
 
                         <XAxis
 
@@ -106,7 +165,22 @@ export default function ProjectProgressChart() {
 
                             unit="%"
 
+                            axisLine={false}
+
+                            tickLine={false}
+
+                            tick={{
+
+                                fill: "currentColor",
+
+                                fontSize: 12,
+
+                            }}
+
+                            className="text-gray-500 dark:text-gray-400"
+
                         />
+
 
                         <YAxis
 
@@ -116,21 +190,75 @@ export default function ProjectProgressChart() {
 
                             width={120}
 
+                            axisLine={false}
+
+                            tickLine={false}
+
+                            tick={{
+
+                                fill: "currentColor",
+
+                                fontSize: 12,
+
+                            }}
+
+                            className="text-gray-600 dark:text-gray-300"
+
                         />
+
 
                         <Tooltip
 
-                            formatter={(value) => `${value}%`}
+                            cursor={{
+
+                                fill: "rgba(59, 130, 246, 0.08)",
+
+                            }}
+
+                            formatter={(value) => [
+
+                                `${value}%`,
+
+                                "Progress",
+
+                            ]}
+
+                            contentStyle={{
+
+                                borderRadius: "12px",
+
+                                border: "1px solid rgb(229 231 235)",
+
+                                backgroundColor: "var(--chart-tooltip-bg, white)",
+
+                                boxShadow:
+
+                                    "0 10px 25px rgba(0, 0, 0, 0.08)",
+
+                                fontSize: "13px",
+
+                            }}
+
+                            labelStyle={{
+
+                                fontWeight: 600,
+
+                                marginBottom: "4px",
+
+                            }}
 
                         />
+
 
                         <Bar
 
                             dataKey="progress"
 
-                            radius={[0, 6, 6, 0]}
+                            fill="#2563EB"
 
-                            fill="#3B82F6"
+                            radius={[0, 8, 8, 0]}
+
+                            maxBarSize={34}
 
                         >
 
@@ -140,7 +268,19 @@ export default function ProjectProgressChart() {
 
                                 position="right"
 
-                                formatter={(value) => `${value}%`}
+                                formatter={(value) =>
+
+                                    `${value}%`
+
+                                }
+
+                                fill="currentColor"
+
+                                className="text-gray-700 dark:text-gray-300"
+
+                                fontSize={12}
+
+                                fontWeight={600}
 
                             />
 

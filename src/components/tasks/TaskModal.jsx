@@ -1,3 +1,4 @@
+
 import {
 
     useEffect,
@@ -5,6 +6,10 @@ import {
 } from "react";
 
 import {
+
+    ClipboardList,
+
+    LoaderCircle,
 
     X,
 
@@ -22,6 +27,10 @@ import { toast } from "react-hot-toast";
 
 import useTaskForm from "@/hooks/useTaskForm";
 
+import useProjectMembers from "@/hooks/useProjectMembers";
+
+import useNotifications from "@/hooks/useNotifications";
+
 import {
 
     createTask,
@@ -35,7 +44,77 @@ import {
     selectProjects,
 
 } from "@/redux/slices/projectSlice";
-import useProjectMembers from "@/hooks/useProjectMembers";
+
+
+/*
+|--------------------------------------------------------------------------
+| Default Form Values
+|--------------------------------------------------------------------------
+*/
+
+const DEFAULT_VALUES = {
+
+    title: "",
+
+    description: "",
+
+    project: "",
+
+    assignedTo: "",
+
+    priority: "Medium",
+
+    status: "Todo",
+
+    dueDate: "",
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Get Error Message
+|--------------------------------------------------------------------------
+*/
+
+const getErrorMessage = (
+
+    error,
+
+    fallbackMessage
+
+) => {
+
+    if (
+
+        typeof error === "string"
+
+    ) {
+
+        return error;
+
+    }
+
+
+    return (
+
+        error?.message ||
+
+        error?.response?.data?.message ||
+
+        fallbackMessage
+
+    );
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Task Modal
+|--------------------------------------------------------------------------
+*/
+
 export default function TaskModal({
 
     open,
@@ -48,64 +127,77 @@ export default function TaskModal({
 
 }) {
 
-    const dispatch = useDispatch();
+    const dispatch =
 
-    const projects = useSelector(
+        useDispatch();
 
-        selectProjects
 
-    );
+    const projects =
 
-   const {
+        useSelector(
 
-    register,
+            selectProjects
 
-    handleSubmit,
+        ) || [];
 
-    reset,
-
-    watch,
-
-    formState: {
-        errors,
-    },
-
-} = useTaskForm(task);
 
     const {
 
-    members,
+        notify,
 
-    loading: membersLoading,
+    } = useNotifications();
 
-    fetchMembers,
 
-    clearMembers,
+    /*
+    |--------------------------------------------------------------------------
+    | Task Form
+    |--------------------------------------------------------------------------
+    */
 
-} = useProjectMembers();
-const selectedProject = watch("project");
+    const {
 
-useEffect(() => {
+        register,
 
-    if (!selectedProject) {
+        handleSubmit,
 
-        clearMembers();
+        reset,
 
-        return;
+        watch,
 
-    }
+        setValue,
 
-    fetchMembers(selectedProject);
+        formState: {
 
-}, [
+            errors = {},
 
-    selectedProject,
+        },
 
-    fetchMembers,
+    } = useTaskForm(task);
 
-    clearMembers,
 
-]);
+    const selectedProject =
+
+        watch("project");
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Project Members
+    |--------------------------------------------------------------------------
+    */
+
+    const {
+
+        members = [],
+
+        loading: membersLoading,
+
+        fetchMembers,
+
+        clearMembers,
+
+    } = useProjectMembers();
+
 
     /*
     |--------------------------------------------------------------------------
@@ -115,11 +207,25 @@ useEffect(() => {
 
     useEffect(() => {
 
-        if (!open) {
+        if (
 
-            reset();
+            open
+
+        ) {
+
+            return;
 
         }
+
+
+        reset(
+
+            DEFAULT_VALUES
+
+        );
+
+
+        clearMembers?.();
 
     }, [
 
@@ -127,7 +233,164 @@ useEffect(() => {
 
         reset,
 
+        clearMembers,
+
     ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fetch Project Members
+    |--------------------------------------------------------------------------
+    */
+
+    useEffect(() => {
+
+        if (
+
+            !open ||
+
+            !selectedProject
+
+        ) {
+
+            clearMembers?.();
+
+            return;
+
+        }
+
+
+        fetchMembers(
+
+            selectedProject
+
+        );
+
+    }, [
+
+        open,
+
+        selectedProject,
+
+        fetchMembers,
+
+        clearMembers,
+
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Clear Assigned User When Project Changes
+    |--------------------------------------------------------------------------
+    */
+
+    useEffect(() => {
+
+        if (
+
+            !open ||
+
+            task?.project?._id === selectedProject ||
+
+            task?.project === selectedProject
+
+        ) {
+
+            return;
+
+        }
+
+
+        setValue(
+
+            "assignedTo",
+
+            ""
+
+        );
+
+    }, [
+
+        open,
+
+        selectedProject,
+
+        task,
+
+        setValue,
+
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close On Escape
+    |--------------------------------------------------------------------------
+    */
+
+    useEffect(() => {
+
+        if (
+
+            !open
+
+        ) {
+
+            return undefined;
+
+        }
+
+
+        const handleEscape = (event) => {
+
+            if (
+
+                event.key === "Escape" &&
+
+                !loading
+
+            ) {
+
+                onClose();
+
+            }
+
+        };
+
+
+        document.addEventListener(
+
+            "keydown",
+
+            handleEscape
+
+        );
+
+
+        return () => {
+
+            document.removeEventListener(
+
+                "keydown",
+
+                handleEscape
+
+            );
+
+        };
+
+    }, [
+
+        open,
+
+        loading,
+
+        onClose,
+
+    ]);
+
 
     /*
     |--------------------------------------------------------------------------
@@ -139,43 +402,76 @@ useEffect(() => {
 
         try {
 
-            if (task) {
+            if (
 
-                await dispatch(
+                task?._id
 
-                    updateTask({
+            ) {
 
-                        taskId: task._id,
+                const updatedTask =
 
-                        taskData: data,
+                    await dispatch(
 
-                    })
+                        updateTask({
 
-                ).unwrap();
+                            taskId: task._id,
 
-                toast.success(
+                            taskData: data,
 
-                    "Task updated successfully"
+                        })
 
-                );
+                    ).unwrap();
+
+
+                notify({
+
+                    title: "Task Updated",
+
+                    message: `${updatedTask?.title || data.title} was updated successfully.`,
+
+                    type: "success",
+
+                    entityType: "task",
+
+                    entityId:
+
+                        updatedTask?._id ||
+
+                        task._id,
+
+                });
 
             }
 
             else {
 
-                await dispatch(
+                const createdTask =
 
-                    createTask(data)
+                    await dispatch(
 
-                ).unwrap();
+                        createTask(data)
 
-                toast.success(
+                    ).unwrap();
 
-                    "Task created successfully"
 
-                );
+                notify({
+
+                    title: "Task Created",
+
+                    message: `${createdTask?.title || data.title} was created successfully.`,
+
+                    type: "success",
+
+                    entityType: "task",
+
+                    entityId:
+
+                        createdTask?._id,
+
+                });
 
             }
+
 
             onClose();
 
@@ -183,153 +479,396 @@ useEffect(() => {
 
         catch (error) {
 
-            toast.error(error);
+            toast.error(
+
+                getErrorMessage(
+
+                    error,
+
+                    task
+
+                        ? "Failed to update task."
+
+                        : "Failed to create task."
+
+                )
+
+            );
 
         }
 
     };
 
-    if (!open) {
+
+    if (
+
+        !open
+
+    ) {
 
         return null;
 
     }
 
+
+    const inputClassName = `
+
+        w-full
+
+        rounded-xl
+
+        border
+
+        border-gray-300
+
+        bg-white
+
+        px-4
+
+        py-2.5
+
+        text-sm
+
+        text-gray-900
+
+        outline-none
+
+        transition
+
+        placeholder:text-gray-400
+
+        focus:border-blue-500
+
+        focus:ring-2
+
+        focus:ring-blue-500/20
+
+        disabled:cursor-not-allowed
+
+        disabled:bg-gray-100
+
+        disabled:text-gray-500
+
+        dark:border-gray-700
+
+        dark:bg-gray-800
+
+        dark:text-white
+
+        dark:placeholder:text-gray-500
+
+        dark:disabled:bg-gray-900
+
+    `;
+
+
+    const labelClassName =
+
+        "mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300";
+
+
+    const errorClassName =
+
+        "mt-1.5 min-h-5 text-sm text-red-500 dark:text-red-400";
+
+
     return (
 
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
 
-            <div className="w-full max-w-2xl rounded-xl bg-white shadow-xl dark:bg-gray-900">
+            role="dialog"
 
-                {/* Header */}
+            aria-modal="true"
 
-                <div className="flex items-center justify-between border-b px-6 py-4 dark:border-gray-800">
+            aria-labelledby="task-modal-title"
 
-                    <h2 className="text-xl font-semibold">
+            className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/60 p-4 backdrop-blur-sm"
 
-                        {
+            onMouseDown={(event) => {
 
-                            task
+                if (
 
-                                ? "Edit Task"
+                    event.target ===
 
-                                : "Create Task"
+                    event.currentTarget &&
 
-                        }
+                    !loading
 
-                    </h2>
+                ) {
+
+                    onClose();
+
+                }
+
+            }}
+
+        >
+
+            <div className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-900">
+
+                {/*
+                |--------------------------------------------------------------------------
+                | Header
+                |--------------------------------------------------------------------------
+                */}
+
+                <div className="flex shrink-0 items-center justify-between gap-4 border-b border-gray-200 px-6 py-5 dark:border-gray-800">
+
+                    <div className="flex min-w-0 items-center gap-4">
+
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+
+                            <ClipboardList
+
+                                size={24}
+
+                            />
+
+                        </div>
+
+
+                        <div className="min-w-0">
+
+                            <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
+
+                                {
+
+                                    task
+
+                                        ? "Update Task"
+
+                                        : "New Task"
+
+                                }
+
+                            </p>
+
+
+                            <h2
+
+                                id="task-modal-title"
+
+                                className="mt-0.5 truncate text-xl font-semibold text-gray-900 dark:text-white"
+
+                            >
+
+                                {
+
+                                    task
+
+                                        ? "Edit Task"
+
+                                        : "Create Task"
+
+                                }
+
+                            </h2>
+
+                        </div>
+
+                    </div>
+
 
                     <button
 
+                        type="button"
+
                         onClick={onClose}
+
+                        disabled={loading}
+
+                        aria-label="Close task modal"
+
+                        className="inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-200"
 
                     >
 
-                        <X size={22} />
+                        <X
+
+                            size={20}
+
+                        />
 
                     </button>
 
                 </div>
 
-                {/* Body */}
+
+                {/*
+                |--------------------------------------------------------------------------
+                | Form
+                |--------------------------------------------------------------------------
+                */}
 
                 <form
 
-                    onSubmit={handleSubmit(onSubmit)}
+                    onSubmit={handleSubmit(
+
+                        onSubmit
+
+                    )}
+
+                    className="flex min-h-0 flex-1 flex-col"
 
                 >
 
-                    <div className="grid gap-5 p-6 md:grid-cols-2">
+                    <div className="flex-1 overflow-y-auto">
 
-                        {/* Title */}
+                        <div className="grid gap-x-5 gap-y-4 p-6 md:grid-cols-2">
 
-                        <div className="md:col-span-2">
+                            {/*
+                            |--------------------------------------------------------------------------
+                            | Title
+                            |--------------------------------------------------------------------------
+                            */}
 
-                            <label className="mb-2 block">
+                            <div className="md:col-span-2">
 
-                                Title
+                                <label
 
-                            </label>
+                                    htmlFor="task-title"
 
-                            <input
+                                    className={labelClassName}
 
-                                {...register("title")}
+                                >
 
-                                className="w-full rounded-lg border px-4 py-2 dark:border-gray-700 dark:bg-gray-800"
+                                    Title
 
-                            />
+                                    <span className="ml-1 text-red-500">
 
-                            <p className="mt-1 text-sm text-red-500">
+                                        *
 
-                                {
+                                    </span>
 
-                                    errors.title?.message
+                                </label>
 
-                                }
 
-                            </p>
+                                <input
 
-                        </div>
+                                    id="task-title"
 
-                        {/* Description */}
+                                    type="text"
 
-                        <div className="md:col-span-2">
+                                    placeholder="Enter task title"
 
-                            <label className="mb-2 block">
+                                    {...register(
 
-                                Description
+                                        "title"
 
-                            </label>
+                                    )}
 
-                            <textarea
+                                    className={inputClassName}
 
-                                rows={4}
+                                />
 
-                                {...register("description")}
 
-                                className="w-full rounded-lg border px-4 py-2 dark:border-gray-700 dark:bg-gray-800"
+                                <p className={errorClassName}>
 
-                            />
+                                    {errors.title?.message}
 
-                            <p className="mt-1 text-sm text-red-500">
+                                </p>
 
-                                {
+                            </div>
 
-                                    errors.description?.message
 
-                                }
+                            {/*
+                            |--------------------------------------------------------------------------
+                            | Description
+                            |--------------------------------------------------------------------------
+                            */}
 
-                            </p>
+                            <div className="md:col-span-2">
 
-                        </div>
+                                <label
 
-                        {/* Project */}
+                                    htmlFor="task-description"
 
-                        <div>
+                                    className={labelClassName}
 
-                            <label className="mb-2 block">
+                                >
 
-                                Project
+                                    Description
 
-                            </label>
+                                </label>
 
-                            <select
 
-                                {...register("project")}
+                                <textarea
 
-                                className="w-full rounded-lg border px-4 py-2 dark:border-gray-700 dark:bg-gray-800"
+                                    id="task-description"
 
-                            >
+                                    rows={4}
 
-                                <option value="">
+                                    placeholder="Describe the task requirements"
 
-                                    Select Project
+                                    {...register(
 
-                                </option>
+                                        "description"
 
-                                {
+                                    )}
 
-                                    projects.map(
+                                    className={`${inputClassName} resize-none`}
+
+                                />
+
+
+                                <p className={errorClassName}>
+
+                                    {errors.description?.message}
+
+                                </p>
+
+                            </div>
+
+
+                            {/*
+                            |--------------------------------------------------------------------------
+                            | Project
+                            |--------------------------------------------------------------------------
+                            */}
+
+                            <div>
+
+                                <label
+
+                                    htmlFor="task-project"
+
+                                    className={labelClassName}
+
+                                >
+
+                                    Project
+
+                                    <span className="ml-1 text-red-500">
+
+                                        *
+
+                                    </span>
+
+                                </label>
+
+
+                                <select
+
+                                    id="task-project"
+
+                                    {...register(
+
+                                        "project"
+
+                                    )}
+
+                                    className={`${inputClassName} dark:[color-scheme:dark]`}
+
+                                >
+
+                                    <option value="">
+
+                                        Select Project
+
+                                    </option>
+
+
+                                    {projects.map(
 
                                         (project) => (
 
@@ -341,221 +880,324 @@ useEffect(() => {
 
                                             >
 
-                                                {
-
-                                                    project.name
-
-                                                }
+                                                {project.name}
 
                                             </option>
 
                                         )
 
-                                    )
+                                    )}
 
-                                }
+                                </select>
 
-                            </select>
 
-                            <p className="mt-1 text-sm text-red-500">
+                                <p className={errorClassName}>
 
-                                {
+                                    {errors.project?.message}
 
-                                    errors.project?.message
+                                </p>
 
-                                }
+                            </div>
 
-                            </p>
 
-                        </div>
+                            {/*
+                            |--------------------------------------------------------------------------
+                            | Assigned User
+                            |--------------------------------------------------------------------------
+                            */}
 
-                        {/* Assigned User */}
+                            <div>
 
-<div>
+                                <label
 
-    <label className="mb-2 block">
+                                    htmlFor="task-assigned-user"
 
-        Assign To
+                                    className={labelClassName}
 
-    </label>
+                                >
 
-    <select
+                                    Assign To
 
-        {...register("assignedTo")}
+                                </label>
 
-        disabled={!selectedProject || membersLoading}
 
-        className="w-full rounded-lg border px-4 py-2 disabled:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:disabled:bg-gray-900"
+                                <select
 
-    >
+                                    id="task-assigned-user"
 
-        <option value="">
+                                    {...register(
 
-            {
+                                        "assignedTo"
 
-                membersLoading
+                                    )}
 
-                    ? "Loading members..."
+                                    disabled={
 
-                    : selectedProject
+                                        !selectedProject ||
 
-                        ? "Select Member"
+                                        membersLoading
 
-                        : "Select Project First"
+                                    }
 
-            }
+                                    className={`${inputClassName} dark:[color-scheme:dark]`}
 
-        </option>
+                                >
 
-        {
+                                    <option value="">
 
-            members.map((member) => (
+                                        {
 
-                <option
+                                            membersLoading
 
-                    key={member._id}
+                                                ? "Loading members..."
 
-                    value={member._id}
+                                                : selectedProject
 
-                >
+                                                    ? members.length
 
-                    {member.name}
+                                                        ? "Select Member"
 
-                </option>
+                                                        : "No Members Available"
 
-            ))
+                                                    : "Select Project First"
 
-        }
+                                        }
 
-    </select>
+                                    </option>
 
-    <p className="mt-1 text-sm text-red-500">
 
-        {errors.assignedTo?.message}
+                                    {members.map(
 
-    </p>
+                                        (member) => (
 
-</div>
+                                            <option
 
-                        {/* Priority */}
+                                                key={member._id}
 
-                        <div>
+                                                value={member._id}
 
-                            <label className="mb-2 block">
+                                            >
 
-                                Priority
+                                                {member.name}
 
-                            </label>
+                                            </option>
 
-                            <select
+                                        )
 
-                                {...register("priority")}
+                                    )}
 
-                                className="w-full rounded-lg border px-4 py-2 dark:border-gray-700 dark:bg-gray-800"
+                                </select>
 
-                            >
 
-                                <option>
+                                <p className={errorClassName}>
 
-                                    Low
+                                    {errors.assignedTo?.message}
 
-                                </option>
+                                </p>
 
-                                <option>
+                            </div>
 
-                                    Medium
 
-                                </option>
+                            {/*
+                            |--------------------------------------------------------------------------
+                            | Priority
+                            |--------------------------------------------------------------------------
+                            */}
 
-                                <option>
+                            <div>
 
-                                    High
+                                <label
 
-                                </option>
+                                    htmlFor="task-priority"
 
-                                 <option>
+                                    className={labelClassName}
 
-                                    Critical
+                                >
 
-                                </option>
+                                    Priority
 
-                            </select>
+                                </label>
 
-                        </div>
 
-                        {/* Status */}
+                                <select
 
-                        <div>
+                                    id="task-priority"
 
-                            <label className="mb-2 block">
+                                    {...register(
 
-                                Status
+                                        "priority"
 
-                            </label>
+                                    )}
 
-                            <select
+                                    className={`${inputClassName} dark:[color-scheme:dark]`}
 
-                                {...register("status")}
+                                >
 
-                                className="w-full rounded-lg border px-4 py-2 dark:border-gray-700 dark:bg-gray-800"
+                                    <option value="Low">
 
-                            >
+                                        Low
 
-                                <option>
+                                    </option>
 
-                                    Todo
+                                    <option value="Medium">
 
-                                </option>
+                                        Medium
 
-                                <option>
+                                    </option>
 
-                                    In Progress
+                                    <option value="High">
 
-                                </option>
+                                        High
 
-                                <option>
+                                    </option>
 
-                                    Review
+                                    <option value="Critical">
 
-                                </option>
+                                        Critical
 
-                                <option>
+                                    </option>
 
-                                    Done
+                                </select>
 
-                                </option>
 
-                            </select>
+                                <p className={errorClassName}>
 
-                        </div>
+                                    {errors.priority?.message}
 
-                        {/* Due Date */}
+                                </p>
 
-                        <div>
+                            </div>
 
-                            <label className="mb-2 block">
 
-                                Due Date
+                            {/*
+                            |--------------------------------------------------------------------------
+                            | Status
+                            |--------------------------------------------------------------------------
+                            */}
 
-                            </label>
+                            <div>
 
-                            <input
+                                <label
 
-                                type="date"
+                                    htmlFor="task-status"
 
-                                {...register("dueDate")}
+                                    className={labelClassName}
 
-                                className="w-full rounded-lg border px-4 py-2 dark:border-gray-700 dark:bg-gray-800"
+                                >
 
-                            />
+                                    Status
+
+                                </label>
+
+
+                                <select
+
+                                    id="task-status"
+
+                                    {...register(
+
+                                        "status"
+
+                                    )}
+
+                                    className={`${inputClassName} dark:[color-scheme:dark]`}
+
+                                >
+
+                                    <option value="Todo">
+
+                                        Todo
+
+                                    </option>
+
+                                    <option value="In Progress">
+
+                                        In Progress
+
+                                    </option>
+
+                                    <option value="Review">
+
+                                        Review
+
+                                    </option>
+
+                                    <option value="Done">
+
+                                        Done
+
+                                    </option>
+
+                                </select>
+
+
+                                <p className={errorClassName}>
+
+                                    {errors.status?.message}
+
+                                </p>
+
+                            </div>
+
+
+                            {/*
+                            |--------------------------------------------------------------------------
+                            | Due Date
+                            |--------------------------------------------------------------------------
+                            */}
+
+                            <div className="md:col-span-2">
+
+                                <label
+
+                                    htmlFor="task-due-date"
+
+                                    className={labelClassName}
+
+                                >
+
+                                    Due Date
+
+                                </label>
+
+
+                                <input
+
+                                    id="task-due-date"
+
+                                    type="date"
+
+                                    {...register(
+
+                                        "dueDate"
+
+                                    )}
+
+                                    className={`${inputClassName} dark:[color-scheme:dark]`}
+
+                                />
+
+
+                                <p className={errorClassName}>
+
+                                    {errors.dueDate?.message}
+
+                                </p>
+
+                            </div>
 
                         </div>
 
                     </div>
 
-                    {/* Footer */}
 
-                    <div className="flex justify-end gap-3 border-t px-6 py-4 dark:border-gray-800">
+                    {/*
+                    |--------------------------------------------------------------------------
+                    | Footer
+                    |--------------------------------------------------------------------------
+                    */}
+
+                    <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-800 dark:bg-gray-900/80 sm:flex-row sm:justify-end">
 
                         <button
 
@@ -565,7 +1207,7 @@ useEffect(() => {
 
                             disabled={loading}
 
-                            className="rounded-lg border px-5 py-2"
+                            className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
 
                         >
 
@@ -573,15 +1215,27 @@ useEffect(() => {
 
                         </button>
 
+
                         <button
 
                             type="submit"
 
                             disabled={loading}
 
-                            className="rounded-lg bg-blue-600 px-6 py-2 text-white disabled:opacity-50"
+                            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:cursor-not-allowed disabled:opacity-60"
 
                         >
+
+                            {loading && (
+
+                                <LoaderCircle
+
+                                    className="h-4 w-4 animate-spin"
+
+                                />
+
+                            )}
+
 
                             {
 
@@ -610,3 +1264,4 @@ useEffect(() => {
     );
 
 }
+

@@ -12,42 +12,132 @@ export default function AuthLayout({
 
     footerLink,
 
-    footerLabel
+    footerLabel,
 
 }) {
 
     return (
 
-        <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex items-center justify-center p-4">
+        <div
+            className="
+                flex
+                min-h-screen
+                items-center
+                justify-center
+                bg-gradient-to-br
+                from-slate-100
+                via-white
+                to-slate-200
+                p-4
+                dark:from-gray-950
+                dark:via-gray-900
+                dark:to-slate-950
+            "
+        >
 
-            <div className="w-full max-w-md rounded-xl bg-white dark:bg-slate-800 shadow-lg p-8">
+            <div className="w-full max-w-md">
 
-                <h1 className="text-3xl font-bold text-center">
+                <div
+                    className="
+                        rounded-3xl
+                        border
+                        border-gray-200
+                        bg-white
+                        p-8
+                        shadow-2xl
+                        dark:border-gray-800
+                        dark:bg-gray-900
+                    "
+                >
 
-                    {title}
+                    {/* Logo */}
 
-                </h1>
+                    <div className="mb-8 flex justify-center">
 
-                <p className="text-center text-gray-500 mt-2 mb-8">
+                        <div
+                            className="
+                                flex
+                                h-16
+                                w-16
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                bg-indigo-600
+                                text-2xl
+                                font-bold
+                                text-white
+                                shadow-lg
+                            "
+                        >
 
-                    {subtitle}
+                            TM
 
-                </p>
+                        </div>
 
-                {children}
+                    </div>
 
-                <p className="mt-6 text-center">
+                    {/* Header */}
 
-                    {footerText}{" "}
+                    <div className="mb-8 text-center">
 
-                    <Link
-                        to={footerLink}
-                        className="text-blue-600 font-semibold"
-                    >
-                        {footerLabel}
-                    </Link>
+                        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
 
-                </p>
+                            {title}
+
+                        </h1>
+
+                        {subtitle && (
+
+                            <p className="mt-3 text-sm leading-6 text-gray-500 dark:text-gray-400">
+
+                                {subtitle}
+
+                            </p>
+
+                        )}
+
+                    </div>
+
+                    {/* Form */}
+
+                    <div>
+
+                        {children}
+
+                    </div>
+
+                    {/* Footer */}
+
+                    <div className="mt-8 border-t border-gray-200 pt-6 text-center dark:border-gray-800">
+
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+
+                            {footerText}{" "}
+
+                            <Link
+
+                                to={footerLink}
+
+                                className="
+                                    font-semibold
+                                    text-indigo-600
+                                    transition-colors
+                                    hover:text-indigo-700
+                                    dark:text-indigo-400
+                                    dark:hover:text-indigo-300
+                                "
+
+                            >
+
+                                {footerLabel}
+
+                            </Link>
+
+                        </p>
+
+                    </div>
+
+                </div>
 
             </div>
 

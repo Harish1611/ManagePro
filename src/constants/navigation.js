@@ -37,12 +37,6 @@ export const navigation = [
     path: "/teams",
     icon: FaUsers,
   },
-  
-  {
-    name: "Notifications",
-    path: "/notifications",
-    icon: FaBell,
-  },
   {
     name: "Profile",
     path: "/profile",

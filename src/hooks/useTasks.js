@@ -1,119 +1,347 @@
-import { useDispatch, useSelector } from "react-redux";
+import {
+
+    useDispatch,
+
+    useSelector,
+
+} from "react-redux";
 
 import {
+
     fetchTasks,
+
     fetchTask,
+
     createTask,
+
     updateTask,
+
     deleteTask,
 
+    uploadTaskAttachment,
+
+    deleteTaskAttachment,
+
     clearTask,
+
     clearTaskError,
 
+    resetTasks,
+
     selectTasks,
+
     selectTask,
+
     selectTaskLoading,
+
+    selectAttachmentLoading,
+
     selectTaskError,
+
     selectTaskPagination,
 
 } from "@/redux/slices/taskSlice";
 
+
 export default function useTasks() {
 
-    const dispatch = useDispatch();
-
     /*
     |--------------------------------------------------------------------------
-    | Redux State
+    | Redux
     |--------------------------------------------------------------------------
     */
 
-    const tasks = useSelector(
-        selectTasks
-    );
+    const dispatch =
+        useDispatch();
 
-    const task = useSelector(
-        selectTask
-    );
 
-    const pagination = useSelector(
-        selectTaskPagination
-    );
+    const tasks =
+        useSelector(
 
-    const loading = useSelector(
-        selectTaskLoading
-    );
+            selectTasks
 
-    const error = useSelector(
-        selectTaskError
-    );
+        );
+
+
+    const task =
+        useSelector(
+
+            selectTask
+
+        );
+
+
+    const loading =
+        useSelector(
+
+            selectTaskLoading
+
+        );
+
+
+    const attachmentLoading =
+        useSelector(
+
+            selectAttachmentLoading
+
+        );
+
+
+    const error =
+        useSelector(
+
+            selectTaskError
+
+        );
+
+
+    const pagination =
+        useSelector(
+
+            selectTaskPagination
+
+        );
+
 
     /*
     |--------------------------------------------------------------------------
-    | API Actions
+    | Fetch Tasks
     |--------------------------------------------------------------------------
     */
 
-    const getTasks = (params = {}) =>
-        dispatch(
-            fetchTasks(params)
-        );
+    const getTasks = (
 
-    const getTask = (taskId) =>
-        dispatch(
-            fetchTask(taskId)
-        );
+        params = {}
 
-    const addTask = (taskData) =>
-        dispatch(
-            createTask(taskData)
-        );
+    ) => {
+
+        return dispatch(
+
+            fetchTasks(
+
+                params
+
+            )
+
+        ).unwrap();
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fetch Single Task
+    |--------------------------------------------------------------------------
+    */
+
+    const getTask = (
+
+        taskId
+
+    ) => {
+
+        return dispatch(
+
+            fetchTask(
+
+                taskId
+
+            )
+
+        ).unwrap();
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Create Task
+    |--------------------------------------------------------------------------
+    */
+
+    const addTask = (
+
+        taskData
+
+    ) => {
+
+        return dispatch(
+
+            createTask(
+
+                taskData
+
+            )
+
+        ).unwrap();
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update Task
+    |--------------------------------------------------------------------------
+    */
 
     const editTask = (
+
         taskId,
+
         taskData
-    ) =>
-        dispatch(
+
+    ) => {
+
+        return dispatch(
+
             updateTask({
+
                 taskId,
+
                 taskData,
+
             })
-        );
 
-    const removeTask = (taskId) =>
-        dispatch(
-            deleteTask(taskId)
-        );
+        ).unwrap();
+
+    };
+
 
     /*
     |--------------------------------------------------------------------------
-    | Utility Actions
+    | Delete Task
     |--------------------------------------------------------------------------
     */
 
-    const resetSelectedTask = () =>
+    const removeTask = (
+
+        taskId
+
+    ) => {
+
+        return dispatch(
+
+            deleteTask(
+
+                taskId
+
+            )
+
+        ).unwrap();
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Upload Task Attachment
+    |--------------------------------------------------------------------------
+    */
+
+    const uploadAttachment = (
+
+        taskId,
+
+        file
+
+    ) => {
+
+        return dispatch(
+
+            uploadTaskAttachment({
+
+                taskId,
+
+                file,
+
+            })
+
+        ).unwrap();
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Delete Task Attachment
+    |--------------------------------------------------------------------------
+    */
+
+    const deleteAttachment = (
+
+        taskId,
+
+        attachmentId
+
+    ) => {
+
+        return dispatch(
+
+            deleteTaskAttachment({
+
+                taskId,
+
+                attachmentId,
+
+            })
+
+        ).unwrap();
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Clear Selected Task
+    |--------------------------------------------------------------------------
+    */
+
+    const clearSelectedTask = () => {
+
         dispatch(
+
             clearTask()
+
         );
 
-    const clearError = () =>
-        dispatch(
-            clearTaskError()
-        );
+    };
+
 
     /*
     |--------------------------------------------------------------------------
-    | Return
+    | Clear Error
     |--------------------------------------------------------------------------
     */
+
+    const clearError = () => {
+
+        dispatch(
+
+            clearTaskError()
+
+        );
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reset Tasks
+    |--------------------------------------------------------------------------
+    */
+
+    const resetTaskState = () => {
+
+        dispatch(
+
+            resetTasks()
+
+        );
+
+    };
+
 
     return {
-
-        /*
-        |--------------------------------------------------------------------------
-        | State
-        |--------------------------------------------------------------------------
-        */
 
         tasks,
 
@@ -123,33 +351,29 @@ export default function useTasks() {
 
         loading,
 
+        attachmentLoading,
+
         error,
 
-        /*
-        |--------------------------------------------------------------------------
-        | CRUD
-        |--------------------------------------------------------------------------
-        */
+        getTasks,
 
-        fetchTasks: getTasks,
+        getTask,
 
-        fetchTask: getTask,
+        addTask,
 
-        createTask: addTask,
+        editTask,
 
-        updateTask: editTask,
+        removeTask,
 
-        deleteTask: removeTask,
+        uploadAttachment,
 
-        /*
-        |--------------------------------------------------------------------------
-        | Helpers
-        |--------------------------------------------------------------------------
-        */
+        deleteAttachment,
 
-        clearTask: resetSelectedTask,
+        clearSelectedTask,
 
         clearError,
+
+        resetTaskState,
 
     };
 

@@ -1,6 +1,5 @@
 export default function ProfileSkeleton() {
 
-
     return (
 
         <div
@@ -19,12 +18,12 @@ export default function ProfileSkeleton() {
             <div
                 className="
                     overflow-hidden
-                    rounded-2xl
+                    rounded-3xl
                     border
                     border-gray-200
                     bg-white
                     shadow-sm
-                    dark:border-gray-700
+                    dark:border-gray-800
                     dark:bg-gray-900
                 "
             >
@@ -41,6 +40,7 @@ export default function ProfileSkeleton() {
 
                 <div
                     className="
+                        relative
                         px-5
                         pb-6
                         sm:px-7
@@ -55,55 +55,86 @@ export default function ProfileSkeleton() {
                             gap-5
                             sm:flex-row
                             sm:items-end
+                            sm:justify-between
                         "
                     >
 
                         <div
                             className="
-                                -mt-14
-                                h-28
-                                w-28
-                                rounded-full
-                                border-4
-                                border-white
-                                bg-gray-200
-                                dark:border-gray-900
-                                dark:bg-gray-700
-                                sm:-mt-16
-                                sm:h-32
-                                sm:w-32
-                            "
-                        />
-
-
-                        <div
-                            className="
-                                space-y-3
-                                pb-2
+                                flex
+                                flex-col
+                                gap-4
+                                sm:flex-row
+                                sm:items-end
                             "
                         >
 
                             <div
                                 className="
-                                    h-7
-                                    w-52
-                                    rounded-lg
+                                    relative
+                                    z-10
+                                    -mt-14
+                                    h-28
+                                    w-28
+                                    rounded-2xl
+                                    border-4
+                                    border-white
                                     bg-gray-200
+                                    shadow-lg
+                                    ring-1
+                                    ring-gray-200
+                                    dark:border-gray-900
                                     dark:bg-gray-700
+                                    dark:ring-gray-700
+                                    sm:-mt-16
+                                    sm:h-32
+                                    sm:w-32
                                 "
                             />
+
 
                             <div
                                 className="
-                                    h-4
-                                    w-24
-                                    rounded
-                                    bg-gray-200
-                                    dark:bg-gray-700
+                                    space-y-3
+                                    pb-1
                                 "
-                            />
+                            >
+
+                                <div
+                                    className="
+                                        h-8
+                                        w-52
+                                        rounded-lg
+                                        bg-gray-200
+                                        dark:bg-gray-700
+                                    "
+                                />
+
+
+                                <div
+                                    className="
+                                        h-4
+                                        w-24
+                                        rounded-md
+                                        bg-gray-200
+                                        dark:bg-gray-700
+                                    "
+                                />
+
+                            </div>
 
                         </div>
+
+
+                        <div
+                            className="
+                                h-9
+                                w-36
+                                rounded-full
+                                bg-gray-200
+                                dark:bg-gray-700
+                            "
+                        />
 
                     </div>
 
@@ -112,11 +143,11 @@ export default function ProfileSkeleton() {
                         className="
                             mt-6
                             grid
-                            gap-4
+                            gap-3
                             border-t
                             border-gray-200
                             pt-6
-                            dark:border-gray-700
+                            dark:border-gray-800
                             sm:grid-cols-2
                             xl:grid-cols-4
                         "
@@ -136,8 +167,16 @@ export default function ProfileSkeleton() {
 
                                     className="
                                         flex
-                                        items-center
+                                        min-w-0
+                                        items-start
                                         gap-3
+                                        rounded-2xl
+                                        border
+                                        border-gray-200
+                                        bg-gray-50/70
+                                        p-4
+                                        dark:border-gray-800
+                                        dark:bg-gray-950/40
                                     "
 
                                 >
@@ -146,13 +185,21 @@ export default function ProfileSkeleton() {
                                         className="
                                             h-10
                                             w-10
-                                            rounded-lg
+                                            shrink-0
+                                            rounded-xl
                                             bg-gray-200
                                             dark:bg-gray-700
                                         "
                                     />
 
-                                    <div className="space-y-2">
+
+                                    <div
+                                        className="
+                                            min-w-0
+                                            flex-1
+                                            space-y-2
+                                        "
+                                    >
 
                                         <div
                                             className="
@@ -164,10 +211,12 @@ export default function ProfileSkeleton() {
                                             "
                                         />
 
+
                                         <div
                                             className="
                                                 h-4
-                                                w-28
+                                                w-full
+                                                max-w-28
                                                 rounded
                                                 bg-gray-200
                                                 dark:bg-gray-700
@@ -201,16 +250,18 @@ export default function ProfileSkeleton() {
                     className="
                         h-6
                         w-28
-                        rounded
+                        rounded-md
                         bg-gray-200
                         dark:bg-gray-700
                     "
                 />
 
+
                 <div
                     className="
                         h-4
                         w-64
+                        max-w-full
                         rounded
                         bg-gray-200
                         dark:bg-gray-700
@@ -254,7 +305,7 @@ export default function ProfileSkeleton() {
                                 bg-white
                                 p-5
                                 shadow-sm
-                                dark:border-gray-700
+                                dark:border-gray-800
                                 dark:bg-gray-900
                             "
 
@@ -265,6 +316,7 @@ export default function ProfileSkeleton() {
                                     flex
                                     items-start
                                     justify-between
+                                    gap-4
                                 "
                             >
 
@@ -280,11 +332,12 @@ export default function ProfileSkeleton() {
                                         "
                                     />
 
+
                                     <div
                                         className="
                                             h-9
                                             w-14
-                                            rounded
+                                            rounded-md
                                             bg-gray-200
                                             dark:bg-gray-700
                                         "
@@ -297,6 +350,7 @@ export default function ProfileSkeleton() {
                                     className="
                                         h-12
                                         w-12
+                                        shrink-0
                                         rounded-xl
                                         bg-gray-200
                                         dark:bg-gray-700

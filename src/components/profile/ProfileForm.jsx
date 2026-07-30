@@ -26,7 +26,25 @@ import {
 } from "react-redux";
 
 
+import {
+
+    LoaderCircle,
+
+    Mail,
+
+    Phone,
+
+    Save,
+
+    UserRound,
+
+} from "lucide-react";
+
+
 import toast from "react-hot-toast";
+
+
+import useNotifications from "@/hooks/useNotifications";
 
 
 import {
@@ -52,8 +70,14 @@ export default function ProfileForm({
 
 }) {
 
-
     const dispatch = useDispatch();
+
+
+    const {
+
+        notify,
+
+    } = useNotifications();
 
 
     const {
@@ -109,6 +133,7 @@ export default function ProfileForm({
 
         }
 
+
         reset({
 
             name: profile.name || "",
@@ -147,7 +172,7 @@ export default function ProfileForm({
             };
 
 
-            await dispatch(
+            const updatedProfile = await dispatch(
 
                 updateProfile(
 
@@ -158,19 +183,62 @@ export default function ProfileForm({
             ).unwrap();
 
 
-            toast.success(
+            notify({
 
-                "Profile updated successfully"
+                title: "Profile Updated",
 
-            );
+                message: "Your profile information was updated successfully.",
 
-        }
+                type: "success",
 
-        catch (error) {
+                entityType: "profile",
+
+                entityId:
+
+                    updatedProfile?._id ||
+
+                    updatedProfile?.user?._id ||
+
+                    profile?._id,
+
+            });
+
+
+            reset({
+
+                name:
+
+                    updatedProfile?.name ||
+
+                    data.name,
+
+                email:
+
+                    updatedProfile?.email ||
+
+                    profile?.email ||
+
+                    data.email,
+
+                phone:
+
+                    updatedProfile?.phone ??
+
+                    data.phone ??
+
+                    "",
+
+            });
+
+        } catch (error) {
 
             toast.error(
 
-                getErrorMessage(error)
+                getErrorMessage(
+
+                    error
+
+                )
 
             );
 
@@ -179,49 +247,116 @@ export default function ProfileForm({
     };
 
 
+    const inputClassName = (error) => `
+
+        mt-2
+        w-full
+        rounded-xl
+        border
+        bg-white
+        py-3
+        pl-11
+        pr-4
+        text-sm
+        text-gray-900
+        shadow-sm
+        outline-none
+        transition-all
+        duration-200
+        placeholder:text-gray-400
+        focus:ring-4
+        disabled:cursor-not-allowed
+        disabled:bg-gray-100
+        disabled:text-gray-500
+        dark:bg-gray-950
+        dark:text-white
+        dark:placeholder:text-gray-500
+        dark:disabled:bg-gray-800
+
+        ${error
+
+            ? `
+                border-red-500
+                focus:border-red-500
+                focus:ring-red-500/10
+            `
+
+            : `
+                border-gray-300
+                focus:border-indigo-600
+                focus:ring-indigo-500/10
+                dark:border-gray-700
+            `
+        }
+
+    `;
+
+
     return (
 
         <section
             className="
+                overflow-hidden
                 rounded-2xl
                 border
                 border-gray-200
                 bg-white
-                p-5
                 shadow-sm
-                dark:border-gray-700
+                dark:border-gray-800
                 dark:bg-gray-900
-                sm:p-6
             "
         >
 
-            <div className="mb-6">
+            <div
+                className="
+                    flex
+                    items-start
+                    gap-4
+                    border-b
+                    border-gray-200
+                    px-6
+                    py-5
+                    dark:border-gray-800
+                "
+            >
 
-                <h2
+                <div
                     className="
-                        text-xl
-                        font-semibold
-                        text-gray-900
-                        dark:text-white
+                        flex
+                        h-11
+                        w-11
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-xl
+                        bg-indigo-100
+                        text-indigo-600
+                        dark:bg-indigo-950/50
+                        dark:text-indigo-400
                     "
                 >
 
-                    Edit Profile
+                    <UserRound size={21} />
 
-                </h2>
+                </div>
 
-                <p
-                    className="
-                        mt-1
-                        text-sm
-                        text-gray-500
-                        dark:text-gray-400
-                    "
-                >
 
-                    Update your personal information.
+                <div>
 
-                </p>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+
+                        Edit Profile
+
+                    </h2>
+
+
+                    <p className="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
+
+                        Update your personal information and contact details.
+
+                    </p>
+
+                </div>
 
             </div>
 
@@ -238,282 +373,269 @@ export default function ProfileForm({
 
                 }
 
-                className="space-y-5"
+                className="p-6"
 
             >
 
                 <div
                     className="
                         grid
+                        grid-cols-1
                         gap-5
                         md:grid-cols-2
                     "
                 >
 
-                    {/*
-                    |--------------------------------------------------------------------------
-                    | Name
-                    |--------------------------------------------------------------------------
-                    */}
-
                     <div>
 
                         <label
+
                             htmlFor="name"
+
                             className="
                                 block
                                 text-sm
-                                font-medium
+                                font-semibold
                                 text-gray-700
                                 dark:text-gray-300
                             "
+
                         >
 
                             Full Name
 
                         </label>
 
-                        <input
 
-                            id="name"
+                        <div className="relative">
 
-                            type="text"
+                            <UserRound
+                                size={17}
+                                className="
+                                    pointer-events-none
+                                    absolute
+                                    left-4
+                                    top-1/2
+                                    z-10
+                                    mt-1
+                                    -translate-y-1/2
+                                    text-gray-400
+                                    dark:text-gray-500
+                                "
+                            />
 
-                            {...register("name")}
 
-                            placeholder="Enter your full name"
+                            <input
 
-                            className={`
-                                mt-2
-                                w-full
-                                rounded-lg
-                                border
-                                bg-white
-                                px-4
-                                py-2.5
-                                text-gray-900
-                                outline-none
-                                transition
-                                focus:ring-2
-                                dark:bg-gray-800
-                                dark:text-white
-                                ${
-                                    errors.name
+                                id="name"
 
-                                        ? `
-                                            border-red-500
-                                            focus:border-red-500
-                                            focus:ring-red-500/20
-                                        `
+                                type="text"
 
-                                        : `
-                                            border-gray-300
-                                            focus:border-blue-500
-                                            focus:ring-blue-500/20
-                                            dark:border-gray-700
-                                        `
+                                disabled={isSubmitting}
+
+                                {...register("name")}
+
+                                placeholder="Enter your full name"
+
+                                className={
+
+                                    inputClassName(
+
+                                        errors.name
+
+                                    )
+
                                 }
-                            `}
 
-                        />
+                            />
 
-                        {
+                        </div>
 
-                            errors.name && (
 
-                                <p
-                                    className="
-                                        mt-1.5
-                                        text-sm
-                                        text-red-500
-                                    "
-                                >
+                        {errors.name && (
 
-                                    {errors.name.message}
+                            <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-400">
 
-                                </p>
+                                {errors.name.message}
 
-                            )
+                            </p>
 
-                        }
+                        )}
 
                     </div>
 
 
-                    {/*
-                    |--------------------------------------------------------------------------
-                    | Email
-                    |--------------------------------------------------------------------------
-                    */}
-
                     <div>
 
                         <label
+
                             htmlFor="email"
+
                             className="
                                 block
                                 text-sm
-                                font-medium
+                                font-semibold
                                 text-gray-700
                                 dark:text-gray-300
                             "
+
                         >
 
                             Email Address
 
                         </label>
 
-                        <input
 
-                            id="email"
+                        <div className="relative">
 
-                            type="email"
+                            <Mail
+                                size={17}
+                                className="
+                                    pointer-events-none
+                                    absolute
+                                    left-4
+                                    top-1/2
+                                    z-10
+                                    -translate-y-1/2
+                                    text-gray-400
+                                    dark:text-gray-500
+                                "
+                            />
 
-                            disabled
 
-                            {...register("email")}
+                            <input
 
-                            className="
-                                mt-2
-                                w-full
-                                cursor-not-allowed
-                                rounded-lg
-                                border
-                                border-gray-300
-                                bg-gray-100
-                                px-4
-                                py-2.5
-                                text-gray-500
-                                outline-none
-                                dark:border-gray-700
-                                dark:bg-gray-800/60
-                                dark:text-gray-400
-                            "
+                                id="email"
 
-                        />
+                                type="email"
 
-                        <p
-                            className="
-                                mt-1.5
-                                text-xs
-                                text-gray-400
-                                dark:text-gray-500
-                            "
-                        >
+                                disabled
 
-                            Email cannot be changed here.
+                                {...register("email")}
+
+                                className="
+                                    mt-2
+                                    w-full
+                                    cursor-not-allowed
+                                    rounded-xl
+                                    border
+                                    border-gray-300
+                                    bg-gray-100
+                                    py-3
+                                    pl-11
+                                    pr-4
+                                    text-sm
+                                    text-gray-500
+                                    outline-none
+                                    dark:border-gray-700
+                                    dark:bg-gray-800/70
+                                    dark:text-gray-400
+                                "
+
+                            />
+
+                        </div>
+
+
+                        <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
+
+                            Email cannot be changed from your profile settings.
 
                         </p>
 
                     </div>
 
 
-                    {/*
-                    |--------------------------------------------------------------------------
-                    | Phone
-                    |--------------------------------------------------------------------------
-                    */}
-
                     <div className="md:col-span-2">
 
                         <label
+
                             htmlFor="phone"
+
                             className="
                                 block
                                 text-sm
-                                font-medium
+                                font-semibold
                                 text-gray-700
                                 dark:text-gray-300
                             "
+
                         >
 
                             Phone Number
 
                         </label>
 
-                        <input
 
-                            id="phone"
+                        <div className="relative">
 
-                            type="tel"
+                            <Phone
+                                size={17}
+                                className="
+                                    pointer-events-none
+                                    absolute
+                                    left-4
+                                    top-1/2
+                                    z-10
+                                    mt-1
+                                    -translate-y-1/2
+                                    text-gray-400
+                                    dark:text-gray-500
+                                "
+                            />
 
-                            {...register("phone")}
 
-                            placeholder="Enter your phone number"
+                            <input
 
-                            className={`
-                                mt-2
-                                w-full
-                                rounded-lg
-                                border
-                                bg-white
-                                px-4
-                                py-2.5
-                                text-gray-900
-                                outline-none
-                                transition
-                                focus:ring-2
-                                dark:bg-gray-800
-                                dark:text-white
-                                ${
-                                    errors.phone
+                                id="phone"
 
-                                        ? `
-                                            border-red-500
-                                            focus:border-red-500
-                                            focus:ring-red-500/20
-                                        `
+                                type="tel"
 
-                                        : `
-                                            border-gray-300
-                                            focus:border-blue-500
-                                            focus:ring-blue-500/20
-                                            dark:border-gray-700
-                                        `
+                                disabled={isSubmitting}
+
+                                {...register("phone")}
+
+                                placeholder="Enter your phone number"
+
+                                className={
+
+                                    inputClassName(
+
+                                        errors.phone
+
+                                    )
+
                                 }
-                            `}
 
-                        />
+                            />
 
-                        {
+                        </div>
 
-                            errors.phone && (
 
-                                <p
-                                    className="
-                                        mt-1.5
-                                        text-sm
-                                        text-red-500
-                                    "
-                                >
+                        {errors.phone && (
 
-                                    {errors.phone.message}
+                            <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-400">
 
-                                </p>
+                                {errors.phone.message}
 
-                            )
+                            </p>
 
-                        }
+                        )}
 
                     </div>
 
                 </div>
 
 
-                {/*
-                |--------------------------------------------------------------------------
-                | Submit
-                |--------------------------------------------------------------------------
-                */}
-
                 <div
                     className="
+                        mt-6
                         flex
                         justify-end
                         border-t
                         border-gray-200
                         pt-5
-                        dark:border-gray-700
+                        dark:border-gray-800
                     "
                 >
 
@@ -530,28 +652,62 @@ export default function ProfileForm({
                         }
 
                         className="
-                            rounded-lg
-                            bg-blue-600
-                            px-6
-                            py-2.5
+                            inline-flex
+                            h-11
+                            items-center
+                            justify-center
+                            gap-2
+                            rounded-xl
+                            bg-indigo-600
+                            px-5
                             text-sm
                             font-medium
+                            leading-none
                             text-white
-                            transition
-                            hover:bg-blue-700
+                            shadow-sm
+                            transition-all
+                            duration-200
+                            hover:-translate-y-0.5
+                            hover:bg-indigo-700
+                            hover:shadow-md
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-indigo-500/40
+                            disabled:translate-y-0
                             disabled:cursor-not-allowed
-                            disabled:opacity-50
+                            disabled:opacity-60
                         "
 
                     >
 
-                        {
+                        {isSubmitting ? (
 
-                            isSubmitting
+                            <LoaderCircle
 
-                                ? "Saving..."
+                                size={17}
 
-                                : "Save Changes"
+                                className="shrink-0 animate-spin"
+
+                            />
+
+                        ) : (
+
+                            <Save
+
+                                size={17}
+
+                                className="shrink-0"
+
+                            />
+
+                        )}
+
+
+                        {isSubmitting
+
+                            ? "Saving Changes..."
+
+                            : "Save Changes"
 
                         }
 

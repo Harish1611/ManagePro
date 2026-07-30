@@ -1,3 +1,24 @@
+
+const selectClassName = `
+    min-h-10
+    rounded-xl
+    border
+    border-gray-300
+    bg-white
+    px-3
+    py-2
+    text-sm
+    text-gray-700
+    outline-none
+    transition
+    focus:border-blue-500
+    focus:ring-2
+    focus:ring-blue-500/20
+    dark:border-gray-700
+    dark:bg-gray-900
+    dark:text-gray-300
+`;
+
 export default function ProjectFilters({
 
     filters,
@@ -6,35 +27,68 @@ export default function ProjectFilters({
 
 }) {
 
+    /*
+    |--------------------------------------------------------------------------
+    | Update Filter
+    |--------------------------------------------------------------------------
+    */
+
+    const updateFilter = (
+
+        key,
+
+        value
+
+    ) => {
+
+        setFilters((currentFilters) => ({
+
+            ...currentFilters,
+
+            [key]: value,
+
+            page: 1,
+
+        }));
+
+    };
+
+
     return (
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Status
+            |--------------------------------------------------------------------------
+            */}
 
             <select
 
-                value={filters.status}
+                value={filters.status || ""}
 
-                onChange={(e) =>
+                onChange={(event) =>
 
-                    setFilters((prev) => ({
+                    updateFilter(
 
-                        ...prev,
+                        "status",
 
-                        status: e.target.value,
+                        event.target.value
 
-                        page: 1,
-
-                    }))
+                    )
 
                 }
 
-                className="rounded-lg border border-gray-300 bg-transparent px-3 py-2 dark:border-gray-700"
+                aria-label="Filter projects by status"
+
+                className={selectClassName}
 
             >
 
                 <option value="">
 
-                    All Status
+                    All Statuses
 
                 </option>
 
@@ -64,23 +118,32 @@ export default function ProjectFilters({
 
             </select>
 
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Sort
+            |--------------------------------------------------------------------------
+            */}
+
             <select
 
-                value={filters.sort}
+                value={filters.sort || "-createdAt"}
 
-                onChange={(e) =>
+                onChange={(event) =>
 
-                    setFilters((prev) => ({
+                    updateFilter(
 
-                        ...prev,
+                        "sort",
 
-                        sort: e.target.value,
+                        event.target.value
 
-                    }))
+                    )
 
                 }
 
-                className="rounded-lg border border-gray-300 bg-transparent px-3 py-2 dark:border-gray-700"
+                aria-label="Sort projects"
+
+                className={selectClassName}
 
             >
 
@@ -98,13 +161,13 @@ export default function ProjectFilters({
 
                 <option value="name">
 
-                    Name A-Z
+                    Name A–Z
 
                 </option>
 
                 <option value="-name">
 
-                    Name Z-A
+                    Name Z–A
 
                 </option>
 
@@ -115,3 +178,4 @@ export default function ProjectFilters({
     );
 
 }
+

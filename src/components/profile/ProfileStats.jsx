@@ -17,14 +17,17 @@ export default function ProfileStats({
 
 }) {
 
-
     /*
     |--------------------------------------------------------------------------
     | Statistics
     |--------------------------------------------------------------------------
     */
 
-    const stats = profile?.statistics || {};
+    const stats =
+
+        profile?.statistics ||
+
+        {};
 
 
     const statistics = [
@@ -43,9 +46,16 @@ export default function ProfileStats({
 
             icon: FolderKanban,
 
-            iconClass:
+            iconClassName: `
+                bg-blue-50
+                text-blue-600
+                dark:bg-blue-950/40
+                dark:text-blue-400
+            `,
 
-                "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400",
+            accentClassName: `
+                bg-blue-500
+            `,
 
         },
 
@@ -63,9 +73,16 @@ export default function ProfileStats({
 
             icon: ListTodo,
 
-            iconClass:
+            iconClassName: `
+                bg-violet-50
+                text-violet-600
+                dark:bg-violet-950/40
+                dark:text-violet-400
+            `,
 
-                "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400",
+            accentClassName: `
+                bg-violet-500
+            `,
 
         },
 
@@ -83,9 +100,16 @@ export default function ProfileStats({
 
             icon: CheckCircle2,
 
-            iconClass:
+            iconClassName: `
+                bg-emerald-50
+                text-emerald-600
+                dark:bg-emerald-950/40
+                dark:text-emerald-400
+            `,
 
-                "bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400",
+            accentClassName: `
+                bg-emerald-500
+            `,
 
         },
 
@@ -99,13 +123,20 @@ export default function ProfileStats({
 
                 0,
 
-            description: "Tasks in progress",
+            description: "Tasks currently in progress",
 
             icon: CircleDashed,
 
-            iconClass:
+            iconClassName: `
+                bg-amber-50
+                text-amber-600
+                dark:bg-amber-950/40
+                dark:text-amber-400
+            `,
 
-                "bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400",
+            accentClassName: `
+                bg-amber-500
+            `,
 
         },
 
@@ -116,12 +147,19 @@ export default function ProfileStats({
 
         <section>
 
-            <div className="mb-4">
+            {/*
+            |--------------------------------------------------------------------------
+            | Section Heading
+            |--------------------------------------------------------------------------
+            */}
+
+            <div className="mb-5">
 
                 <h2
                     className="
-                        text-lg
-                        font-semibold
+                        text-xl
+                        font-bold
+                        tracking-tight
                         text-gray-900
                         dark:text-white
                     "
@@ -131,10 +169,12 @@ export default function ProfileStats({
 
                 </h2>
 
+
                 <p
                     className="
                         mt-1
                         text-sm
+                        leading-6
                         text-gray-500
                         dark:text-gray-400
                     "
@@ -147,103 +187,157 @@ export default function ProfileStats({
             </div>
 
 
+            {/*
+            |--------------------------------------------------------------------------
+            | Statistics Cards
+            |--------------------------------------------------------------------------
+            */}
+
             <div
                 className="
                     grid
+                    grid-cols-1
                     gap-4
                     sm:grid-cols-2
                     xl:grid-cols-4
                 "
             >
 
-                {
+                {statistics.map((statistic) => {
 
-                    statistics.map((statistic) => {
+                    const Icon =
 
-                        const Icon = statistic.icon;
+                        statistic.icon;
 
-                        return (
 
-                            <article
+                    return (
 
-                                key={statistic.title}
+                        <article
 
+                            key={statistic.title}
+
+                            className="
+                                group
+                                relative
+                                overflow-hidden
+                                rounded-2xl
+                                border
+                                border-gray-200
+                                bg-white
+                                p-5
+                                shadow-sm
+                                transition-all
+                                duration-200
+                                hover:-translate-y-1
+                                hover:shadow-lg
+                                dark:border-gray-800
+                                dark:bg-gray-900
+                            "
+
+                        >
+
+                            {/*
+                            |--------------------------------------------------------------------------
+                            | Accent
+                            |--------------------------------------------------------------------------
+                            */}
+
+                            <div
+                                className={`
+                                    absolute
+                                    left-0
+                                    top-0
+                                    h-full
+                                    w-1
+                                    ${statistic.accentClassName}
+                                `}
+                            />
+
+
+                            <div
                                 className="
-                                    rounded-2xl
-                                    border
-                                    border-gray-200
-                                    bg-white
-                                    p-5
-                                    shadow-sm
-                                    transition
-                                    hover:-translate-y-0.5
-                                    hover:shadow-md
-                                    dark:border-gray-700
-                                    dark:bg-gray-900
+                                    flex
+                                    items-start
+                                    justify-between
+                                    gap-4
                                 "
-
                             >
 
-                                <div
-                                    className="
-                                        flex
-                                        items-start
-                                        justify-between
-                                        gap-4
-                                    "
-                                >
+                                <div className="min-w-0">
 
-                                    <div>
-
-                                        <p
-                                            className="
-                                                text-sm
-                                                font-medium
-                                                text-gray-500
-                                                dark:text-gray-400
-                                            "
-                                        >
-
-                                            {statistic.title}
-
-                                        </p>
-
-                                        <p
-                                            className="
-                                                mt-2
-                                                text-3xl
-                                                font-bold
-                                                text-gray-900
-                                                dark:text-white
-                                            "
-                                        >
-
-                                            {statistic.value}
-
-                                        </p>
-
-                                    </div>
-
-
-                                    <div
-                                        className={`
-                                            rounded-xl
-                                            p-3
-                                            ${statistic.iconClass}
-                                        `}
+                                    <p
+                                        className="
+                                            text-sm
+                                            font-semibold
+                                            text-gray-500
+                                            dark:text-gray-400
+                                        "
                                     >
 
-                                        <Icon size={23} />
+                                        {statistic.title}
 
-                                    </div>
+                                    </p>
+
+
+                                    <p
+                                        className="
+                                            mt-2
+                                            text-3xl
+                                            font-bold
+                                            tracking-tight
+                                            text-gray-900
+                                            dark:text-white
+                                        "
+                                    >
+
+                                        {Number(
+
+                                            statistic.value
+
+                                        ).toLocaleString()}
+
+                                    </p>
 
                                 </div>
 
 
+                                <div
+                                    className={`
+                                        flex
+                                        h-12
+                                        w-12
+                                        shrink-0
+                                        items-center
+                                        justify-center
+                                        rounded-xl
+                                        transition-transform
+                                        duration-200
+                                        group-hover:scale-105
+                                        ${statistic.iconClassName}
+                                    `}
+                                >
+
+                                    <Icon size={22} />
+
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                className="
+                                    mt-5
+                                    border-t
+                                    border-gray-100
+                                    pt-4
+                                    dark:border-gray-800
+                                "
+                            >
+
                                 <p
                                     className="
-                                        mt-4
                                         text-xs
+                                        font-medium
                                         text-gray-400
                                         dark:text-gray-500
                                     "
@@ -253,13 +347,13 @@ export default function ProfileStats({
 
                                 </p>
 
-                            </article>
+                            </div>
 
-                        );
+                        </article>
 
-                    })
+                    );
 
-                }
+                })}
 
             </div>
 

@@ -1,4 +1,6 @@
+
 import ProjectCard from "./ProjectCard";
+
 
 export default function ProjectGrid({
 
@@ -13,53 +15,67 @@ export default function ProjectGrid({
 }) {
 
     if (!projects.length) {
+
         return null;
+
     }
+
 
     return (
 
         <div
+
+            role="list"
+
+            aria-label="Projects"
+
             className="
                 grid
-                gap-5
+                grid-cols-1
+                gap-6
                 sm:grid-cols-2
                 lg:grid-cols-3
-                xl:grid-cols-3
                 2xl:grid-cols-4
             "
+
         >
 
-            {
-                projects.map((project) => (
+            {projects.map((project) => (
 
-                    <div
-                        key={project._id}
-                        className="
-                            animate-in
-                            fade-in
-                            duration-300
-                        "
-                    >
+                <div
 
-                        <ProjectCard
+                    key={project._id}
 
-                            project={project}
+                    role="listitem"
 
-                            onEdit={onEdit}
+                    className="
+                        h-full
+                        animate-in
+                        fade-in
+                        duration-300
+                    "
 
-                            onDelete={onDelete}
+                >
 
-                            onManageMembers={onManageMembers}
+                    <ProjectCard
 
-                        />
+                        project={project}
 
-                    </div>
+                        onEdit={onEdit}
 
-                ))
-            }
+                        onDelete={onDelete}
+
+                        onManageMembers={onManageMembers}
+
+                    />
+
+                </div>
+
+            ))}
 
         </div>
 
     );
 
 }
+

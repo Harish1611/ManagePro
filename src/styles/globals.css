@@ -18,3 +18,17 @@ body {
     system-ui,
     sans-serif;
 }
+
+html {
+    color-scheme: light;
+}
+
+html.dark {
+    color-scheme: dark;
+}
+
+html.dark select,
+html.dark option {
+    background-color: #1f2937;
+    color: #f9fafb;
+}
