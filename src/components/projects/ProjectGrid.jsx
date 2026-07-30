@@ -1,16 +1,24 @@
 
 import ProjectCard from "./ProjectCard";
+import ProjectPagination from "./ProjectPagination";
 
 
 export default function ProjectGrid({
 
     projects = [],
 
+
     onEdit,
 
     onDelete,
 
     onManageMembers,
+
+    pagination,
+
+    filters,
+
+    setFilters,
 
 }) {
 
@@ -23,13 +31,15 @@ export default function ProjectGrid({
 
     return (
 
-        <div
+        <>
 
-            role="list"
+            <div
 
-            aria-label="Projects"
+                role="list"
 
-            className="
+                aria-label="Projects"
+
+                className="
                 grid
                 grid-cols-1
                 gap-6
@@ -38,42 +48,57 @@ export default function ProjectGrid({
                 2xl:grid-cols-4
             "
 
-        >
+            >
 
-            {projects.map((project) => (
+                {projects.map((project) => (
 
-                <div
+                    <div
 
-                    key={project._id}
+                        key={project._id}
 
-                    role="listitem"
+                        role="listitem"
 
-                    className="
+                        className="
                         h-full
                         animate-in
                         fade-in
                         duration-300
                     "
 
-                >
+                    >
 
-                    <ProjectCard
+                        <ProjectCard
 
-                        project={project}
+                            project={project}
 
-                        onEdit={onEdit}
+                            onEdit={onEdit}
 
-                        onDelete={onDelete}
+                            onDelete={onDelete}
 
-                        onManageMembers={onManageMembers}
+                            onManageMembers={onManageMembers}
 
-                    />
+                        />
 
-                </div>
+                    </div>
 
-            ))}
+                ))}
 
-        </div>
+
+
+
+            </div>
+
+            <ProjectPagination
+
+                pagination={pagination}
+
+                filters={filters}
+
+                setFilters={setFilters}
+
+            />
+
+        </>
 
     );
 

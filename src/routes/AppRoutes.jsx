@@ -19,75 +19,75 @@ import ProjectDetailsPage from "@/pages/projects/ProjectDetailsPage";
 
 
 export default function AppRoutes() {
-  return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-      <Route
-    path="/register"
-    element={<Register />}
-/>
+    return (
+        <Routes>
+            <Route path="/" element={<Login />} />
+            <Route
+                path="/register"
+                element={<Register />}
+            />
 
-     <Route element={<ProtectedRoute />}>
+            <Route element={<ProtectedRoute />}>
 
-    <Route element={<DashboardLayout />}>
+                <Route element={<DashboardLayout />}>
 
-        <Route
-            path="/dashboard"
-            element={<Dashboard />}
-        />
+                    <Route
+                        path="/dashboard"
+                        element={<Dashboard />}
+                    />
 
-        <Route
-            path="/projects"
-            element={<Projects />}
-        />
-           <Route
-        path="/projects/:projectId"
-        element={<ProjectDetailsPage />}
-    />
+                    <Route
+                        path="/projects"
+                        element={<Projects />}
+                    />
+                    <Route
+                        path="/projects/:projectId"
+                        element={<ProjectDetailsPage />}
+                    />
 
 
-        <Route
-            path="/tasks"
-            element={<Tasks />}
-        />
+                    <Route
+                        path="/tasks"
+                        element={<Tasks />}
+                    />
 
-        <Route
-            path="/teams"
-            element={<Teams />}
-        />
+                    <Route
+                        path="/teams"
+                        element={<Teams />}
+                    />
 
-        <Route
-    path="/team/:id"
-    element={<MemberProfile />}
-/>
+                    <Route
+                        path="/team/:id"
+                        element={<MemberProfile />}
+                    />
 
-      
 
-        <Route
-            path="/settings"
-            element={<Settings />}
-        />
 
-        <Route
-    path="/profile"
-    element={<Profile />}
-/>
+                    <Route
+                        path="/settings"
+                        element={<Settings />}
+                    />
 
- <Route
+                    <Route
+                        path="/profile"
+                        element={<Profile />}
+                    />
 
-    path="/kanban"
+                    <Route
 
-    element={<Kanban />}
+                        path="/kanban"
 
-/>
+                        element={<Kanban />}
 
-    </Route>
+                    />
 
-   
+                </Route>
 
-</Route>
 
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
+
+            </Route>
+
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+    );
 }

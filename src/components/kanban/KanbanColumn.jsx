@@ -151,6 +151,8 @@ export default function KanbanColumn({
 
     tasks = [],
 
+    onView,
+
     onEdit,
 
     onDelete,
@@ -461,15 +463,17 @@ export default function KanbanColumn({
 
                             <KanbanTaskCard
 
-                                key={task._id}
+    key={task._id}
 
-                                task={task}
+    task={task}
 
-                                onEdit={onEdit}
+    onView={onView}
 
-                                onDelete={onDelete}
+    onEdit={onEdit}
 
-                            />
+    onDelete={onDelete}
+
+/>
 
                         ))
 

@@ -72,7 +72,7 @@ export default function KanbanHeader({
             |--------------------------------------------------------------------------
             */}
 
-            <div
+            {/* <div
                 className="
                     flex
                     shrink-0
@@ -137,7 +137,7 @@ export default function KanbanHeader({
 
                 </button>
 
-            </div>
+            </div> */}
 
         </section>
 

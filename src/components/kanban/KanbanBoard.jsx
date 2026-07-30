@@ -54,6 +54,8 @@ import KanbanTaskCard from "./KanbanTaskCard";
 
 import TaskModal from "@/components/tasks/TaskModal";
 import DeleteTaskModal from "@/components/tasks/DeleteTaskModal";
+import useNotifications from "@/hooks/useNotifications";
+import TaskDetailsModal from "@/components/tasks/TaskDetailsModal";
 
 
 export default function KanbanBoard({
@@ -62,16 +64,21 @@ export default function KanbanBoard({
 
 }) {
 
-const {
+    const {
 
-    tasks = [],
+        tasks = [],
 
-    loading,
+        loading,
 
-    editTask,
+        editTask,
 
-} = useTasks();
+    } = useTasks();
 
+    const {
+
+        notify,
+
+    } = useNotifications();
 
     /*
     |--------------------------------------------------------------------------
@@ -106,29 +113,57 @@ const {
 
         useRef(null);
 
+/*
+|--------------------------------------------------------------------------
+| Task Details Modal
+|--------------------------------------------------------------------------
+*/
+
+const [
+
+    selectedTask,
+
+    setSelectedTask,
+
+] = useState(null);
+
+
+const [
+
+    detailsModalOpen,
+
+    setDetailsModalOpen,
+
+] = useState(false);
+
 
     /*
     |--------------------------------------------------------------------------
     | Task Modal
     |--------------------------------------------------------------------------
     */
+/*
+|--------------------------------------------------------------------------
+| Edit Task Modal
+|--------------------------------------------------------------------------
+*/
 
-    const [
+const [
 
-        editingTask,
+    editingTask,
 
-        setEditingTask,
+    setEditingTask,
 
-    ] = useState(null);
+] = useState(null);
 
 
-    const [
+const [
 
-        taskModalOpen,
+    taskModalOpen,
 
-        setTaskModalOpen,
+    setTaskModalOpen,
 
-    ] = useState(false);
+] = useState(false);
 
 
     /*
@@ -153,6 +188,53 @@ const {
         setDeleteModalOpen,
 
     ] = useState(false);
+
+
+    const handleViewTask = (task) => {
+
+    setSelectedTask(task);
+
+    setDetailsModalOpen(true);
+
+};
+
+
+const closeDetailsModal = () => {
+
+    setDetailsModalOpen(false);
+
+    setSelectedTask(null);
+
+};
+
+
+const handleEditTask = (task) => {
+
+    setEditingTask(task);
+
+    setTaskModalOpen(true);
+
+};
+
+
+const closeTaskModal = () => {
+
+    setTaskModalOpen(false);
+
+    setEditingTask(null);
+
+};
+
+
+    const openTaskModal = (task) => {
+
+        setSelectedTask(task);
+
+        setTaskModalOpen(true);
+
+    };
+
+
 
 
     /*
@@ -685,172 +767,189 @@ const {
     |--------------------------------------------------------------------------
     */
 
-const handleDragEnd = async ({
+    const handleDragEnd = async ({
 
-    active,
+        active,
 
-    over,
+        over,
 
-}) => {
+    }) => {
 
-    setActiveTask(null);
-
-
-    const activeId =
-
-        String(active.id);
+        setActiveTask(null);
 
 
-    if (!over) {
+        const activeId =
 
-        if (originalBoardRef.current) {
+            String(active.id);
 
-            setBoard(
 
-                originalBoardRef.current
+        if (!over) {
+
+            if (originalBoardRef.current) {
+
+                setBoard(
+
+                    originalBoardRef.current
+
+                );
+
+            }
+
+
+            originalBoardRef.current = null;
+
+            originalStatusRef.current = null;
+
+            return;
+
+        }
+
+
+        const previousStatus =
+
+            originalStatusRef.current;
+
+
+        const currentStatus =
+
+            findContainer(activeId);
+
+
+        if (
+
+            !previousStatus ||
+
+            !currentStatus
+
+        ) {
+
+            if (originalBoardRef.current) {
+
+                setBoard(
+
+                    originalBoardRef.current
+
+                );
+
+            }
+
+
+            originalBoardRef.current = null;
+
+            originalStatusRef.current = null;
+
+            return;
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Same Column Reordering
+        |--------------------------------------------------------------------------
+        */
+
+        if (previousStatus === currentStatus) {
+
+            originalBoardRef.current = null;
+
+            originalStatusRef.current = null;
+
+            return;
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update Task Status
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            const updatedTask = await editTask(
+
+                activeId,
+
+                {
+
+                    status: currentStatus,
+
+                }
 
             );
 
+
+            const movedTask =
+
+                findTask(activeId)?.task;
+
+
+            notify({
+
+                title: "Task Status Updated",
+
+                message: `${updatedTask?.title || movedTask?.title || "Task"} was moved to ${currentStatus}.`,
+
+                type: "success",
+
+                entityType: "task",
+
+                entityId:
+
+                    updatedTask?._id ||
+
+                    activeId,
+
+            });
+
         }
 
+        catch (error) {
 
-        originalBoardRef.current = null;
+            console.error(
 
-        originalStatusRef.current = null;
+                "Task status update error:",
 
-        return;
-
-    }
-
-
-    const previousStatus =
-
-        originalStatusRef.current;
-
-
-    const currentStatus =
-
-        findContainer(activeId);
-
-
-    if (
-
-        !previousStatus ||
-
-        !currentStatus
-
-    ) {
-
-        if (originalBoardRef.current) {
-
-            setBoard(
-
-                originalBoardRef.current
+                error
 
             );
 
-        }
+
+            const errorMessage =
+
+                error?.message ||
+
+                error?.response?.data?.message ||
+
+                "Failed to update task status.";
 
 
-        originalBoardRef.current = null;
-
-        originalStatusRef.current = null;
-
-        return;
-
-    }
+            toast.error(errorMessage);
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Same Column Reordering
-    |--------------------------------------------------------------------------
-    */
+            if (originalBoardRef.current) {
 
-    if (previousStatus === currentStatus) {
+                setBoard(
 
-        originalBoardRef.current = null;
+                    originalBoardRef.current
 
-        originalStatusRef.current = null;
+                );
 
-        return;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Update Task Status
-    |--------------------------------------------------------------------------
-    */
-
-   try {
-
-    await editTask(
-
-        activeId,
-
-        {
-
-            status: currentStatus,
+            }
 
         }
 
-    );
+        finally {
 
+            originalBoardRef.current = null;
 
-    toast.success(
+            originalStatusRef.current = null;
 
-        "Task status updated successfully."
+        }
 
-    );
-
-}
-
-catch (error) {
-
-    console.error(
-
-        "Task status update error:",
-
-        error
-
-    );
-
-
-    const errorMessage =
-
-        error?.message ||
-
-        error?.response?.data?.message ||
-
-        "Failed to update task status.";
-
-
-    toast.error(errorMessage);
-
-
-    if (originalBoardRef.current) {
-
-        setBoard(
-
-            originalBoardRef.current
-
-        );
-
-    }
-
-}
-
-finally {
-
-    originalBoardRef.current = null;
-
-    originalStatusRef.current = null;
-
-}
-
-};
+    };
 
 
     /*
@@ -882,28 +981,6 @@ finally {
     };
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Edit Task
-    |--------------------------------------------------------------------------
-    */
-
-    const handleEdit = (task) => {
-
-        setEditingTask(task);
-
-        setTaskModalOpen(true);
-
-    };
-
-
-    const closeTaskModal = () => {
-
-        setTaskModalOpen(false);
-
-        setEditingTask(null);
-
-    };
 
 
     /*
@@ -1026,15 +1103,17 @@ finally {
 
                                 <KanbanColumn
 
-                                    status={status}
+    status={status}
 
-                                    tasks={columnTasks}
+    tasks={board[status] || []}
 
-                                    onEdit={handleEdit}
+    onView={handleViewTask}
 
-                                    onDelete={handleDelete}
+    onEdit={handleEditTask}
 
-                                />
+    onDelete={handleDelete}
+
+/>
 
                             </SortableContext>
 
@@ -1074,17 +1153,37 @@ finally {
             </DndContext>
 
 
-            <TaskModal
+<TaskDetailsModal
 
-                open={taskModalOpen}
+    open={detailsModalOpen}
 
-                task={editingTask}
+    task={selectedTask}
 
-                loading={loading}
+    onClose={closeDetailsModal}
 
-                onClose={closeTaskModal}
+    onEdit={(task) => {
 
-            />
+        closeDetailsModal();
+
+        handleEditTask(task);
+
+    }}
+
+/>
+
+
+<TaskModal
+
+    open={taskModalOpen}
+
+    task={editingTask}
+
+    loading={loading}
+
+    onClose={closeTaskModal}
+
+/>
+
 
 
             <DeleteTaskModal
@@ -1096,6 +1195,8 @@ finally {
                 onClose={closeDeleteModal}
 
             />
+
+            
 
         </>
 

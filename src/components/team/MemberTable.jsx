@@ -5,104 +5,200 @@ import {
     FiClock,
 } from "react-icons/fi";
 
-function Avatar({ member }) {
-    if (member.avatar) {
+import {
+
+    useEffect,
+
+    useMemo,
+
+    useState,
+
+} from "react";
+
+
+function Avatar({
+
+    member,
+
+}) {
+
+    const [
+
+        imageError,
+
+        setImageError,
+
+    ] = useState(false);
+
+
+    const avatarPath =
+
+        member?.avatar ||
+
+        member?.profileImage ||
+
+        member?.profilePicture ||
+
+        member?.image ||
+
+        "";
+
+
+    const avatarUrl = useMemo(() => {
+
+        if (!avatarPath) {
+
+            return "";
+
+        }
+
+
+        if (
+
+            avatarPath.startsWith("http://") ||
+
+            avatarPath.startsWith("https://") ||
+
+            avatarPath.startsWith("data:") ||
+
+            avatarPath.startsWith("blob:")
+
+        ) {
+
+            return avatarPath;
+
+        }
+
+
+        const apiUrl =
+
+            import.meta.env.VITE_API_URL ||
+
+            "http://localhost:8000/api";
+
+
+        const backendUrl =
+
+            apiUrl
+
+                .replace(/\/api\/?$/, "")
+
+                .replace(/\/$/, "");
+
+
+        const normalizedPath =
+
+            avatarPath.replace(/^\/+/, "");
+
+
+        return `${backendUrl}/${normalizedPath}`;
+
+    }, [
+
+        avatarPath,
+
+    ]);
+
+
+    useEffect(() => {
+
+        setImageError(false);
+
+    }, [
+
+        avatarUrl,
+
+    ]);
+
+
+    const initial =
+
+        member?.name
+            ?.trim()
+            ?.charAt(0)
+            ?.toUpperCase() ||
+
+        "?";
+
+
+    if (
+
+        avatarUrl &&
+
+        !imageError
+
+    ) {
+
         return (
+
             <img
-                src={member.avatar}
-                alt={member.name}
+
+                src={avatarUrl}
+
+                alt={member?.name || "Member"}
+
+                onError={() => {
+
+                    setImageError(true);
+
+                }}
+
+                loading="lazy"
+
+                referrerPolicy="no-referrer"
+
                 className="
-                    h-11
-                    w-11
+                    h-12
+                    w-12
+                    shrink-0
                     rounded-full
+                    border
+                    border-gray-200
+                    bg-gray-100
                     object-cover
                     ring-2
-                    ring-gray-200
+                    ring-gray-100
+                    dark:border-gray-700
+                    dark:bg-slate-800
                     dark:ring-gray-700
                 "
+
             />
+
         );
+
     }
 
+
     return (
+
         <div
             className="
                 flex
-                h-11
-                w-11
+                h-12
+                w-12
+                shrink-0
                 items-center
                 justify-center
                 rounded-full
                 bg-gradient-to-br
-                from-blue-500
-                to-indigo-600
-                text-sm
+                from-indigo-500
+                to-violet-600
+                text-lg
                 font-bold
                 text-white
             "
         >
-            {member.name?.charAt(0)?.toUpperCase()}
+
+            {initial}
+
         </div>
+
     );
+
 }
 
-function StatusBadge({ active }) {
-    return (
-        <span
-            className={`
-                inline-flex
-                items-center
-                rounded-full
-                px-3
-                py-1
-                text-xs
-                font-semibold
-                ${
-                    active
-                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                        : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                }
-            `}
-        >
-            <span
-                className={`
-                    mr-2
-                    h-2
-                    w-2
-                    rounded-full
-                    ${
-                        active
-                            ? "bg-green-500"
-                            : "bg-red-500"
-                    }
-                `}
-            />
 
-            {active ? "Active" : "Inactive"}
-        </span>
-    );
-}
-
-function RoleBadge({ role }) {
-    return (
-        <span
-            className="
-                inline-flex
-                rounded-full
-                bg-blue-100
-                px-3
-                py-1
-                text-xs
-                font-semibold
-                text-blue-700
-                dark:bg-blue-900/30
-                dark:text-blue-300
-            "
-        >
-            {role}
-        </span>
-    );
-}
 
 export default function MemberTable({
     members = [],
@@ -294,46 +390,7 @@ export default function MemberTable({
 
                                     <div className="flex items-center gap-4">
 
-                                        {member.avatar ? (
-
-                                            <img
-                                                src={member.avatar}
-                                                alt={member.name}
-                                                className="
-                                                    h-12
-                                                    w-12
-                                                    rounded-full
-                                                    object-cover
-                                                    ring-2
-                                                    ring-gray-100
-                                                    dark:ring-gray-700
-                                                "
-                                            />
-
-                                        ) : (
-
-                                            <div className="
-                                                flex
-                                                h-12
-                                                w-12
-                                                items-center
-                                                justify-center
-                                                rounded-full
-                                                bg-gradient-to-br
-                                                from-blue-500
-                                                to-indigo-600
-                                                text-lg
-                                                font-bold
-                                                text-white
-                                            ">
-
-                                                {member.name
-                                                    ?.charAt(0)
-                                                    .toUpperCase()}
-
-                                            </div>
-
-                                        )}
+                                       <Avatar member={member} />
 
                                         <div>
 

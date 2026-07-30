@@ -44,6 +44,8 @@ export default function KanbanTaskCard({
 
     onEdit,
 
+    onView,
+
     onDelete,
 
     overlay = false,
@@ -553,30 +555,23 @@ export default function KanbanTaskCard({
 
                         <KanbanTaskMenu
 
-                            onView={() =>
+                          onView={() => {
 
-                                navigate(
+        onView?.(task);
 
-                                    `/tasks/${task._id}`
+    }}
 
-                                )
+    onEdit={() => {
 
-                            }
+        onEdit?.(task);
 
-                            onEdit={() =>
+    }}
 
-                                onEdit?.(task)
+    onDelete={() => {
 
-                            }
+        onDelete?.(task);
 
-                            onDelete={() =>
-
-                                onDelete?.(task)
-
-                            }
-
-                        />
-
+    }} />
                     </div>
 
                 )}
@@ -590,34 +585,31 @@ export default function KanbanTaskCard({
             |--------------------------------------------------------------------------
             */}
 
-            <button
+          <button
 
-                type="button"
+    type="button"
 
-                onClick={() => {
+    onClick={() => {
 
-                    if (!overlay) {
+        if (!overlay) {
 
-                        navigate(
+            onView?.(task);
 
-                            `/tasks/${task._id}`
+        }
 
-                        );
+    }}
 
-                    }
+    className="
+        block
+        w-full
+        cursor-pointer
+        text-left
+        focus:outline-none
+    "
 
-                }}
+    tabIndex={overlay ? -1 : 0}
 
-                className="
-                    block
-                    w-full
-                    text-left
-                    focus:outline-none
-                "
-
-                tabIndex={overlay ? -1 : 0}
-
-            >
+>
 
                 <h3
 

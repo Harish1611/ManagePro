@@ -26,6 +26,18 @@ import {
 
 import toast from "react-hot-toast";
 
+import {
+
+    useDispatch,
+
+} from "react-redux";
+
+import {
+
+    updateAuthUser,
+
+} from "@/redux/slices/authSlice";
+
 import useProfile from "@/hooks/useProfile";
 
 import useNotifications from "@/hooks/useNotifications";
@@ -63,6 +75,7 @@ export default function AvatarUploader({
 
     const fileInputRef = useRef(null);
 
+    const dispatch = useDispatch();
 
     const {
 
@@ -284,121 +297,174 @@ export default function AvatarUploader({
     };
 
 
-    const handleUpload = async () => {
+   const handleUpload = async () => {
 
-        if (!selectedFile) {
+    if (!selectedFile) {
 
-            toast.error(
+        toast.error(
 
-                "Please select an image."
+            "Please select an image."
 
-            );
+        );
 
-            return;
+        return;
 
-        }
-
-
-        try {
-
-            const updatedProfile = await uploadProfileAvatar(
-
-                selectedFile,
-
-                setUploadProgress
-
-            ).unwrap();
+    }
 
 
-            notify({
+    try {
 
-                title: "Profile Picture Updated",
+        const response = await uploadProfileAvatar(
 
-                message: "Your profile picture was updated successfully.",
+            selectedFile,
 
-                type: "success",
+            setUploadProgress
 
-                entityType: "profile",
-
-                entityId:
-
-                    updatedProfile?._id ||
-
-                    profile?._id,
-
-            });
+        ).unwrap();
 
 
-            clearSelection();
+        const updatedProfile =
 
-        } catch (error) {
+            response?.data?.user ||
 
-            toast.error(
+            response?.data?.profile ||
 
-                getErrorMessage(
+            response?.user ||
 
-                    error
+            response?.profile ||
 
-                )
+            response?.data ||
 
-            );
-
-        }
-
-    };
+            response;
 
 
-    const handleRemove = async () => {
+        dispatch(
 
-        if (!profile?.avatar) {
+            updateAuthUser({
 
-            return;
+                ...updatedProfile,
 
-        }
+                avatarVersion: Date.now(),
 
+            })
 
-        try {
-
-            const updatedProfile = await removeProfileAvatar().unwrap();
-
-
-            notify({
-
-                title: "Profile Picture Removed",
-
-                message: "Your profile picture was removed successfully.",
-
-                type: "success",
-
-                entityType: "profile",
-
-                entityId:
-
-                    updatedProfile?._id ||
-
-                    profile?._id,
-
-            });
+        );
 
 
-            clearSelection();
+        notify({
 
-        } catch (error) {
+            title: "Profile Picture Updated",
 
-            toast.error(
+            message: "Your profile picture was updated successfully.",
 
-                getErrorMessage(
+            type: "success",
 
-                    error
+            entityType: "profile",
 
-                )
+            entityId:
 
-            );
+                updatedProfile?._id ||
 
-        }
+                profile?._id,
 
-    };
+        });
 
+
+        clearSelection();
+
+    }
+
+    catch (error) {
+
+        toast.error(
+
+            getErrorMessage(error)
+
+        );
+
+    }
+
+};
+
+
+   const handleRemove = async () => {
+
+    if (!profile?.avatar) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const response = await removeProfileAvatar().unwrap();
+
+
+        const updatedProfile =
+
+            response?.data?.user ||
+
+            response?.data?.profile ||
+
+            response?.user ||
+
+            response?.profile ||
+
+            response?.data ||
+
+            response;
+
+
+        dispatch(
+
+            updateAuthUser({
+
+                ...updatedProfile,
+
+                avatar: null,
+
+                avatarVersion: Date.now(),
+
+            })
+
+        );
+
+
+        notify({
+
+            title: "Profile Picture Removed",
+
+            message: "Your profile picture was removed successfully.",
+
+            type: "success",
+
+            entityType: "profile",
+
+            entityId:
+
+                updatedProfile?._id ||
+
+                profile?._id,
+
+        });
+
+
+        clearSelection();
+
+    }
+
+    catch (error) {
+
+        toast.error(
+
+            getErrorMessage(error)
+
+        );
+
+    }
+
+};
 
     const busy =
 

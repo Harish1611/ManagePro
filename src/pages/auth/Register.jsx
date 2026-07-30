@@ -1,36 +1,77 @@
-import { useForm } from "react-hook-form";
+import {
 
-import { yupResolver } from "@hookform/resolvers/yup";
+    useForm,
+
+} from "react-hook-form";
 
 import {
 
-    registerSchema
+    yupResolver,
 
-} from "@/validation/authValidation";
+} from "@hookform/resolvers/yup";
 
-import AuthLayout from "@/components/auth/AuthLayout";
+import {
 
-import AuthInput from "@/components/auth/AuthInput";
+    useDispatch,
 
-import PasswordInput from "@/components/auth/PasswordInput";
+    useSelector,
+
+} from "react-redux";
+
+import {
+
+    useNavigate,
+
+} from "react-router-dom";
+
+import {
+
+    LoaderCircle,
+
+    UserPlus,
+
+} from "lucide-react";
 
 import toast from "react-hot-toast";
 
-import { useDispatch, useSelector } from "react-redux";
+import AuthLayout from "@/components/auth/AuthLayout";
+import AuthInput from "@/components/auth/AuthInput";
+import PasswordInput from "@/components/auth/PasswordInput";
 
-import { register as registerUser } from "@/redux/slices/authSlice";
+import {
 
-import { useNavigate } from "react-router-dom";
+    register as registerUser,
+
+} from "@/redux/slices/authSlice";
+
+import {
+
+    registerSchema,
+
+} from "@/validation/authValidation";
+
 
 export default function Register() {
 
-    const dispatch = useDispatch();
+    const dispatch =
 
-const navigate = useNavigate();
+        useDispatch();
 
-const { loading } = useSelector(
-    state => state.auth
-);
+
+    const navigate =
+
+        useNavigate();
+
+
+    const {
+
+        loading,
+
+    } = useSelector(
+
+        (state) => state.auth
+
+    );
 
 
     const {
@@ -39,26 +80,107 @@ const { loading } = useSelector(
 
         handleSubmit,
 
-        formState: { errors }
+        formState: {
+
+            errors,
+
+        },
 
     } = useForm({
 
-        resolver: yupResolver(registerSchema)
+        resolver:
+
+            yupResolver(registerSchema),
+
+        defaultValues: {
+
+            name: "",
+
+            email: "",
+
+            phone: "",
+
+            password: "",
+
+            confirmPassword: "",
+
+        },
 
     });
 
-const onSubmit = async (data) => {
-    delete data.confirmPassword;
 
-    const result = await dispatch(registerUser(data));
+    /*
+    |--------------------------------------------------------------------------
+    | Submit
+    |--------------------------------------------------------------------------
+    */
 
-    if (registerUser.fulfilled.match(result)) {
-        toast.success("Registration Successful");
-        navigate("/"); // Login page
-    } else {
-        toast.error(result.payload);
-    }
-};
+    const onSubmit = async (data) => {
+
+        try {
+
+            const {
+
+                confirmPassword,
+
+                ...registrationData
+
+            } = data;
+
+
+            await dispatch(
+
+                registerUser(
+
+                    registrationData
+
+                )
+
+            ).unwrap();
+
+
+            toast.success(
+
+                "Registration successful. Please sign in."
+
+            );
+
+
+            navigate(
+
+                "/",
+
+                {
+
+                    replace: true,
+
+                }
+
+            );
+
+        }
+
+        catch (error) {
+
+            const errorMessage =
+
+                typeof error === "string"
+
+                    ? error
+
+                    : error?.message ||
+
+                      error?.response?.data?.message ||
+
+                      "Unable to create your account. Please try again.";
+
+
+            toast.error(errorMessage);
+
+        }
+
+    };
+
 
     return (
 
@@ -66,23 +188,37 @@ const onSubmit = async (data) => {
 
             title="Create Account"
 
-            subtitle="Register to get started"
+            subtitle="Create your account to get started"
 
             footerText="Already have an account?"
 
             footerLink="/"
 
-            footerLabel="Login"
+            footerLabel="Sign In"
 
         >
 
             <form
+
                 onSubmit={handleSubmit(onSubmit)}
+
+                className="space-y-5"
+
+                noValidate
+
             >
 
                 <AuthInput
 
-                    label="Name"
+                    label="Full Name"
+
+                    type="text"
+
+                    placeholder="Enter your full name"
+
+                    autoComplete="name"
+
+                    disabled={loading}
 
                     error={errors.name}
 
@@ -90,11 +226,18 @@ const onSubmit = async (data) => {
 
                 />
 
+
                 <AuthInput
 
-                    label="Email"
+                    label="Email Address"
 
                     type="email"
+
+                    placeholder="Enter your email address"
+
+                    autoComplete="email"
+
+                    disabled={loading}
 
                     error={errors.email}
 
@@ -102,15 +245,25 @@ const onSubmit = async (data) => {
 
                 />
 
+
                 <AuthInput
 
-                    label="Phone"
+                    label="Phone Number"
+
+                    type="tel"
+
+                    placeholder="Enter your phone number"
+
+                    autoComplete="tel"
+
+                    disabled={loading}
 
                     error={errors.phone}
 
                     {...register("phone")}
 
                 />
+
 
                 <PasswordInput
 
@@ -120,9 +273,14 @@ const onSubmit = async (data) => {
 
                     label="Password"
 
+                    autoComplete="new-password"
+
+                    disabled={loading}
+
                     error={errors.password}
 
                 />
+
 
                 <PasswordInput
 
@@ -132,19 +290,88 @@ const onSubmit = async (data) => {
 
                     label="Confirm Password"
 
+                    autoComplete="new-password"
+
+                    disabled={loading}
+
                     error={errors.confirmPassword}
 
                 />
 
-               
 
-<button
-    type="submit"
-    disabled={loading}
-    className="w-full rounded-lg bg-blue-600 py-3 text-white disabled:cursor-not-allowed disabled:opacity-60"
->
-    {loading ? "Registering..." : "Register"}
-</button>
+                <button
+
+                    type="submit"
+
+                    disabled={loading}
+
+                    className="
+                        inline-flex
+                        w-full
+                        cursor-pointer
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-xl
+                        bg-indigo-600
+                        px-5
+                        py-3
+                        text-sm
+                        font-semibold
+                        text-white
+                        shadow-sm
+                        transition-all
+                        duration-200
+                        hover:bg-indigo-700
+                        hover:shadow-md
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-indigo-500/30
+                        disabled:cursor-not-allowed
+                        disabled:opacity-60
+                        dark:bg-indigo-500
+                        dark:hover:bg-indigo-600
+                    "
+
+                >
+
+                    {loading ? (
+
+                        <>
+
+                            <LoaderCircle
+
+                                size={18}
+
+                                className="animate-spin"
+
+                                aria-hidden="true"
+
+                            />
+
+                            Creating Account...
+
+                        </>
+
+                    ) : (
+
+                        <>
+
+                            <UserPlus
+
+                                size={18}
+
+                                aria-hidden="true"
+
+                            />
+
+                            Create Account
+
+                        </>
+
+                    )}
+
+                </button>
 
             </form>
 

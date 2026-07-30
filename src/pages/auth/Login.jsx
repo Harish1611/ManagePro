@@ -1,37 +1,78 @@
-import { useForm } from "react-hook-form";
+import {
 
-import { yupResolver } from "@hookform/resolvers/yup";
+    useForm,
+
+} from "react-hook-form";
 
 import {
 
-    loginSchema
+    yupResolver,
 
-} from "@/validation/authValidation";
+} from "@hookform/resolvers/yup";
 
-import AuthLayout from "@/components/auth/AuthLayout";
+import {
 
-import AuthInput from "@/components/auth/AuthInput";
+    useDispatch,
 
-import PasswordInput from "@/components/auth/PasswordInput";
+    useSelector,
 
-import { useDispatch, useSelector } from "react-redux";
+} from "react-redux";
 
-import { login } from "@/redux/slices/authSlice";
+import {
 
-import { useNavigate } from "react-router-dom";
+    useNavigate,
+
+} from "react-router-dom";
+
+import {
+
+    LoaderCircle,
+
+    LogIn,
+
+} from "lucide-react";
 
 import toast from "react-hot-toast";
+
+import AuthLayout from "@/components/auth/AuthLayout";
+import AuthInput from "@/components/auth/AuthInput";
+import PasswordInput from "@/components/auth/PasswordInput";
+
+import {
+
+    login,
+
+} from "@/redux/slices/authSlice";
+
+import {
+
+    loginSchema,
+
+} from "@/validation/authValidation";
 
 
 export default function Login() {
 
-  const dispatch = useDispatch();
+    const dispatch =
 
-const navigate = useNavigate();
+        useDispatch();
 
-const { loading } = useSelector(
-    state => state.auth
-);
+
+    const navigate =
+
+        useNavigate();
+
+
+    const {
+
+        loading,
+
+    } = useSelector(
+
+        (state) => state.auth
+
+    );
+
 
     const {
 
@@ -39,35 +80,88 @@ const { loading } = useSelector(
 
         handleSubmit,
 
-        formState: { errors }
+        formState: {
+
+            errors,
+
+        },
 
     } = useForm({
 
-        resolver: yupResolver(loginSchema)
+        resolver:
+
+            yupResolver(loginSchema),
+
+        defaultValues: {
+
+            email: "",
+
+            password: "",
+
+        },
 
     });
 
-const onSubmit = async (data) => {
 
-    const result = await dispatch(
-        login(data)
-    );
+    /*
+    |--------------------------------------------------------------------------
+    | Submit
+    |--------------------------------------------------------------------------
+    */
 
-    if (login.fulfilled.match(result)) {
+    const onSubmit = async (data) => {
 
-        toast.success("Login Successful");
+        try {
 
-        navigate("/dashboard");
+            await dispatch(
 
-    }
+                login(data)
 
-    else {
+            ).unwrap();
 
-        toast.error(result.payload);
 
-    }
+            toast.success(
 
-};
+                "Login successful."
+
+            );
+
+
+            navigate(
+
+                "/dashboard",
+
+                {
+
+                    replace: true,
+
+                }
+
+            );
+
+        }
+
+        catch (error) {
+
+            const errorMessage =
+
+                typeof error === "string"
+
+                    ? error
+
+                    : error?.message ||
+
+                      error?.response?.data?.message ||
+
+                      "Unable to login. Please check your credentials.";
+
+
+            toast.error(errorMessage);
+
+        }
+
+    };
+
 
     return (
 
@@ -75,33 +169,44 @@ const onSubmit = async (data) => {
 
             title="Welcome Back"
 
-            subtitle="Login to continue"
+            subtitle="Sign in to continue to your workspace"
 
             footerText="Don't have an account?"
 
             footerLink="/register"
 
-            footerLabel="Register"
+            footerLabel="Create account"
 
         >
 
             <form
+
                 onSubmit={handleSubmit(onSubmit)}
+
+                className="space-y-5"
+
+                noValidate
+
             >
 
                 <AuthInput
 
-                    label="Email"
+                    label="Email Address"
 
                     type="email"
 
-                    placeholder="Enter email"
+                    placeholder="Enter your email address"
+
+                    autoComplete="email"
+
+                    disabled={loading}
 
                     error={errors.email}
 
                     {...register("email")}
 
                 />
+
 
                 <PasswordInput
 
@@ -111,19 +216,88 @@ const onSubmit = async (data) => {
 
                     label="Password"
 
+                    autoComplete="current-password"
+
+                    disabled={loading}
+
                     error={errors.password}
 
                 />
 
+
                 <button
-    className="w-full rounded-lg bg-blue-600 py-3 text-white"
->
 
-    {loading
-        ? "Signing In..."
-        : "Login"}
+                    type="submit"
 
-</button>
+                    disabled={loading}
+
+                    className="
+                        inline-flex
+                        w-full
+                        cursor-pointer
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-xl
+                        bg-indigo-600
+                        px-5
+                        py-3
+                        text-sm
+                        font-semibold
+                        text-white
+                        shadow-sm
+                        transition-all
+                        duration-200
+                        hover:bg-indigo-700
+                        hover:shadow-md
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-indigo-500/30
+                        disabled:cursor-not-allowed
+                        disabled:opacity-60
+                        dark:bg-indigo-500
+                        dark:hover:bg-indigo-600
+                    "
+
+                >
+
+                    {loading ? (
+
+                        <>
+
+                            <LoaderCircle
+
+                                size={18}
+
+                                className="animate-spin"
+
+                                aria-hidden="true"
+
+                            />
+
+                            Signing In...
+
+                        </>
+
+                    ) : (
+
+                        <>
+
+                            <LogIn
+
+                                size={18}
+
+                                aria-hidden="true"
+
+                            />
+
+                            Sign In
+
+                        </>
+
+                    )}
+
+                </button>
 
             </form>
 
